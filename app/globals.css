@@ -1,0 +1,506 @@
+/*
+ * Written for someone in their seventies holding a phone, possibly frightened,
+ * possibly with a tremor and reading glasses. That drives every number here:
+ * a 20px base rather than 16, touch targets well over the 44px minimum, spacing
+ * generous enough that nothing is tapped by accident, and contrast kept high
+ * rather than fashionable.
+ */
+
+:root {
+	--ink: #16181d;
+	--ink-soft: #4a4f5a;
+	--page: #f7f7f5;
+	--card: #ffffff;
+	--edge: #d8d8d4;
+
+	--scam: #a4131a;
+	--scam-wash: #fdeced;
+	--warning: #8a5200;
+	--warning-wash: #fdf2e2;
+	--unclear: #23508c;
+	--unclear-wash: #eaf0f8;
+
+	--radius: 14px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	/* The one place a percentage is right: it respects the reader's own browser
+	   text-size setting instead of overriding it. */
+	font-size: 125%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background: var(--page);
+	color: var(--ink);
+	font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+	font-size: 1rem;
+	line-height: 1.55;
+	-webkit-text-size-adjust: 100%;
+}
+
+.page {
+	max-width: 40rem;
+	margin: 0 auto;
+	padding: 1.5rem 1.1rem 5rem;
+}
+
+.masthead h1 {
+	font-size: 2rem;
+	line-height: 1.15;
+	margin: 0.4rem 0 0.5rem;
+	letter-spacing: -0.01em;
+}
+
+.masthead p {
+	margin: 0 0 1.6rem;
+	color: var(--ink-soft);
+	font-size: 1.05rem;
+}
+
+label {
+	display: block;
+	font-weight: 700;
+	font-size: 1.1rem;
+	margin-bottom: 0.6rem;
+}
+
+.hint {
+	font-weight: 400;
+	color: var(--ink-soft);
+	font-size: 0.95rem;
+	margin: -0.3rem 0 0.7rem;
+}
+
+textarea {
+	width: 100%;
+	min-height: 9rem;
+	padding: 0.9rem 1rem;
+	font: inherit;
+	line-height: 1.5;
+	color: var(--ink);
+	background: var(--card);
+	border: 2px solid var(--edge);
+	border-radius: var(--radius);
+	resize: vertical;
+}
+
+textarea:focus-visible,
+button:focus-visible {
+	outline: 3px solid var(--unclear);
+	outline-offset: 2px;
+}
+
+button {
+	display: block;
+	width: 100%;
+	margin-top: 1rem;
+	padding: 1.05rem 1.2rem;
+	font: inherit;
+	font-size: 1.2rem;
+	font-weight: 700;
+	color: #fff;
+	background: #1c2430;
+	border: none;
+	border-radius: var(--radius);
+	cursor: pointer;
+	min-height: 3.4rem;
+}
+
+button:hover:not(:disabled) {
+	background: #2b3646;
+}
+
+button:disabled {
+	background: #6b7280;
+	cursor: default;
+}
+
+/* --- The answer ------------------------------------------------------- */
+
+.verdict {
+	margin-top: 2rem;
+	border: 2px solid var(--edge);
+	border-left-width: 10px;
+	border-radius: var(--radius);
+	background: var(--card);
+	padding: 1.3rem 1.2rem;
+}
+
+.verdict.scam {
+	border-color: var(--scam);
+	background: var(--scam-wash);
+}
+.verdict.warning {
+	border-color: var(--warning);
+	background: var(--warning-wash);
+}
+.verdict.unclear {
+	border-color: var(--unclear);
+	background: var(--unclear-wash);
+}
+
+.verdict h2 {
+	margin: 0;
+	font-size: 1.5rem;
+	line-height: 1.25;
+}
+
+.verdict.scam h2 {
+	color: var(--scam);
+}
+.verdict.warning h2 {
+	color: var(--warning);
+}
+.verdict.unclear h2 {
+	color: var(--unclear);
+}
+
+.reasons {
+	margin: 1.1rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.reasons li {
+	padding: 0.85rem 0 0.85rem 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.12);
+	font-size: 1.05rem;
+}
+
+.panel {
+	margin-top: 1.1rem;
+	padding: 1rem 1.05rem;
+	background: var(--card);
+	border: 2px solid var(--edge);
+	border-radius: var(--radius);
+	font-size: 1.05rem;
+}
+
+.panel strong {
+	display: block;
+	margin-bottom: 0.35rem;
+}
+
+.disclaimer {
+	margin-top: 1.1rem;
+	color: var(--ink-soft);
+	font-size: 0.95rem;
+}
+
+.error {
+	margin-top: 1.5rem;
+	padding: 1rem;
+	border: 2px solid var(--scam);
+	border-radius: var(--radius);
+	background: var(--scam-wash);
+	color: var(--scam);
+	font-weight: 600;
+}
+
+.examples {
+	margin-top: 2.5rem;
+	border-top: 1px solid var(--edge);
+	padding-top: 1.2rem;
+}
+
+.examples h3 {
+	font-size: 1rem;
+	color: var(--ink-soft);
+	margin: 0 0 0.7rem;
+	font-weight: 600;
+}
+
+.examples button {
+	width: 100%;
+	text-align: left;
+	margin: 0 0 0.55rem;
+	padding: 0.75rem 0.9rem;
+	font-size: 0.95rem;
+	font-weight: 400;
+	color: var(--ink);
+	background: var(--card);
+	border: 1px solid var(--edge);
+	min-height: 0;
+}
+
+.examples button:hover:not(:disabled) {
+	background: #eeeeec;
+}
+
+.colophon {
+	margin-top: 2.5rem;
+	border-top: 1px solid var(--edge);
+	padding-top: 1.2rem;
+	color: var(--ink-soft);
+	font-size: 0.9rem;
+}
+
+.colophon a {
+	color: var(--unclear);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--ink: #f2f3f5;
+		--ink-soft: #b3b8c2;
+		--page: #14161a;
+		--card: #1e2128;
+		--edge: #3a3f4a;
+
+		--scam: #ff8f93;
+		--scam-wash: #2e1416;
+		--warning: #f0b866;
+		--warning-wash: #2c2011;
+		--unclear: #9dc0ee;
+		--unclear-wash: #151f2e;
+	}
+
+	button {
+		background: #e8eaee;
+		color: #14161a;
+	}
+	button:hover:not(:disabled) {
+		background: #ffffff;
+	}
+	.examples button {
+		background: var(--card);
+		color: var(--ink);
+	}
+	.reasons li {
+		border-top-color: rgba(255, 255, 255, 0.14);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.verdict {
+		animation: settle 0.18s ease-out;
+	}
+	@keyframes settle {
+		from {
+			opacity: 0;
+			transform: translateY(4px);
+		}
+	}
+}
+
+/* --- The trusted person ------------------------------------------------ */
+
+.trusted {
+	margin-top: 2rem;
+	padding: 1rem 1.05rem;
+	background: var(--card);
+	border: 2px solid var(--edge);
+	border-radius: var(--radius);
+}
+
+.trusted p {
+	margin: 0 0 0.7rem;
+	font-size: 1.02rem;
+}
+
+.trusted input {
+	width: 100%;
+	padding: 0.8rem 0.9rem;
+	margin-bottom: 0.9rem;
+	font: inherit;
+	color: var(--ink);
+	background: var(--page);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	min-height: 3rem;
+}
+
+.trusted input:focus-visible {
+	outline: 3px solid var(--unclear);
+	outline-offset: 2px;
+}
+
+.trusted-actions {
+	display: flex;
+	gap: 1.1rem;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.trusted-actions button[type="submit"] {
+	width: auto;
+	margin-top: 0;
+	padding: 0.8rem 1.6rem;
+	font-size: 1.05rem;
+}
+
+/* A text button for the secondary choices, so only one thing on screen looks
+   like the main action. */
+button.link {
+	width: auto;
+	margin: 0;
+	padding: 0.5rem 0;
+	min-height: 0;
+	background: none;
+	color: var(--unclear);
+	font-size: 1rem;
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+button.link:hover:not(:disabled) {
+	background: none;
+	color: var(--ink);
+}
+
+/* The ask button is a link, not a button, because the phone opens it. */
+a.ask {
+	display: block;
+	margin-top: 0.9rem;
+	padding: 1rem 1.2rem;
+	text-align: center;
+	font-size: 1.15rem;
+	font-weight: 700;
+	text-decoration: none;
+	color: var(--ink);
+	background: var(--card);
+	border: 2px solid currentColor;
+	border-radius: var(--radius);
+	min-height: 3.4rem;
+}
+
+a.ask.primary {
+	color: #fff;
+	background: #1c2430;
+	border-color: #1c2430;
+}
+
+@media (prefers-color-scheme: dark) {
+	a.ask.primary {
+		color: #14161a;
+		background: #e8eaee;
+		border-color: #e8eaee;
+	}
+}
+
+/* --- The scam library --------------------------------------------------- */
+
+.back {
+	margin: 0 0 0.4rem;
+	font-size: 1rem;
+}
+
+.back a,
+.contents a,
+.source a {
+	color: var(--unclear);
+}
+
+.contents {
+	margin: 0 0 1rem;
+	padding: 1rem 1.05rem;
+	background: var(--card);
+	border: 2px solid var(--edge);
+	border-radius: var(--radius);
+}
+
+.contents ol {
+	margin: 0;
+	padding-left: 1.4rem;
+}
+
+.contents li {
+	padding: 0.3rem 0;
+	font-size: 1.02rem;
+}
+
+.scam {
+	margin-top: 2.2rem;
+	padding-top: 1.6rem;
+	border-top: 2px solid var(--edge);
+	/* So a jump from the contents list does not land the heading under the top
+	   edge of the screen. */
+	scroll-margin-top: 1rem;
+}
+
+.scam h2 {
+	font-size: 1.4rem;
+	line-height: 1.25;
+	margin: 0 0 0.6rem;
+}
+
+.scam h3 {
+	font-size: 0.95rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--ink-soft);
+	margin: 1.4rem 0 0.4rem;
+}
+
+.scam p {
+	margin: 0;
+	font-size: 1.05rem;
+}
+
+.scam .summary {
+	font-size: 1.12rem;
+	font-weight: 600;
+}
+
+/* The action is the part worth finding again in a hurry, so it is the only
+   thing on the page with a box around it. */
+.scam .do {
+	padding: 0.9rem 1rem;
+	background: var(--unclear-wash);
+	border-left: 6px solid var(--unclear);
+	border-radius: 0 10px 10px 0;
+}
+
+.scam blockquote {
+	margin: 0.6rem 0 0;
+	padding: 0.85rem 1rem;
+	background: var(--card);
+	border: 2px dashed var(--edge);
+	border-radius: 10px;
+	font-size: 1rem;
+	/* These are the scammer's words, not ours. Kept visually distinct so nobody
+	   mistakes an example for advice. */
+	color: var(--ink-soft);
+	overflow-wrap: anywhere;
+}
+
+.scam .source {
+	margin-top: 1.2rem;
+	font-size: 0.9rem;
+	color: var(--ink-soft);
+}
+
+/* --- Reporting ---------------------------------------------------------- */
+
+.report-confirm p {
+	margin: 0 0 0.7rem;
+	font-size: 1.02rem;
+}
+
+.report-confirm blockquote {
+	margin: 0.8rem 0;
+	padding: 0.85rem 1rem;
+	background: var(--page);
+	border: 2px dashed var(--edge);
+	border-radius: 10px;
+	font-size: 1rem;
+	color: var(--ink-soft);
+	overflow-wrap: anywhere;
+	/* Long emails must not push the two buttons off the screen. */
+	max-height: 14rem;
+	overflow-y: auto;
+}
+
+.report-confirm button[type="button"]:not(.link) {
+	width: auto;
+	margin-top: 0;
+	padding: 0.8rem 1.6rem;
+	font-size: 1.05rem;
+}

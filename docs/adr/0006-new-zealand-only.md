@@ -1,0 +1,3 @@
+# New Zealand only for v1
+
+Two of the most useful checks — spotting that a Message claiming to be from a Known Organisation links somewhere that organisation does not own, and telling the Checker the real phone number they should have called instead — depend on a hand-curated list of organisations, their genuine domains, and their genuine public numbers. That list is inherently per-country: an NZ list is ANZ, ASB, BNZ, Westpac, Kiwibank, IRD, NZ Post, NZTA and Spark, and none of it transfers. Rather than build a shallow list covering several countries badly, v1 covers New Zealand properly, where the real Checker this is being built for actually lives. The list is data, not code, so a second country is a new file rather than a rewrite.
