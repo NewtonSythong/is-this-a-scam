@@ -1,3 +1,37 @@
+The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is twenty messages the
+engine was never built against, run with `npm run bench`. Six are `verbatim` —
+transcribed by eye from screenshots ANZ and NZ Post publish, because New Zealand
+organisations release annotated images of scam texts rather than the text.
+
+| | Offline engine only | Both engines |
+| :-- | :-- | :-- |
+| Scams raised, never developed against | 6/9 (67%) | **9/9 (100%)** |
+| Legitimate messages left quiet | 8/8 | 8/8 |
+| — of those, genuine messages that look like scams | 5/5 | 5/5 |
+
+Three further scam messages are excluded from those figures. Narrative patterns
+were written after studying them, so they now pass by construction and measure
+nothing — they are flagged in the corpus and `npm run bench` says so on every
+run.
+
+**The headline hides the model's half.** Every recent addition carries a
+lookalike domain, so the deterministic rules reach them without the model being
+consulted — a narrative pattern could be completely broken and that number would
+not move. `npm run bench:narrative` runs the model's half with the rules taken
+away: it finds something in 12/12 scams, raises **zero** false alarms on all
+eight legitimate messages, and shows two of the three new patterns firing on real
+messages they were never written from. The third,
+`unauthorised-payment-pretext`, is still unvalidated for want of a real example.
+
+**Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before quoting
+any number from here.** It gives every reason to distrust these figures,
+including that most non-verbatim items were written by a language model, which is
+also half of what is being tested.
+
+The benchmark has earned its keep three times: it caught the app calling a
+genuine NZ Post tracking text a scam, it told us when it had stopped being a
+measurement, and it showed which of three new patterns had actually generalised.
+
 # Is This a Scam?
 
 An app that tells someone whether a text message or email they have received is a scam, in language they can act on without knowing anything about how scams work.

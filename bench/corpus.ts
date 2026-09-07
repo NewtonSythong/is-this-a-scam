@@ -167,6 +167,58 @@ const SCAMS: readonly CorpusItem[] = [
 		source: "https://netsafe.org.nz/scams/understanding-scams",
 		note: "The opening move only — no ask yet. Catching this is what would actually protect someone, and it is the hardest case in the corpus.",
 	},
+	// ── Added 2026-09-07, transcribed from published screenshots ──────────
+	//
+	// New Zealand organisations publish annotated *images* of scam texts, not
+	// the text, which is why this corpus began with only two verbatim items and
+	// why the Smishtank researchers had to build an OCR pipeline to get any. The
+	// four below were read off those screenshots by eye, so the words are the
+	// scammer's but the transcription is ours — whitespace especially is
+	// approximate, and the source line names the image so anyone can re-check it.
+	//
+	// None of them was seen before the three narrative patterns of 2026-09-07
+	// were written, so all four are properly held out and are the only current
+	// test of whether those patterns generalise.
+	{
+		id: "anz-account-frozen-verbatim",
+		message:
+			"From ANZ : Your account is being checked for suspected fraudulent funds, your account will be frozen immediately, please click the link below to complete the verification: www.anznzz.com",
+		kind: "scam",
+		provenance: "verbatim",
+		source:
+			"Screenshot published by ANZ at https://www.anz.co.nz/banking-with-anz/banking-safely/recognise-scams-fraud/latest-scams/july-2024-anz-phishing-text/ — transcribed 2026-09-07",
+		note: "Names ANZ and links to anznzz.com, which ANZ does not own. The Artifact Check should reach this one without the model.",
+	},
+	{
+		id: "anz-points-expiry-verbatim",
+		message:
+			"ANZ Points\nThis is to notify you that 12,076 Rewards Points will expire at 9 March 2026 unless redeemed prior to this date.\n\nDiscover a wide selection of rewards, including Apple, Gift card and more, available for redemption before your points expire.\n\nhttps://anz-points.click/nz\n\nPlease reply with ‘Y’, then close and reopen the SMS to activate the link. If the link remains inactive, copy and paste it directly into Safari.",
+		kind: "scam",
+		provenance: "verbatim",
+		source:
+			"Screenshot published by ANZ at https://www.anz.co.nz/banking-with-anz/banking-safely/recognise-scams-fraud/latest-scams/march-2026-anz-fake-reward-scams/ — transcribed 2026-09-07",
+		note: "The real version of bnz-rewards-expiry, which benefit-expiry-pretext was written from. Sent from a +44 number, and the closing paragraph coaches the reader past their own phone's link protection.",
+	},
+	{
+		id: "anz-points-expiry-short-verbatim",
+		message:
+			"ANZ: Your 12,805 rewards points will expire at 12:00AM on 28/10/2025. Please redeem at https://anz-pointscheck.click/au immediately",
+		kind: "scam",
+		provenance: "verbatim",
+		source:
+			"Screenshot published by ANZ at https://www.anz.co.nz/banking-with-anz/banking-safely/recognise-scams-fraud/latest-scams/march-2026-anz-fake-reward-scams/ — transcribed 2026-09-07",
+		note: "The same campaign compressed into one line. Worth having both: length is one of the few things a real corpus varies that an invented one does not.",
+	},
+	{
+		id: "nzpost-redelivery-verbatim",
+		message:
+			"NZPOST - attempted delivery, please update your information online at: https://www.help-nzpost.life to arrange redelivery.",
+		kind: "scam",
+		provenance: "verbatim",
+		source:
+			"Screenshot published by NZ Post at https://www.nzpost.co.nz/contact-support/scams-and-fraud — transcribed 2026-09-07",
+		note: "The real version of nzpost-warehouse-verbatim's shape, which delivery-blocked-pretext was written from. The domain contains 'nzpost' but is not nzpost.co.nz.",
+	},
 ];
 
 /**

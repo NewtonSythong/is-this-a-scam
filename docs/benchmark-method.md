@@ -111,3 +111,27 @@ So the honest position after this change is:
 - The one part still worth something is the legitimate half. It was not tuned *toward* — but each new pattern carries an explicit clause excluding the hard negative nearest to it, and those clauses were written while looking at those negatives. Treat 8/8 as "the fixes were built not to break these", which is weaker than "the fixes do not cause false alarms".
 
 The corpus therefore needs replacing, not extending, before the next engine change is measured — and that is the argument for [`CONTRIBUTING.md`](../CONTRIBUTING.md) putting a real scam text with a citation above every other kind of contribution.
+
+## Refilling the corpus from screenshots, and what it showed
+
+**Added 2026-09-07, later the same day.** Four real scam texts were added, taking the corpus to twenty and the `verbatim` tier from two items to six.
+
+They came out of screenshots. New Zealand organisations publish annotated *images* of scam texts rather than the text — ANZ's page literally says "The text message may look like this" above a picture — which is why this corpus started with only two verbatim items, and why the Smishtank researchers had to build an OCR pipeline to obtain any at all. These four were read off ANZ's and NZ Post's own published images by eye. **The words are the scammer's; the transcription is ours.** Whitespace especially is approximate, and each `source` names the image so anyone can re-check it.
+
+With those four held out, the run reads **9/9 scams raised, 0 false alarms, 8/8 legitimate messages left quiet.**
+
+### What that does not show
+
+Every one of the four carries a lookalike domain — `anznzz.com`, `anz-points.click`, `anz-pointscheck.click`, `help-nzpost.life`. The Artifact Check reaches all of them without the model being consulted at all, so those four verdicts say nothing about whether the three new narrative patterns generalise. That is a general problem with this benchmark and not a detail: **a narrative pattern can be completely broken and the headline number will not move**, because the deterministic half is strongest exactly where the model's half is being hidden.
+
+### What does show it
+
+`npm run bench:narrative` exists for this. It runs the model's half with the rules taken away:
+
+- `benefit-expiry-pretext` was written from `bnz-rewards-expiry`. It fires on **both** real ANZ points-expiry texts, which it had never seen.
+- `delivery-blocked-pretext` was written from `nzpost-warehouse-verbatim`. It fires on the real NZ Post redelivery text.
+- The model's half alone finds something in 12/12 scams and raises **zero** false alarms across all eight legitimate messages, including the genuine shortened courier link and the genuine "Reply YES" bank fraud check.
+
+So two of the three patterns have now generalised to real messages nobody wrote them from. That is real evidence, and it is the first this project has had.
+
+**The third has not been tested.** `unauthorised-payment-pretext` was written from `bank-dispute-payment`, and no real payment-dispute message could be found published as text or as a legible screenshot. It remains unvalidated, and it is the pattern sitting closest to a genuine bank message — which makes it the one most worth a real example. If you are contributing one message to this project, make it that one.

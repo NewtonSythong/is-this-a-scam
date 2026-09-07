@@ -1,23 +1,23 @@
 # Benchmark — both engines
 
-Run 2026-09-07. Corpus: 16 messages, held out from the regression suite.
+Run 2026-09-07. Corpus: 20 messages, held out from the regression suite.
 
 | Measure | Result | What it means |
 | :-- | :-- | :-- |
-| **Scams raised, never developed against** | **5/5** (100%) | **The headline. The only scam figure that measures the engine.** |
+| **Scams raised, never developed against** | **9/9** (100%) | **The headline. The only scam figure that measures the engine.** |
 | Scams raised, since developed against | 3/3 | Proves nothing — the engine was changed while looking at these |
-| — of which verbatim | 2/2 | The only items free of model-authorship bias |
+| — of which verbatim | 6/6 | The only items free of model-authorship bias |
 | Legitimate left quiet | 8/8 (100%) | Correctly returned `unclear` |
 | — hard negatives | 5/5 | Genuine messages wearing a scam's clothes |
-| All scams, held out or not | 8/8 (100%) | The flattering number. Do not quote it alone |
-| Overall | 16/16 (100%) | |
+| All scams, held out or not | 12/12 (100%) | The flattering number. Do not quote it alone |
+| Overall | 20/20 (100%) | |
 
-> **3 of 8 scam messages no longer measure anything.** A held-out
+> **3 of 12 scam messages no longer measure anything.** A held-out
 > corpus is a wasting asset: once somebody fixes a miss by studying the message
 > that produced it, that message passes by construction. They are listed at the
 > end with what was done to them, and the headline above excludes them.
 
-### Scams — 8/8 (100%)
+### Scams — 12/12 (100%)
 
 | | id | verdict | provenance |
 | :-- | :-- | :-- | :-- |
@@ -29,6 +29,10 @@ Run 2026-09-07. Corpus: 16 messages, held out from the regression suite.
 | pass | `ird-refund-plausible-domain` | scam | reconstructed |
 | pass | `asb-fraud-team-callback` | warning | reconstructed |
 | pass | `hi-mum-no-secrecy` | warning | reconstructed |
+| pass | `anz-account-frozen-verbatim` | scam | verbatim |
+| pass | `anz-points-expiry-verbatim` | scam | verbatim |
+| pass | `anz-points-expiry-short-verbatim` | scam | verbatim |
+| pass | `nzpost-redelivery-verbatim` | scam | verbatim |
 
 ### Legitimate messages — 8/8 (100%)
 

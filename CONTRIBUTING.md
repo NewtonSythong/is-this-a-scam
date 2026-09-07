@@ -6,6 +6,18 @@ This app tells people who are frightened, and often not confident with a phone, 
 
 **1. A real scam message, with a citation.** This is the bottleneck and it is not close. The benchmark ([`docs/benchmark.md`](./docs/benchmark.md)) is measured against sixteen messages, only two of which could be sourced verbatim — because New Zealand publishes almost no scam text. Banks, NZ Post and IRD publish annotated screenshots; CERT NZ publishes quarterly counts; the DIA's 7726 service took over 114,000 reports in two months of 2021 and published none of them as text. If you have a real one and you can say where it came from, that is worth more than any amount of code.
 
+**The single most wanted message right now** is a real bank text reporting a
+payment you did not make and sending you to a link or number to dispute it. The
+`unauthorised-payment-pretext` pattern was written from a reconstruction, it sits
+closer to a genuine bank message than any other pattern, and no real example has
+been found published as text or as a legible screenshot. It is the one
+unvalidated pattern in the engine.
+
+Where the organisation publishes a screenshot rather than text — which is nearly
+always — transcribing it by eye is a legitimate and useful contribution. Say so
+in the `source` field, name the image, and give the date you read it, so the next
+person can re-check your transcription.
+
 Add it to [`bench/corpus.ts`](./bench/corpus.ts) with its `provenance` set honestly:
 
 - `verbatim` — the exact words, as published by the organisation impersonated or by a reporting body. The only tier free of authorship bias.
@@ -47,7 +59,17 @@ npm run verify     # tests and type-check; run this before pushing
 npm run bench      # score the held-out corpus offline (free)
 ```
 
+```sh
+npm run bench:full       # score the corpus with both engines (spends credit)
+npm run bench:narrative  # score the model's half alone (spends credit)
+```
+
 `npm test` does not type-check, so a broken type can pass the tests. `npm run verify` is the one that catches both.
+
+Run `bench:narrative` whenever you touch a narrative pattern. The main benchmark
+cannot see your change: most real scam texts carry a lookalike domain, so the
+deterministic rules reach `scam` without the model being consulted, and a pattern
+you have broken will not move the headline number at all.
 
 ## Licence
 
