@@ -310,7 +310,14 @@ say ""
 # instead — an editor's shell, a terminal inside another tool. Without it the
 # command fails with "requires confirmation" having asked nothing. The defaults
 # are what the line above already told the reader to accept.
-vercel link --yes || {
+# Vercel names the project after the folder unless told otherwise, and it
+# rejects any name with a capital letter in it. A folder called IsThisAScam is
+# perfectly ordinary on this machine but fails there, so take the name from
+# package.json — already lowercase, and stable wherever the folder is cloned.
+project_name=$(node -p "require('./package.json').name" 2>/dev/null || true)
+[[ -n "$project_name" ]] || project_name="is-this-a-scam"
+
+vercel link --yes --project "$project_name" || {
   warn "linking failed"
   say ""
   say "If it says you are not signed in, run this in an ordinary terminal window:"
@@ -349,7 +356,12 @@ say ""
 # possible place for one. `tee FILE` shows the output and keeps a copy.
 DEPLOY_LOG="$(mktemp)"
 vercel deploy --prod --yes 2>&1 | tee "$DEPLOY_LOG"
-DEPLOY_URL="$(grep -oE 'https://[a-zA-Z0-9.-]+\.vercel\.app' "$DEPLOY_LOG" | tail -1)"
+# Two addresses come back. The deployment-specific one carries a build hash and
+# sits behind Vercel's Standard Protection, so hitting it gets a 401 from the
+# SSO gate rather than from the app. The alias is the public address people will
+# actually use, so prefer it and only fall back to the other one.
+DEPLOY_URL="$(grep -i 'alias' "$DEPLOY_LOG" | grep -oE 'https://[a-zA-Z0-9.-]+\.vercel\.app' | tail -1)"
+[[ -n "$DEPLOY_URL" ]] || DEPLOY_URL="$(grep -oE 'https://[a-zA-Z0-9.-]+\.vercel\.app' "$DEPLOY_LOG" | tail -1)"
 rm -f "$DEPLOY_LOG"
 
 if [[ -z "$DEPLOY_URL" ]]; then
