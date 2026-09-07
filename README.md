@@ -18,6 +18,8 @@ Built for older and less digitally confident people in New Zealand. The name is 
 
 **The model cannot write its own sentences.** It picks from a fixed catalogue of patterns and quotes the words that made it pick; the sentence a reader sees was written in advance by a person. A quote that does not appear in the message is discarded, which makes hallucination something the code catches rather than something the reader has to notice. See [ADR 0010](./docs/adr/0010-narrative-check-provider.md).
 
+**The person they ask can answer in two taps.** The text a Checker sends their Trusted Person carries a link to a page with three buttons on it — *it's a scam*, *it looks genuine to me*, *I'm not sure either* — and the answer opens as a pre-written reply back. The Message travels in the link's fragment, the one part of a web address a browser never sends to the server, so none of it reaches us. See [ADR 0013](./docs/adr/0013-the-trusted-person-can-answer.md).
+
 **A scam supplies its own proof**, so every answer points at a channel the message had no hand in choosing — ASB's own Caller Check, a bank's real number, or a number the person already has. See [ADR 0009](./docs/adr/0009-verified-route-back-to-the-organisation.md).
 
 ## Setup
@@ -126,15 +128,16 @@ src/
 ├── engine/           the check itself: pure, offline, no framework
 ├── lookups/          Safe Browsing and redirect following
 ├── narrative/        the Claude client
+├── trusted/          the escalation: the ask, the answer page's logic
 └── api/              the endpoint, as a plain function of a Request
-app/                  Next.js: the route, and the web demo
+app/                  Next.js: the route, the web demo, and /asked
 ```
 
 Nothing in `src/engine` imports a framework, a network client, or `app/`. That is what lets the whole check run in tests in milliseconds, with no mocks.
 
 ## Privacy
 
-Messages are sent to the server to be checked and are not stored, logged, or kept afterwards. There are no accounts and no history. Redacting names before sending was considered and rejected — it would delete the "Hi Mum, my phone broke" signal the narrative check exists to catch. See [ADR 0005](./docs/adr/0005-nothing-is-stored.md).
+Messages are sent to the server to be checked and are not stored, logged, or kept afterwards. There are no accounts and no history. The Trusted Person's name and number, and the Checker's own, stay on the Checker's device — and when a Message is handed to a Trusted Person it travels inside the link's fragment, which browsers do not send to servers, so the escalation runs without us seeing any of it either (ADR 0013). Redacting names before sending was considered and rejected — it would delete the "Hi Mum, my phone broke" signal the narrative check exists to catch. See [ADR 0005](./docs/adr/0005-nothing-is-stored.md).
 
 ## Not done yet
 

@@ -217,3 +217,50 @@ export interface ScamReport {
 	/** The reviewer's own note — never shown to a Checker. */
 	note: string | null;
 }
+/**
+ * The Checker's own name and number, so a Trusted Person can answer them by name
+ * and with one tap rather than composing a reply from scratch.
+ *
+ * Every field is optional in practice — the app works without it, and asking an
+ * unconfident person for their own phone number before they may check anything
+ * would cost more than the tap it saves. Held on the Checker's own device beside
+ * the Trusted Person, and never sent to the server.
+ */
+export interface CheckerIdentity {
+	/** What the Checker is called, used to greet them in the answer. May be "". */
+	name: string;
+	/** Their own mobile, so the answer can be addressed. May be "". */
+	phone: string;
+}
+
+/**
+ * What a Trusted Person is being asked to look at, as it travels to them.
+ *
+ * This is carried in the *fragment* of the link — the part after `#` — because a
+ * fragment is never sent to the server by any browser. The Message therefore
+ * reaches the Trusted Person's screen without passing through, or being logged
+ * by, anything of ours, which is what keeps ADR 0005 true for a feature that
+ * puts a Message on a second device. See ADR 0013.
+ */
+export interface Ask {
+	/** The Message, as the Checker received it. */
+	message: string;
+	/** What the Checker is called, or `null` if they never said. */
+	from: string | null;
+	/** The Trusted Person's name, so the page can greet them, or `null`. */
+	to: string | null;
+	/** The Checker's number, so the answer is one tap, or `null`. */
+	back: string | null;
+	/** What the app itself made of the Message, or `null` if it was not carried. */
+	level: VerdictLevel | null;
+}
+
+/**
+ * What a Trusted Person concluded.
+ *
+ * Three answers, matching the three a Verdict has — but note that "genuine" is
+ * theirs to give and not the app's. ADR 0001 forbids the app from ever saying a
+ * Message is safe; it does not forbid a person the Checker already trusts from
+ * saying so in their own words, which is the entire point of asking them.
+ */
+export type Answer = "scam" | "genuine" | "unsure";

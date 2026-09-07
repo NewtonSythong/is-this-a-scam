@@ -1,12 +1,14 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import type { TrustedPerson } from "@/src/domain/types";
+import type { CheckerIdentity, TrustedPerson } from "@/src/domain/types";
 import { isReachable } from "@/src/trusted/askForHelp";
 
 interface Props {
 	person: TrustedPerson | null;
-	onSave: (person: TrustedPerson) => void;
+	/** The Checker's own name and number. Optional, and often absent. */
+	checker: CheckerIdentity | null;
+	onSave: (person: TrustedPerson, checker: CheckerIdentity) => void;
 	onForget: () => void;
 	/** Set when the browser refused to remember them, so we can say so plainly. */
 	saveFailed: boolean;
@@ -19,10 +21,12 @@ interface Props {
  * for the thing the Checker came to do, not the thing itself. It stays out of the
  * way until it is needed.
  */
-export function TrustedPersonPanel({ person, onSave, onForget, saveFailed }: Props) {
+export function TrustedPersonPanel({ person, checker, onSave, onForget, saveFailed }: Props) {
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(person?.name ?? "");
 	const [phone, setPhone] = useState(person?.phone ?? "");
+	const [yourName, setYourName] = useState(checker?.name ?? "");
+	const [yourPhone, setYourPhone] = useState(checker?.phone ?? "");
 
 	const draft = { name, phone };
 
@@ -30,7 +34,7 @@ export function TrustedPersonPanel({ person, onSave, onForget, saveFailed }: Pro
 		event.preventDefault();
 		if (!isReachable(draft)) return;
 
-		onSave(draft);
+		onSave(draft, { name: yourName, phone: yourPhone });
 		setEditing(false);
 	}
 
@@ -47,6 +51,8 @@ export function TrustedPersonPanel({ person, onSave, onForget, saveFailed }: Pro
 						onClick={() => {
 							setName(person.name);
 							setPhone(person.phone);
+							setYourName(checker?.name ?? "");
+							setYourPhone(checker?.phone ?? "");
 							setEditing(true);
 						}}
 					>
@@ -63,7 +69,7 @@ export function TrustedPersonPanel({ person, onSave, onForget, saveFailed }: Pro
 	if (!editing) {
 		return (
 			<section className="trusted">
-				<p>
+				<p className="lead">
 					<strong>Add someone you trust</strong>
 					Then you can send them anything you are unsure about, with one tap.
 				</p>
@@ -100,6 +106,38 @@ export function TrustedPersonPanel({ person, onSave, onForget, saveFailed }: Pro
 					This stays on this device. It is never sent to us, and we never message them —
 					your phone does.
 				</p>
+
+				{/* Optional on purpose. Asking an unconfident person for their own phone
+				    number before they may check anything would cost more than the tap it
+				    saves — so the app works without this, and works a little better with
+				    it. */}
+				<fieldset className="about-you">
+					<legend>About you — you can skip this</legend>
+
+					<label htmlFor="your-name">Your name</label>
+					<input
+						id="your-name"
+						value={yourName}
+						onChange={(event) => setYourName(event.target.value)}
+						placeholder="Mum"
+						autoComplete="name"
+					/>
+
+					<label htmlFor="your-phone">Your own mobile number</label>
+					<input
+						id="your-phone"
+						value={yourPhone}
+						onChange={(event) => setYourPhone(event.target.value)}
+						placeholder="021 555 0199"
+						inputMode="tel"
+						autoComplete="tel"
+					/>
+
+					<p className="hint">
+						So {name.trim() === "" ? "they" : name.trim()} can see who is asking, and answer
+						you with one tap instead of typing a reply. This stays on this device too.
+					</p>
+				</fieldset>
 
 				{saveFailed && (
 					<p className="error" role="alert">

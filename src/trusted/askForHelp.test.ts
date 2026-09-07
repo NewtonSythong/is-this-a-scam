@@ -92,3 +92,34 @@ describe("isReachable: whether we have enough to ask anyone", () => {
 		}
 	});
 });
+
+describe("askForHelp: with a link to the answer page", () => {
+	const LINK = "https://example.nz/asked#m=x";
+
+	it("appends the link so they can answer rather than compose a reply", () => {
+		expect(askForHelp(SARAH, "ANZ: verify at anz-secure.top", LINK)).toBe(
+			"Hi Sarah, I got this message and I'm not sure if it's real. Can you have a look?\n\n" +
+				'"ANZ: verify at anz-secure.top"\n\n' +
+				`Read it and tell me here:\n${LINK}`,
+		);
+	});
+
+	// The same text is now in the SMS twice — once quoted, once inside the link.
+	// The quote gives way rather than the link, because the link is the half that
+	// can be answered.
+	it("shortens the quote, because the link carries its own copy", () => {
+		const long = "a".repeat(800);
+
+		expect(askForHelp(SARAH, long, LINK)).toContain("(shortened)");
+		expect(askForHelp(SARAH, long)).not.toContain("(shortened)");
+	});
+
+	// A phone that will not open the link leaves the Trusted Person holding a
+	// question from someone they know, which is what this was before the page
+	// existed.
+	it("still reads as a question from a person if the link is never tapped", () => {
+		expect(askForHelp(SARAH, "Hi Mum, my phone broke", LINK)).toContain(
+			'"Hi Mum, my phone broke"',
+		);
+	});
+});

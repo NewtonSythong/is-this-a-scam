@@ -1,12 +1,16 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { TrustedPerson, Verdict } from "@/src/domain/types";
+import type { CheckerIdentity, TrustedPerson, Verdict } from "@/src/domain/types";
 import { askForHelp, smsHref } from "@/src/trusted/askForHelp";
+import { askUrl } from "@/src/trusted/reply";
 import {
 	browserStore,
+	forgetChecker,
 	forgetTrustedPerson,
+	loadChecker,
 	loadTrustedPerson,
+	saveChecker,
 	saveTrustedPerson,
 } from "@/src/trusted/storage";
 import { ReportPanel } from "./ReportPanel";
@@ -32,7 +36,12 @@ export function CheckForm() {
 	const [error, setError] = useState<string | null>(null);
 	const [checking, setChecking] = useState(false);
 	const [trusted, setTrusted] = useState<TrustedPerson | null>(null);
+	const [checker, setChecker] = useState<CheckerIdentity | null>(null);
 	const [saveFailed, setSaveFailed] = useState(false);
+	// Where this app is being served from, for the link the Trusted Person taps.
+	// Read after mount for the same reason the stored contact is: there is no
+	// `window` while this is being rendered on the server.
+	const [origin, setOrigin] = useState<string | null>(null);
 	const answer = useRef<HTMLDivElement>(null);
 
 	// Read after mount, not during render: the server has no localStorage, and
@@ -40,17 +49,44 @@ export function CheckForm() {
 	// second.
 	useEffect(() => {
 		setTrusted(loadTrustedPerson(browserStore()));
+		setChecker(loadChecker(browserStore()));
+		setOrigin(window.location.origin);
 	}, []);
 
-	function rememberTrusted(person: TrustedPerson) {
+	function rememberTrusted(person: TrustedPerson, identity: CheckerIdentity) {
+		const store = browserStore();
+
 		setTrusted(person);
-		setSaveFailed(!saveTrustedPerson(browserStore(), person));
+		setChecker(identity);
+		setSaveFailed(!saveTrustedPerson(store, person) || !saveChecker(store, identity));
 	}
 
 	function forgetTrusted() {
-		forgetTrustedPerson(browserStore());
+		const store = browserStore();
+
+		forgetTrustedPerson(store);
+		// Their own details exist only to serve this, so "Remove" removes both.
+		forgetChecker(store);
 		setTrusted(null);
+		setChecker(null);
 		setSaveFailed(false);
+	}
+
+	/**
+	 * The link that opens the answer page on the Trusted Person's phone, or
+	 * `null` before mount. A `null` link degrades the text back to a quoted
+	 * message and a question, which still works.
+	 */
+	function linkFor(level: Verdict["level"]): string | null {
+		if (origin === null || trusted === null) return null;
+
+		return askUrl(origin, {
+			message,
+			from: checker?.name ?? null,
+			to: trusted.name,
+			back: checker?.phone ?? null,
+			level,
+		});
 	}
 
 	async function onSubmit(event: FormEvent) {
@@ -136,7 +172,7 @@ export function CheckForm() {
 								: `Send it to ${trusted.name} as well, if you would like a second opinion.`}
 							<a
 								className={verdict.escalationIsPrimary ? "ask primary" : "ask"}
-								href={smsHref(trusted, askForHelp(trusted, message))}
+								href={smsHref(trusted, askForHelp(trusted, message, linkFor(verdict.level)))}
 							>
 								Send this to {trusted.name}
 							</a>
@@ -175,6 +211,7 @@ export function CheckForm() {
 
 			<TrustedPersonPanel
 				person={trusted}
+				checker={checker}
 				onSave={rememberTrusted}
 				onForget={forgetTrusted}
 				saveFailed={saveFailed}

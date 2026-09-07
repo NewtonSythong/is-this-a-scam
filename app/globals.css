@@ -504,3 +504,142 @@ a.ask.primary {
 	padding: 0.8rem 1.6rem;
 	font-size: 1.05rem;
 }
+
+/* --- About you, inside the trusted person form -------------------------- */
+
+.about-you {
+	margin: 1.2rem 0 1rem;
+	padding: 0.9rem 1rem 0.3rem;
+	border: 1px solid var(--edge);
+	border-radius: 10px;
+	background: var(--page);
+}
+
+.about-you legend {
+	padding: 0 0.4rem;
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: var(--ink-soft);
+}
+
+.about-you label {
+	font-size: 1rem;
+}
+
+/* --- The answer page, seen by the Trusted Person ------------------------ */
+
+/*
+ * A different reader from the rest of the app: usually the adult child, on their
+ * own phone, mid-something-else. So this page is built to be finished in about
+ * fifteen seconds — read the message, tap one of three, send — rather than to be
+ * dwelt on.
+ */
+
+.asked,
+.answer {
+	margin-top: 1.6rem;
+	padding: 1.2rem 1.1rem;
+	background: var(--card);
+	border: 2px solid var(--edge);
+	border-radius: var(--radius);
+}
+
+.asked h2,
+.answer h2 {
+	margin: 0 0 0.7rem;
+	font-size: 1.15rem;
+}
+
+.asked blockquote {
+	margin: 0;
+	padding: 1rem;
+	background: var(--page);
+	border: 2px dashed var(--edge);
+	border-radius: 10px;
+	font-size: 1.05rem;
+	/* Their words, exactly as they arrived — including the line breaks, which are
+	   sometimes the tell. */
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	/* A forwarded email must not push the three buttons off the screen. */
+	max-height: 18rem;
+	overflow-y: auto;
+}
+
+.asked .hint {
+	margin: 0.7rem 0 0;
+}
+
+.what-app-said {
+	margin: 0.9rem 0 0;
+	padding: 0.8rem 0.95rem;
+	background: var(--unclear-wash);
+	border-left: 6px solid var(--unclear);
+	border-radius: 0 10px 10px 0;
+	font-size: 1rem;
+}
+
+.answer textarea {
+	min-height: 5.5rem;
+	margin-bottom: 0.4rem;
+}
+
+/* The three answers are equals — none of them is the recommended one, because
+   which is right depends entirely on the message. So they are sized alike and
+   only their colour differs. */
+.answer button.choice {
+	color: var(--ink);
+	background: var(--card);
+	border: 2px solid var(--edge);
+	font-size: 1.1rem;
+	text-align: left;
+}
+
+.answer button.choice.scam {
+	color: var(--scam);
+	border-color: var(--scam);
+	background: var(--scam-wash);
+}
+
+.answer button.choice.genuine {
+	border-color: var(--ink-soft);
+}
+
+.answer button.choice.unsure {
+	color: var(--unclear);
+	border-color: var(--unclear);
+	background: var(--unclear-wash);
+}
+
+.answer button.choice:hover:not(:disabled) {
+	filter: brightness(0.96);
+}
+
+/* Shown before it is sent, because the words are the app's and the sender is
+   not — they should see exactly what will go out under their name. */
+.answer blockquote.reply {
+	margin: 0 0 0.4rem;
+	padding: 1rem;
+	background: var(--page);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	font-size: 1.05rem;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.answer .back {
+	margin: 0.9rem 0 0;
+}
+
+.answer a.ask {
+	margin-top: 0.4rem;
+}
+
+/* The invitation reads as a heading and a sentence, not one run-on line. The
+   saved-contact summary above it is deliberately left inline, because there the
+   label and the name belong on the same line. */
+.trusted p.lead strong {
+	display: block;
+	margin-bottom: 0.2rem;
+}
