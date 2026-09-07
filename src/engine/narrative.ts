@@ -83,6 +83,23 @@ export const NARRATIVE_PATTERNS: readonly NarrativePattern[] = [
 			"investment is guaranteed.",
 	},
 	{
+		id: "verify-account-pretext",
+		severity: "warning",
+		description:
+			"Says the reader's account, details or information are unverified, incomplete, " +
+			"out of date, suspended, or need confirming, and asks them to put it right or " +
+			"log in to fix it. Two things that are NOT this pattern: a message saying only " +
+			"that a document, bill or statement is ready and to log in to a named service, " +
+			"claiming nothing is wrong; and a bank asking the reader to confirm whether one " +
+			"particular payment was theirs.",
+		reason:
+			"This message says something about your account needs checking, confirming or " +
+			"putting right. That is the most common trick there is, and it works because it " +
+			"sounds like paperwork rather than a threat. If you really have an account with " +
+			"them, open their own app or type their web address in yourself — never the link " +
+			"in the message.",
+	},
+	{
 		id: "delivery-blocked-pretext",
 		severity: "warning",
 		description:

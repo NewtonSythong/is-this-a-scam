@@ -135,3 +135,16 @@ Every one of the four carries a lookalike domain — `anznzz.com`, `anz-points.c
 So two of the three patterns have now generalised to real messages nobody wrote them from. That is real evidence, and it is the first this project has had.
 
 **The third has not been tested.** `unauthorised-payment-pretext` was written from `bank-dispute-payment`, and no real payment-dispute message could be found published as text or as a legible screenshot. It remains unvalidated, and it is the pattern sitting closest to a genuine bank message — which makes it the one most worth a real example. If you are contributing one message to this project, make it that one.
+
+
+## The politeness gap
+
+**Added 2026-09-07, later still.** A real phishing email out of a New Zealander's junk folder was rated `unclear` **with no reasons at all** — the model's half found nothing whatsoever. It impersonated Afterpay and linked to an abused Dutch ticketing host.
+
+Two separate gaps, and both are worth stating because neither was visible in any number on this page.
+
+**The catalogue was built around alarm.** Its eleven patterns covered threats, deadlines, secrecy, money, and pretexts. Nothing covered *"we have noticed some information in your account seems unverified — please confirm your details"*, which is the most common phishing pretext in existence. It got through because it is **calm**: no threat, no deadline, nothing about money, written in the register of a service reminder. `verify-account-pretext` now covers it, and was checked against four verification-phish shapes it was not written from — a Netflix billing line, a generic suspended-account notice, and a Dutch-language one — plus four genuine messages that sit close to it, including "your income tax assessment is ready, log in to myIR" and a real power bill. It caught all four and stayed silent on all four.
+
+**The Known Organisation list is the only route to a `scam` verdict for a message like this**, and Afterpay was not on it. With Afterpay added, the same email goes from `unclear` with no reasons to `scam` with "This message says it is from Afterpay, but the link goes to lahresour.inportal.nl, which is not a real Afterpay address."
+
+That second gap is the more uncomfortable one, because it means the app's confidence is bounded by a list of eight — now twelve — organisations, and everything outside it is capped at `warning` no matter how obvious. Expanding that list is not free: a link matching any organisation on it suppresses every link signal, so an incomplete domain set turns that organisation's genuine mail into a `scam` verdict. That is why the retailers and telcos most impersonated after these are deliberately still absent — they send marketing through third-party tracking domains, and one missed domain would have this app calling a real supermarket promotion a scam.

@@ -1,7 +1,8 @@
-The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is twenty messages the
-engine was never built against, run with `npm run bench`. Six are `verbatim` —
-transcribed by eye from screenshots ANZ and NZ Post publish, because New Zealand
-organisations release annotated images of scam texts rather than the text.
+The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is twenty-one messages the
+engine was never built against, run with `npm run bench`. Seven are `verbatim` —
+six transcribed by eye from screenshots ANZ and NZ Post publish, because New
+Zealand organisations release annotated images of scam texts rather than the
+text, and one pasted straight out of somebody's junk folder.
 
 | | Offline engine only | Both engines |
 | :-- | :-- | :-- |
@@ -9,7 +10,7 @@ organisations release annotated images of scam texts rather than the text.
 | Legitimate messages left quiet | 8/8 | 8/8 |
 | — of those, genuine messages that look like scams | 5/5 | 5/5 |
 
-Three further scam messages are excluded from those figures. Narrative patterns
+Four further scam messages are excluded from those figures. Narrative patterns
 were written after studying them, so they now pass by construction and measure
 nothing — they are flagged in the corpus and `npm run bench` says so on every
 run.

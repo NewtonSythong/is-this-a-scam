@@ -1,23 +1,23 @@
 # Benchmark — offline engine only
 
-Run 2026-09-07. Corpus: 20 messages, held out from the regression suite.
+Run 2026-09-07. Corpus: 21 messages, held out from the regression suite.
 
 | Measure | Result | What it means |
 | :-- | :-- | :-- |
 | **Scams raised, never developed against** | **6/9** (67%) | **The headline. The only scam figure that measures the engine.** |
-| Scams raised, since developed against | 0/3 | Proves nothing — the engine was changed while looking at these |
-| — of which verbatim | 5/6 | The only items free of model-authorship bias |
+| Scams raised, since developed against | 1/4 | Proves nothing — the engine was changed while looking at these |
+| — of which verbatim | 6/7 | The only items free of model-authorship bias |
 | Legitimate left quiet | 8/8 (100%) | Correctly returned `unclear` |
 | — hard negatives | 5/5 | Genuine messages wearing a scam's clothes |
-| All scams, held out or not | 6/12 (50%) | The flattering number. Do not quote it alone |
-| Overall | 14/20 (70%) | |
+| All scams, held out or not | 7/13 (54%) | The flattering number. Do not quote it alone |
+| Overall | 15/21 (71%) | |
 
-> **3 of 12 scam messages no longer measure anything.** A held-out
+> **4 of 13 scam messages no longer measure anything.** A held-out
 > corpus is a wasting asset: once somebody fixes a miss by studying the message
 > that produced it, that message passes by construction. They are listed at the
 > end with what was done to them, and the headline above excludes them.
 
-### Scams — 6/12 (50%)
+### Scams — 7/13 (54%)
 
 | | id | verdict | provenance |
 | :-- | :-- | :-- | :-- |
@@ -29,6 +29,7 @@ Run 2026-09-07. Corpus: 20 messages, held out from the regression suite.
 | pass | `ird-refund-plausible-domain` | scam | reconstructed |
 | **FAIL** | `asb-fraud-team-callback` | unclear | reconstructed |
 | **FAIL** | `hi-mum-no-secrecy` | unclear | reconstructed |
+| pass | `afterpay-verify-account-verbatim` *(no longer held out)* | scam | verbatim |
 | pass | `anz-account-frozen-verbatim` | scam | verbatim |
 | pass | `anz-points-expiry-verbatim` | scam | verbatim |
 | pass | `anz-points-expiry-short-verbatim` | scam | verbatim |
@@ -91,4 +92,6 @@ The opening move only — no ask yet. Catching this is what would actually prote
 **`bnz-rewards-expiry`** — 2026-09-07: the benefit-expiry-pretext narrative pattern was written after reading this message.
 
 **`bank-dispute-payment`** — 2026-09-07: the unauthorised-payment-pretext narrative pattern was written after reading this message, including the clause separating it from bank-genuine-confirm-payment.
+
+**`afterpay-verify-account-verbatim`** — 2026-09-07: this is the message that exposed both gaps. The verify-account-pretext narrative pattern was written after reading it, and Afterpay was added to the Known Organisation list because of it.
 

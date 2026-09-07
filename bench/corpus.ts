@@ -167,6 +167,21 @@ const SCAMS: readonly CorpusItem[] = [
 		source: "https://netsafe.org.nz/scams/understanding-scams",
 		note: "The opening move only — no ask yet. Catching this is what would actually protect someone, and it is the hardest case in the corpus.",
 	},
+	{
+		id: "afterpay-verify-account-verbatim",
+		// A real phishing email out of a New Zealander's junk folder, pasted
+		// exactly as it arrived. Sent from "Afterpay <lahresour@mailtoinserve.nl>"
+		// through what looks like an abused Dutch ticketing system, which is why
+		// the footer is in Dutch and the body is not.
+		message:
+			"Confirm your Account\n\nAfterpay\n\nDear customer,\n\nWe have noticed that there is certain information in your account details that seems inaccurate or unverified. You should verify your information so that you can use our service smoothly.\n\nPlease check the details of your account to ensure they comply with the new rules. This will help us maintain accurate records and ensure greater security for your account.\n\nClick the button below.\n\nUpdate Now\n\n© 2026 Afterpay\n\nBekijk je ticket online in ons klantportaal: https://lahresour.inportal.nl/tickets/1",
+		kind: "scam",
+		provenance: "verbatim",
+		developedAgainst:
+			"2026-09-07: this is the message that exposed both gaps. The verify-account-pretext narrative pattern was written after reading it, and Afterpay was added to the Known Organisation list because of it.",
+		source: "Reported by a user from their own junk mail, 2026-09-07",
+		note: "The app rated this 'unclear' with no reasons at all. It is the most common phishing pretext there is, and it slipped through because it is calm: no threat, no deadline, no money mentioned. A catalogue built around alarm had nothing to say about politeness.",
+	},
 	// ── Added 2026-09-07, transcribed from published screenshots ──────────
 	//
 	// New Zealand organisations publish annotated *images* of scam texts, not
