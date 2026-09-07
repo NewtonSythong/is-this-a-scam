@@ -83,6 +83,45 @@ export const NARRATIVE_PATTERNS: readonly NarrativePattern[] = [
 			"investment is guaranteed.",
 	},
 	{
+		id: "delivery-blocked-pretext",
+		severity: "warning",
+		description:
+			"Says a parcel or delivery is held, suspended, or has failed, and cannot proceed " +
+			"until the reader pays a fee, confirms an address, or supplies other details. A " +
+			"plain tracking or ready-for-collection notice that asks nothing of the reader is " +
+			"NOT this pattern.",
+		reason:
+			"This message says a delivery is stuck and needs something from you. That is the " +
+			"most common scam text in New Zealand. If you are expecting a parcel, look it up on " +
+			"the courier's own website or app — not through anything in this message.",
+	},
+	{
+		id: "benefit-expiry-pretext",
+		severity: "warning",
+		description:
+			"Claims something the reader already has — reward points, an account, a " +
+			"subscription, an entitlement, a refund — will expire or be lost unless they reply " +
+			"or act. A message about something that has just happened on the reader's account, " +
+			"asking them to confirm whether it was them, is NOT this pattern.",
+		reason:
+			"This message says you will lose something unless you act. That deadline is the " +
+			"trick — it is there to stop you checking. Nothing genuine is lost because you took " +
+			"an hour to ask someone.",
+	},
+	{
+		id: "unauthorised-payment-pretext",
+		severity: "warning",
+		description:
+			"Reports a payment, charge or transaction the reader may not have made, AND directs " +
+			"them to a link, website or phone number given in the message in order to dispute, " +
+			"cancel or stop it. A message that only asks the reader to reply yes or no, " +
+			"supplying no destination of its own, is NOT this pattern.",
+		reason:
+			"This message reports a payment you did not make, and then tells you where to go " +
+			"about it. That is the trap. Ring your bank on the number on your own card, or use " +
+			"their app — never a link or number from the message itself.",
+	},
+	{
 		id: "romance-pretext",
 		severity: "warning",
 		description:

@@ -50,6 +50,22 @@ export interface CorpusItem {
 	provenance: Provenance;
 	/** A genuine message written to look suspicious — the false-alarm test. */
 	hardNegative?: boolean;
+	/**
+	 * Set once the engine has been changed *while looking at this item*, with the
+	 * date and what was done.
+	 *
+	 * A held-out corpus is a wasting asset. The moment somebody fixes a miss by
+	 * studying the message that produced it, that message stops measuring the
+	 * engine and starts measuring the fix — it will pass by construction, exactly
+	 * as every example in `src/data/scamLibrary.nz.ts` does. Pretending otherwise
+	 * is how a benchmark becomes a marketing number.
+	 *
+	 * So the erosion is recorded here rather than remembered, and the report
+	 * counts these items separately and says they prove nothing. An item can
+	 * never be un-marked. When too many carry this, the corpus needs replacing,
+	 * and the flags are what will make that obvious.
+	 */
+	developedAgainst?: string;
 	/** Where the message or the campaign it reconstructs is documented. */
 	source: string;
 	/** What the offline engine alone is expected to manage, where known. */
@@ -80,6 +96,8 @@ const SCAMS: readonly CorpusItem[] = [
 	},
 	{
 		id: "nzpost-warehouse-verbatim",
+		developedAgainst:
+			"2026-09-07: the delivery-blocked-pretext narrative pattern was written after reading this message.",
 		// Quoted in press coverage of the campaign. No link in the quoted
 		// portion at all, which leaves nothing for the deterministic half.
 		message:
@@ -92,6 +110,8 @@ const SCAMS: readonly CorpusItem[] = [
 	},
 	{
 		id: "bnz-rewards-expiry",
+		developedAgainst:
+			"2026-09-07: the benefit-expiry-pretext narrative pattern was written after reading this message.",
 		message:
 			"BNZ: Your BNZ Rewards points will expire shortly. Reply Y to confirm you wish to keep them.",
 		kind: "scam",
@@ -101,6 +121,8 @@ const SCAMS: readonly CorpusItem[] = [
 	},
 	{
 		id: "bank-dispute-payment",
+		developedAgainst:
+			"2026-09-07: the unauthorised-payment-pretext narrative pattern was written after reading this message, including the clause separating it from bank-genuine-confirm-payment.",
 		message:
 			"A payment of $739.00 to WELLINGTON TRADING was authorised on your account. If you did not authorise this, dispute it here: secure-verify-nz.com/dispute",
 		kind: "scam",

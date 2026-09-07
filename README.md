@@ -62,6 +62,77 @@ Both go in `.env.local`, which is git-ignored.
 
 ## Does it actually work?
 
+The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is sixteen messages the
+engine was never built against, run with `npm run bench`. It gave one clean
+reading, on 2026-09-07:
+
+| | Offline engine only | Both engines |
+| :-- | :-- | :-- |
+| Scams raised | 2/8 (25%) | 5/8 (63%) |
+| Legitimate messages left quiet | 8/8 | 8/8 |
+| — of those, genuine messages that look like scams | 5/5 | 5/5 |
+
+The deterministic half alone catches a quarter of unfamiliar scams; the model
+roughly doubles that. Neither raises a false alarm, which matters more than it
+sounds: an app that shouts at a real courier text teaches a frightened person to
+ignore it.
+
+**That reading is the last one this corpus can give.** Three narrative patterns
+have since been written to catch the three scams it caught getting through, so
+those three now pass by construction and measure nothing. They are flagged in the
+corpus, the report counts them separately, and `npm run bench` will tell you so.
+Whether those patterns generalise is unknown until there are messages nobody has
+looked at. **Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before
+quoting any number from here** — it gives six reasons to distrust these figures,
+starting with the fact that only two of the sixteen could be sourced verbatim and
+most of the rest were written by a language model, which is also half of what is
+being tested.
+
+The benchmark has already earned its keep twice. Its first run caught the app
+calling a genuine NZ Post tracking text a scam, because NZ Post's own link
+shortener was missing from their record. Its second told us it had stopped
+being a measurement.
+
+## What a scammer can do with it
+
+The app is deliberately free, account-less and — if it is open-sourced — readable, and each of those is reachable by someone who wants to use it as a weapon. What is done about that:
+
+| The move | What stops it |
+| :-- | :-- |
+| Craft an `/asked` link that texts a premium-rate number | The reply number must be an NZ mobile (`02…`); `0900` cannot pass, and the destination is printed beside the button |
+| Put an organisation's name in the "who is asking" field | Names are cut to 24 characters, and whoever is named is cast as the person confused and asking for help |
+| Hide a hostname behind a right-to-left override | Invisible and bidirectional characters are stripped from everything shown |
+| Borrow the domain's credibility for their own text | A provenance line above it says the contents came from the link, not from us; nothing in a quoted message is ever clickable |
+| Submit drafts until one comes back "we can't tell" | Only partly. A per-caller cap and a provider spend cap ([ADR 0011](./docs/adr/0011-rate-limiting-and-spend.md)) are brakes, not a fix — see below |
+| Report genuine bank messages to poison the scam library | Reports are human-reviewed, and a library entry cannot be added without a `source` citing where the scam was published |
+
+**The endpoint is an oracle and cannot fully stop being one.** Anyone can submit a draft and learn whether it comes back as a scam. Nothing closes that while the app is free and has no accounts, and those are the two properties that make it reachable by the people it is for. Note also what the benchmark says: the offline rules catch 2/8 of unfamiliar scams on their own, so they are not a filter whose secrecy would be worth much. See [ADR 0013](./docs/adr/0013-the-trusted-person-can-answer.md) for the reasoning, including what was rejected.
+
+## Setup
+
+Requires Node.js `>=22.12.0`.
+
+```sh
+npm install
+bash scripts/setup.sh   # optional — walks you through the two API keys
+npm run dev             # http://localhost:3000
+```
+
+**No keys are needed to run it.** A missing key degrades the check rather than breaking it: without either, the deterministic rules still return a complete verdict.
+
+[`scripts/setup.sh`](./scripts/setup.sh) opens each console for you, explains what to click, hides your paste, and **proves each key with a real call before saving it** — so a key that is valid but whose API was never switched on is caught here rather than in front of the person you built this for. Either key can be skipped, and re-running the script picks up where you left off.
+
+| Variable | Effect when set |
+| :-- | :-- |
+| `ANTHROPIC_API_KEY` | Enables the Narrative Check — the half that catches scams with no link in them |
+| `SAFE_BROWSING_API_KEY` | Enables Safe Browsing lookups and shortened-link expansion |
+| `REVIEW_TOKEN` | Opens the review queue at `/review?token=…`. Unset means the queue refuses everything |
+| `REPORTS_DB_PATH` | Where reported scams are kept (default `./data/reports.db`) |
+
+Both go in `.env.local`, which is git-ignored.
+
+## Does it actually work?
+
 Measured against a held-out corpus of sixteen messages the engine was never built
 against — [`bench/corpus.ts`](./bench/corpus.ts), run with `npm run bench`:
 

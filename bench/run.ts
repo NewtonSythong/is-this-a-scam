@@ -12,6 +12,8 @@
  * Results go to stdout and, with --write, to docs/benchmark.md.
  */
 
+import { existsSync } from "node:fs";
+
 import { NEW_ZEALAND_ORGANISATIONS } from "../src/data/knownOrganisations.nz";
 import type { VerdictLevel } from "../src/domain/types";
 import { check } from "../src/engine/check";
@@ -20,6 +22,17 @@ import { type CorpusItem, CORPUS, isCorrect, type Provenance } from "./corpus";
 
 const full = process.argv.includes("--full");
 const write = process.argv.includes("--write");
+
+/**
+ * Read the keys the same way the app does.
+ *
+ * Next loads `.env.local` for you; a bare `tsx` script does not, so `--full`
+ * used to refuse to run on a machine that was correctly set up — which is a
+ * miserable first experience for someone who has just followed the README and
+ * wants to check our numbers for themselves. Node's own loader, so there is no
+ * dependency and no second definition of what an env file means.
+ */
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 interface Row {
 	item: CorpusItem;
@@ -69,7 +82,10 @@ function section(title: string, rows: readonly Row[]): string {
 	for (const row of rows) {
 		const mark = row.correct ? "pass" : "**FAIL**";
 		const hard = row.item.hardNegative ? " *(hard)*" : "";
-		lines.push(`| ${mark} | \`${row.item.id}\`${hard} | ${row.level} | ${row.item.provenance} |`);
+		const spentMark = row.item.developedAgainst === undefined ? "" : " *(no longer held out)*";
+		lines.push(
+			`| ${mark} | \`${row.item.id}\`${hard}${spentMark} | ${row.level} | ${row.item.provenance} |`,
+		);
 	}
 	lines.push("");
 	return lines.join("\n");
@@ -87,6 +103,10 @@ async function main() {
 	const legit = rows.filter((row) => row.item.kind === "legitimate");
 	const hard = legit.filter((row) => row.item.hardNegative);
 	const verbatim = scams.filter((row) => row.item.provenance === "verbatim");
+	// The only scam figure that still measures the engine rather than the fixes
+	// made to it. See `developedAgainst` in corpus.ts.
+	const heldOut = scams.filter((row) => row.item.developedAgainst === undefined);
+	const spent = scams.filter((row) => row.item.developedAgainst !== undefined);
 
 	const out: string[] = [];
 	out.push(`# Benchmark — ${full ? "both engines" : "offline engine only"}`);
@@ -99,14 +119,36 @@ async function main() {
 	const legitT = tally(legit);
 	const hardT = tally(hard);
 	const verbT = tally(verbatim);
+	const heldOutT = tally(heldOut);
+	const spentT = tally(spent);
 
 	out.push("| Measure | Result | What it means |");
 	out.push("| :-- | :-- | :-- |");
-	out.push(`| Scams raised | ${scamT.right}/${scamT.total} (${scamT.pct}%) | Reached \`scam\` or \`warning\` rather than \`unclear\` |`);
+	out.push(
+		`| **Scams raised, never developed against** | **${heldOutT.right}/${heldOutT.total}** (${heldOutT.pct}%) | **The headline. The only scam figure that measures the engine.** |`,
+	);
+	if (spentT.total > 0) {
+		out.push(
+			`| Scams raised, since developed against | ${spentT.right}/${spentT.total} | Proves nothing — the engine was changed while looking at these |`,
+		);
+	}
 	out.push(`| — of which verbatim | ${verbT.right}/${verbT.total} | The only items free of model-authorship bias |`);
 	out.push(`| Legitimate left quiet | ${legitT.right}/${legitT.total} (${legitT.pct}%) | Correctly returned \`unclear\` |`);
 	out.push(`| — hard negatives | ${hardT.right}/${hardT.total} | Genuine messages wearing a scam's clothes |`);
+	out.push(
+		`| All scams, held out or not | ${scamT.right}/${scamT.total} (${scamT.pct}%) | The flattering number. Do not quote it alone |`,
+	);
 	out.push(`| Overall | ${overall.right}/${overall.total} (${overall.pct}%) | |`);
+	out.push("");
+
+	if (spentT.total > 0) {
+		out.push(
+			`> **${spentT.total} of ${scamT.total} scam messages no longer measure anything.** A held-out`,
+		);
+		out.push("> corpus is a wasting asset: once somebody fixes a miss by studying the message");
+		out.push("> that produced it, that message passes by construction. They are listed at the");
+		out.push("> end with what was done to them, and the headline above excludes them.");
+	}
 	out.push("");
 
 	out.push(section("Scams", scams));
@@ -127,6 +169,15 @@ async function main() {
 				out.push("Reasons given:");
 				for (const reason of row.reasons) out.push(`- ${reason}`);
 			}
+			out.push("");
+		}
+	}
+
+	if (spent.length > 0) {
+		out.push("## Items that no longer measure anything");
+		out.push("");
+		for (const row of spent) {
+			out.push(`**\`${row.item.id}\`** — ${row.item.developedAgainst}`);
 			out.push("");
 		}
 	}

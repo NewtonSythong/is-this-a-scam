@@ -95,3 +95,19 @@ Three scams get through with both engines running:
 
 All three share a shape: **no link worth checking, and no organisation named.**
 That is the gap, and it is a more useful thing to know than the percentage.
+
+## The corpus is now spent, and that is the most important thing on this page
+
+**Added 2026-09-07.** Three narrative patterns were written to catch the three scams this corpus had shown getting through — `delivery-blocked-pretext`, `benefit-expiry-pretext` and `unauthorised-payment-pretext`. All three misses now pass, and the run reports 16/16.
+
+**Do not read that as the engine having improved by a measurable amount.** The three items were studied in order to write the patterns, so they pass by construction, exactly as every example in `src/data/scamLibrary.nz.ts` does. They are flagged `developedAgainst` in `bench/corpus.ts`, the report counts them separately, and it says they prove nothing.
+
+The subtler problem is with what is left. The report's headline — scams raised among items never developed against — reads 5/5, and that figure carries no information either, because the set of items never developed against is now *exactly* the set that was already passing. Partitioning a corpus by which items you then fixed guarantees the remainder looks perfect. Both numbers on that table are now artefacts of the split.
+
+So the honest position after this change is:
+
+- The corpus gave one clean reading, on 2026-09-07, before any of this: **5/8 unfamiliar scams raised, 0 false alarms, 8/8 legitimate messages left quiet.** That reading stands and is the last one this corpus can give.
+- Whether the three new patterns generalise beyond the three messages that prompted them is **unknown and not currently knowable.** Only messages nobody has looked at can answer it.
+- The one part still worth something is the legitimate half. It was not tuned *toward* — but each new pattern carries an explicit clause excluding the hard negative nearest to it, and those clauses were written while looking at those negatives. Treat 8/8 as "the fixes were built not to break these", which is weaker than "the fixes do not cause false alarms".
+
+The corpus therefore needs replacing, not extending, before the next engine change is measured — and that is the argument for [`CONTRIBUTING.md`](../CONTRIBUTING.md) putting a real scam text with a citation above every other kind of contribution.
