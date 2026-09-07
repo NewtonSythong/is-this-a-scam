@@ -134,6 +134,12 @@ Five stages: set a spend cap at Anthropic, run the tests and a real build, sign 
 
 It sets the spend cap **before** it deploys anything. The app caps one caller at 20 checks per 10 minutes, but that lives in memory — it resets when the server restarts and does nothing about someone changing address. The provider's spend cap is the limit that cannot be out-run, because it is enforced where the money is. See [ADR 0011](./docs/adr/0011-rate-limiting-and-spend.md).
 
+## Licence and contributing
+
+Free software under the [GNU AGPL, version 3 or later](./LICENSE). The network-copyleft licence is deliberate: the risk worth guarding against is not somebody reading this code, it is somebody deploying a quietly degraded copy that a frightened person trusts. The AGPL covers use over a network, so a fork's users can demand its source. The app carries a link to that source in its own footer, which is section 13's requirement and also the only thing that makes the numbers above checkable by anyone but us — set `NEXT_PUBLIC_SOURCE_URL` before deploying.
+
+The most useful contributions are not code. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) — a real scam text with a citation is worth more here than a refactor, because the benchmark's stated weakness is that the corpus is sixteen messages and only two of them are verbatim.
+
 ## Structure
 
 ```text

@@ -302,8 +302,26 @@ vercel link || {
   exit 1
 }
 
+# The AGPL's section 13 obliges an app people only reach over a network to offer
+# them its source, and the footer link is that offer. Asked here rather than in
+# setup.sh because it is a property of the thing being published, not of the
+# machine it was built on — and because this is the last point before it becomes
+# public with or without it.
+say ""
+say "Where can people read this app's source? Your repository address, for the"
+say "footer link. The AGPL requires the offer, and it is what lets anyone check"
+say "the numbers you are publishing. Leave it empty to deploy without it."
+say ""
+ask NEXT_PUBLIC_SOURCE_URL "Source address (e.g. https://github.com/you/is-this-a-scam):"
+if [[ -n "$NEXT_PUBLIC_SOURCE_URL" ]]; then
+  write_env NEXT_PUBLIC_SOURCE_URL "$NEXT_PUBLIC_SOURCE_URL"
+else
+  SKIPPED+=("NEXT_PUBLIC_SOURCE_URL — the footer will name the licence without linking the source")
+fi
+
 push_key ANTHROPIC_API_KEY
 push_key SAFE_BROWSING_API_KEY
+push_key NEXT_PUBLIC_SOURCE_URL
 
 say ""
 say "Deploying to production. This takes a minute or two."

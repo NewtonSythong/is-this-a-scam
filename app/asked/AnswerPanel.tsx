@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Answer, Ask } from "@/src/domain/types";
+import { sourceUrl } from "@/src/meta/source";
 import { parseAsk, replyHref, replyText, whatTheAppSaid } from "@/src/trusted/reply";
 
 /** What each button says, in the order they are offered. */
@@ -190,6 +191,13 @@ export function AnswerPanel() {
 				<p>
 					<Link href="/">What this is</Link> — a scam checker for people in New Zealand. It
 					never says a message is safe, only that it found something wrong or could not tell.
+					{sourceUrl() !== null && (
+						<>
+							{" "}
+							<a href={sourceUrl() ?? ""}>Its source is public</a>, so anyone can check how
+							it decides.
+						</>
+					)}
 				</p>
 			</footer>
 		</>
