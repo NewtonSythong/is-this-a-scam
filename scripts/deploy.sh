@@ -259,6 +259,15 @@ say ""
 
 if vercel whoami >/dev/null 2>&1; then
   printf '  %s✓ already signed in as%s %s\n' "$GREEN" "$RESET" "$(vercel whoami 2>/dev/null)"
+elif [[ ! -t 0 ]]; then
+  # Signing in opens a browser and waits on a real terminal. Say so now rather
+  # than letting it fail four stages later, after the keys have been pushed.
+  warn "not signed in, and this is not a terminal that can sign you in"
+  say ""
+  say "Open an ordinary terminal window, run:"
+  say "  vercel login"
+  say "then come back and run this script again."
+  exit 1
 else
   vercel login || {
     warn "sign-in did not complete"
@@ -294,11 +303,19 @@ push_key() {
   fi
 }
 
-say "Linking this folder to a Vercel project. Accept the defaults unless you"
-say "have a reason not to."
+say "Linking this folder to a Vercel project, accepting the defaults."
 say ""
-vercel link || {
+# --yes is not impatience. The Vercel CLI refuses to prompt unless stdin is a
+# real terminal, and this script is often run somewhere that gives it a pipe
+# instead — an editor's shell, a terminal inside another tool. Without it the
+# command fails with "requires confirmation" having asked nothing. The defaults
+# are what the line above already told the reader to accept.
+vercel link --yes || {
   warn "linking failed"
+  say ""
+  say "If it says you are not signed in, run this in an ordinary terminal window:"
+  say "  vercel login"
+  say "then run this script again. Signing in needs a real terminal and a browser."
   exit 1
 }
 
@@ -326,7 +343,14 @@ push_key NEXT_PUBLIC_SOURCE_URL
 say ""
 say "Deploying to production. This takes a minute or two."
 say ""
-DEPLOY_URL="$(vercel deploy --prod 2>&1 | tee /dev/tty | grep -oE 'https://[a-zA-Z0-9.-]+\.vercel\.app' | tail -1)"
+# Written to a file rather than piped through `tee /dev/tty`, because /dev/tty
+# does not exist when this runs without a terminal attached — and that failure
+# would be a broken pipe in the middle of a real deployment, which is the worst
+# possible place for one. `tee FILE` shows the output and keeps a copy.
+DEPLOY_LOG="$(mktemp)"
+vercel deploy --prod --yes 2>&1 | tee "$DEPLOY_LOG"
+DEPLOY_URL="$(grep -oE 'https://[a-zA-Z0-9.-]+\.vercel\.app' "$DEPLOY_LOG" | tail -1)"
+rm -f "$DEPLOY_LOG"
 
 if [[ -z "$DEPLOY_URL" ]]; then
   warn "could not read the deployed address from the output above"
