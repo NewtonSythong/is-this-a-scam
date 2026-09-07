@@ -22,6 +22,21 @@ Built for older and less digitally confident people in New Zealand. The name is 
 
 **A scam supplies its own proof**, so every answer points at a channel the message had no hand in choosing — ASB's own Caller Check, a bank's real number, or a number the person already has. See [ADR 0009](./docs/adr/0009-verified-route-back-to-the-organisation.md).
 
+## What a scammer can do with it
+
+The app is deliberately free, account-less and — if it is open-sourced — readable, and each of those is reachable by someone who wants to use it as a weapon. What is done about that:
+
+| The move | What stops it |
+| :-- | :-- |
+| Craft an `/asked` link that texts a premium-rate number | The reply number must be an NZ mobile (`02…`); `0900` cannot pass, and the destination is printed beside the button |
+| Put an organisation's name in the "who is asking" field | Names are cut to 24 characters, and whoever is named is cast as the person confused and asking for help |
+| Hide a hostname behind a right-to-left override | Invisible and bidirectional characters are stripped from everything shown |
+| Borrow the domain's credibility for their own text | A provenance line above it says the contents came from the link, not from us; nothing in a quoted message is ever clickable |
+| Submit drafts until one comes back "we can't tell" | Only partly. A per-caller cap and a provider spend cap ([ADR 0011](./docs/adr/0011-rate-limiting-and-spend.md)) are brakes, not a fix — see below |
+| Report genuine bank messages to poison the scam library | Reports are human-reviewed, and a library entry cannot be added without a `source` citing where the scam was published |
+
+**The endpoint is an oracle and cannot fully stop being one.** Anyone can submit a draft and learn whether it comes back as a scam. Nothing closes that while the app is free and has no accounts, and those are the two properties that make it reachable by the people it is for. Note also what the benchmark says: the offline rules catch 2/8 of unfamiliar scams on their own, so they are not a filter whose secrecy would be worth much. See [ADR 0013](./docs/adr/0013-the-trusted-person-can-answer.md) for the reasoning, including what was rejected.
+
 ## Setup
 
 Requires Node.js `>=22.12.0`.

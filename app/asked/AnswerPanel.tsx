@@ -91,6 +91,17 @@ export function AnswerPanel() {
 				</p>
 			</header>
 
+			{/* Anybody can build a link to this page, so anybody can choose what it
+			    says — including who it claims is asking. Saying so plainly is the
+			    defence: a page that quietly presents a stranger's text as a friend's
+			    question is lending this domain's credibility to whoever sent it. */}
+			<p className="provenance">
+				Everything on this page came out of the link you tapped, including who it says is
+				asking. We did not write any of it and cannot tell you who sent it. If you were not
+				expecting this{ask.from === null ? "" : ` from ${ask.from}`}, treat it as you would any
+				other message you did not expect.
+			</p>
+
 			<section className="asked">
 				<h2>The message they were sent</h2>
 				{/* Rendered as plain text on purpose: nothing in here is clickable, so a
@@ -133,9 +144,18 @@ export function AnswerPanel() {
 					<blockquote className="reply">{reply}</blockquote>
 
 					{href !== null ? (
-						<a className="ask primary" href={href}>
-							Send it{ask.from === null ? "" : ` to ${ask.from}`}
-						</a>
+						<>
+							<a className="ask primary" href={href}>
+								Send it{ask.from === null ? "" : ` to ${ask.from}`}
+							</a>
+							{/* The number is on screen because the link chose it, not you. If it
+							    is not the number you were expecting, that is worth seeing before
+							    your phone texts it. */}
+							<p className="hint destination">
+								This opens a text message to <strong>{ask.back}</strong>. Nothing is sent
+								until you send it.
+							</p>
+						</>
 					) : (
 						<>
 							<p>

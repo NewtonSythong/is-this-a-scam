@@ -643,3 +643,19 @@ a.ask.primary {
 	display: block;
 	margin-bottom: 0.2rem;
 }
+
+/* Said before anything the link chose, and styled to read as ours rather than as
+   part of what is being shown. */
+.provenance {
+	margin: 1.4rem 0 0;
+	padding: 0.85rem 1rem;
+	border: 1px solid var(--edge);
+	border-radius: 10px;
+	color: var(--ink-soft);
+	font-size: 0.95rem;
+}
+
+.answer .destination {
+	margin: 0.6rem 0 0;
+	overflow-wrap: anywhere;
+}

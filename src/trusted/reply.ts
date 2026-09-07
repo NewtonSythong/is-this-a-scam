@@ -1,5 +1,5 @@
 import type { Answer, Ask, VerdictLevel } from "../domain/types";
-import { isDialable, smsLink } from "./phone";
+import { isNewZealandMobile, smsLink, withoutInvisibles } from "./phone";
 
 /**
  * The Trusted Person's side of the escalation: reading what they were sent, and
@@ -25,6 +25,16 @@ const MAX_CARRIED = 600;
 /** How much the Trusted Person may add in their own words. */
 const MAX_NOTE = 300;
 
+/**
+ * How long a name in the link may be.
+ *
+ * Both names are rendered straight into headings on a page anybody can build a
+ * link to, so they are somewhere a stranger can put words on our domain. Short
+ * enough that nothing resembling a sentence, an instruction or an organisation's
+ * full title survives, and long enough for any name a person is actually called.
+ */
+const MAX_NAME = 24;
+
 /** Fragment keys. Single letters because each one costs SMS characters. */
 const KEY = { message: "m", from: "f", to: "t", back: "b", level: "l" } as const;
 
@@ -40,10 +50,16 @@ const KEY = { message: "m", from: "f", to: "t", back: "b", level: "l" } as const
 export function askUrl(origin: string, ask: Ask): string {
 	const params = new URLSearchParams();
 
-	params.set(KEY.message, clamp(ask.message, MAX_CARRIED));
-	if (ask.from !== null && ask.from.trim() !== "") params.set(KEY.from, ask.from.trim());
-	if (ask.to !== null && ask.to.trim() !== "") params.set(KEY.to, ask.to.trim());
-	if (ask.back !== null && isDialable(ask.back)) params.set(KEY.back, ask.back.trim());
+	const from = name(ask.from);
+	const to = name(ask.to);
+
+	params.set(KEY.message, clamp(withoutInvisibles(ask.message), MAX_CARRIED));
+	if (from !== null) params.set(KEY.from, from);
+	if (to !== null) params.set(KEY.to, to);
+	// Held to a New Zealand mobile on the way out as well as the way in, so a
+	// Checker whose own number would be refused by the page finds that out here
+	// rather than by their Trusted Person's tap going nowhere.
+	if (ask.back !== null && isNewZealandMobile(ask.back)) params.set(KEY.back, ask.back.trim());
 	if (ask.level !== null) params.set(KEY.level, ask.level);
 
 	return `${origin.replace(/\/+$/, "")}/asked#${params.toString()}`;
@@ -70,10 +86,10 @@ export function parseAsk(hash: string): Ask | null {
 	if (message === null || message.trim() === "") return null;
 
 	return {
-		message,
-		from: nonEmpty(params.get(KEY.from)),
-		to: nonEmpty(params.get(KEY.to)),
-		back: nonEmpty(params.get(KEY.back)),
+		message: withoutInvisibles(message),
+		from: name(params.get(KEY.from)),
+		to: name(params.get(KEY.to)),
+		back: answerable(params.get(KEY.back)),
 		level: asLevel(params.get(KEY.level)),
 	};
 }
@@ -118,7 +134,7 @@ const ANSWERS: Record<Answer, string> = {
  * words to send instead of the tap.
  */
 export function replyHref(back: string | null, text: string): string | null {
-	if (back === null || !isDialable(back)) return null;
+	if (back === null || !isNewZealandMobile(back)) return null;
 
 	return smsLink(back, text);
 }
@@ -144,10 +160,35 @@ function capitalised(sentence: string): string {
 	return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }
 
-function nonEmpty(value: string | null): string | null {
+/**
+ * A name from the link, made safe to put on the page, or `null`.
+ *
+ * Anyone can write this field, so it is stripped of invisibles, collapsed to
+ * single spaces and cut to a name's length. It is deliberately not restricted to
+ * an alphabet: macrons, apostrophes and hyphens are in real people's names, and
+ * an app for New Zealanders that mangles a Māori name to feel safer has made the
+ * wrong trade. Length and the surrounding wording carry the defence instead —
+ * the page casts whoever this is as the person asking for help, which is not a
+ * position anybody can borrow authority from.
+ */
+function name(value: string | null): string | null {
 	if (value === null) return null;
 
-	return value.trim() === "" ? null : value;
+	const cleaned = withoutInvisibles(value).replace(/\s+/g, " ").trim().slice(0, MAX_NAME).trim();
+
+	return cleaned === "" ? null : cleaned;
+}
+
+/**
+ * A number the answer may be sent to, or `null`.
+ *
+ * The one field in the link that causes the reader's phone to do something, so
+ * it is the one held to a shape. See `isNewZealandMobile`.
+ */
+function answerable(value: string | null): string | null {
+	if (value === null || !isNewZealandMobile(value)) return null;
+
+	return value.trim();
 }
 
 function asLevel(value: string | null): VerdictLevel | null {

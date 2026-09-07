@@ -162,3 +162,61 @@ describe("whatTheAppSaid", () => {
 		expect(whatTheAppSaid(null)).toBeNull();
 	});
 });
+
+/*
+ * Anyone can build a link to /asked, so every field below may have been written
+ * by a stranger rather than by the Checker. These are the limits on what that
+ * stranger can make the page say and do.
+ */
+describe("a link built by somebody other than the Checker", () => {
+	it("refuses a reply number that is not a New Zealand mobile", () => {
+		expect(parseAsk("#m=x&b=0900+12345")?.back).toBeNull();
+		expect(parseAsk("#m=x&b=%2B61+400+555+010")?.back).toBeNull();
+		expect(parseAsk("#m=x&b=021+555+0100")?.back).toBe("021 555 0100");
+	});
+
+	// Without this the page's one large button texts a number of the sender's
+	// choosing — a premium-rate charge, and a confirmation that the number works.
+	it("offers no reply button at all for such a number", () => {
+		expect(replyHref("0900 12345", "x")).toBeNull();
+	});
+
+	// The names go straight into headings on our domain, so they are somewhere a
+	// stranger can put words. Nothing sentence-shaped survives the length.
+	it("cuts a name down to a name", () => {
+		const long = parseAsk("#m=x&f=ANZ+Security+Team+-+your+account+is+suspended");
+
+		expect(long?.from?.length).toBeLessThanOrEqual(24);
+		expect(long?.from).not.toContain("suspended");
+	});
+
+	it("keeps names with macrons, hyphens and apostrophes intact", () => {
+		expect(parseAsk("#m=x&f=M%C4%81ori")?.from).toBe("Māori");
+		expect(parseAsk("#m=x&f=Anne-Marie+O'Brien")?.from).toBe("Anne-Marie O'Brien");
+	});
+
+	it("strips the invisible characters that make a screen lie", () => {
+		expect(parseAsk("#m=anz%E2%80%AE.top")?.message).toBe("anz.top");
+		expect(parseAsk("#m=x&f=Mum%E2%80%8B")?.from).toBe("Mum");
+	});
+
+	it("reads a name that was only invisibles as no name", () => {
+		expect(parseAsk("#m=x&f=%E2%80%8B%E2%80%8B")?.from).toBeNull();
+	});
+});
+
+describe("askUrl: what the Checker's own device will and will not carry", () => {
+	// Better they find out here than have their Trusted Person tap a button that
+	// goes nowhere.
+	it("leaves out the Checker's own number when the page would refuse it", () => {
+		const url = askUrl("https://example.nz", { ...ASK, back: "+61 400 555 010" });
+
+		expect(parseAsk(new URL(url).hash)?.back).toBeNull();
+	});
+
+	it("carries a New Zealand mobile through unchanged", () => {
+		const url = askUrl("https://example.nz", { ...ASK, back: "027 555 0100" });
+
+		expect(parseAsk(new URL(url).hash)?.back).toBe("027 555 0100");
+	});
+});
