@@ -44,6 +44,12 @@ These are decisions with reasons written down in [`docs/adr/`](./docs/adr). Disa
 - **The worse of the two engines wins, always.** Never an average. [ADR 0003](./docs/adr/0003-two-engines-worst-verdict-wins.md)
 - **The model cannot write its own sentences.** It picks from a fixed catalogue and quotes the words that made it pick; a quote that does not appear in the message is discarded. Hallucination is something the code catches, not something the reader has to notice. [ADR 0010](./docs/adr/0010-narrative-check-provider.md)
 - **A check stores nothing.** No accounts, no history, no log line, nothing written to disk. The single exception is a message somebody deliberately chose to report. [ADR 0005](./docs/adr/0005-nothing-is-stored.md), [ADR 0012](./docs/adr/0012-reporting-is-the-one-exception.md)
+- **The palette is held to its contrast by a test.** `app/palette.test.ts` reads
+  the tokens out of `globals.css` and asserts 4.5:1 for text and 3:1 for the
+  border of any control someone has to find. If you change a colour and that
+  test fails, the colour is wrong — nobody notices a faint border on the machine
+  they designed it on, and the people who do notice will not file an issue.
+  `--edge` separates things and is exempt; `--field` bounds controls and is not.
 - **Do not tune the engine against the benchmark corpus.** Nothing in `src/` may import `bench/`. The moment the engine is developed against those sixteen messages they stop measuring anything, and the number in the README becomes a claim about our own imagination. Fix a miss by principle, then see whether the fix generalises to cases you did not look at.
 
 ## Writing for the reader

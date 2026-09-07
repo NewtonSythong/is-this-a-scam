@@ -12,6 +12,14 @@
 	--page: #f7f7f5;
 	--card: #ffffff;
 	--edge: #d8d8d4;
+	/*
+	 * Borders that say where a control is, as opposed to --edge, which only
+	 * separates things. WCAG 1.4.11 asks for 3:1 on the boundary of any control
+	 * a person has to find, and --edge is 1.33:1 against white — invisible to
+	 * the eyes this app is built for. Measured 3.28:1 or better against every
+	 * surface it appears on, including all three verdict washes.
+	 */
+	--field: #84847f;
 
 	--scam: #a4131a;
 	--scam-wash: #fdeced;
@@ -45,7 +53,13 @@ body {
 }
 
 .page {
-	max-width: 40rem;
+	/*
+	 * About 68 characters at this text size. Forty rem ran to nearly ninety,
+	 * and the wider the measure the harder it is to find the start of the next
+	 * line — which is a small irritation for a practised reader and a real one
+	 * for somebody using reading glasses on a page they are anxious about.
+	 */
+	max-width: 34rem;
 	margin: 0 auto;
 	padding: 1.5rem 1.1rem 5rem;
 }
@@ -85,12 +99,19 @@ textarea {
 	line-height: 1.5;
 	color: var(--ink);
 	background: var(--card);
-	border: 2px solid var(--edge);
+	border: 2px solid var(--field);
 	border-radius: var(--radius);
 	resize: vertical;
 }
 
+/*
+ * Links are in here because the biggest button on an "unclear" verdict — the
+ * one that hands the message to a Trusted Person — is an <a>, and without this
+ * it fell back to whatever ring the browser felt like drawing.
+ */
 textarea:focus-visible,
+input:focus-visible,
+a:focus-visible,
 button:focus-visible {
 	outline: 3px solid var(--unclear);
 	outline-offset: 2px;
@@ -125,6 +146,9 @@ button:disabled {
 
 .verdict {
 	margin-top: 2rem;
+	/* The answer is moved to when it arrives. Without this it lands hard against
+	   the top edge of the screen with nothing above it to show it is the top. */
+	scroll-margin-top: 1rem;
 	border: 2px solid var(--edge);
 	border-left-width: 10px;
 	border-radius: var(--radius);
@@ -225,7 +249,7 @@ button:disabled {
 	font-weight: 400;
 	color: var(--ink);
 	background: var(--card);
-	border: 1px solid var(--edge);
+	border: 1px solid var(--field);
 	min-height: 0;
 }
 
@@ -252,6 +276,7 @@ button:disabled {
 		--page: #14161a;
 		--card: #1e2128;
 		--edge: #3a3f4a;
+		--field: #6b7280;
 
 		--scam: #ff8f93;
 		--scam-wash: #2e1416;
@@ -311,7 +336,7 @@ button:disabled {
 	font: inherit;
 	color: var(--ink);
 	background: var(--page);
-	border: 2px solid var(--edge);
+	border: 2px solid var(--field);
 	border-radius: 10px;
 	min-height: 3rem;
 }
@@ -341,7 +366,9 @@ button.link {
 	width: auto;
 	margin: 0;
 	padding: 0.5rem 0;
-	min-height: 0;
+	/* A floor, not a change: these already compute taller. It is here so a later
+	   tweak to the padding cannot quietly shrink a target below a thumb. */
+	min-height: 2.2rem;
 	background: none;
 	color: var(--unclear);
 	font-size: 1rem;
@@ -462,7 +489,7 @@ a.ask.primary {
 	margin: 0.6rem 0 0;
 	padding: 0.85rem 1rem;
 	background: var(--card);
-	border: 2px dashed var(--edge);
+	border: 2px dashed var(--field);
 	border-radius: 10px;
 	font-size: 1rem;
 	/* These are the scammer's words, not ours. Kept visually distinct so nobody
@@ -488,7 +515,7 @@ a.ask.primary {
 	margin: 0.8rem 0;
 	padding: 0.85rem 1rem;
 	background: var(--page);
-	border: 2px dashed var(--edge);
+	border: 2px dashed var(--field);
 	border-radius: 10px;
 	font-size: 1rem;
 	color: var(--ink-soft);
@@ -554,7 +581,7 @@ a.ask.primary {
 	margin: 0;
 	padding: 1rem;
 	background: var(--page);
-	border: 2px dashed var(--edge);
+	border: 2px dashed var(--field);
 	border-radius: 10px;
 	font-size: 1.05rem;
 	/* Their words, exactly as they arrived — including the line breaks, which are
@@ -590,7 +617,7 @@ a.ask.primary {
 .answer button.choice {
 	color: var(--ink);
 	background: var(--card);
-	border: 2px solid var(--edge);
+	border: 2px solid var(--field);
 	font-size: 1.1rem;
 	text-align: left;
 }
@@ -621,7 +648,7 @@ a.ask.primary {
 	margin: 0 0 0.4rem;
 	padding: 1rem;
 	background: var(--page);
-	border: 2px solid var(--edge);
+	border: 2px solid var(--field);
 	border-radius: 10px;
 	font-size: 1.05rem;
 	white-space: pre-wrap;
@@ -658,4 +685,58 @@ a.ask.primary {
 .answer .destination {
 	margin: 0.6rem 0 0;
 	overflow-wrap: anywhere;
+}
+
+/* --- Preferences the reader has already told their computer about -------- */
+
+/*
+ * Somebody who has turned on more contrast has said something specific about
+ * their eyes, and this is the audience most likely to have done it. Control
+ * boundaries go to full ink and the separators follow. The verdict keeps its own
+ * colour — `.verdict.scam` outranks the rule below — because red on the scam
+ * wash is already 6.9:1 and the colour is carrying meaning, not decoration.
+ */
+@media (prefers-contrast: more) {
+	:root {
+		--field: var(--ink);
+		--edge: var(--ink-soft);
+	}
+
+	.panel,
+	.trusted,
+	.asked,
+	.answer,
+	.contents,
+	.provenance {
+		border-color: var(--ink);
+	}
+}
+
+/*
+ * Tap feedback.
+ *
+ * Somebody unsure whether their tap registered taps again — and on the ask
+ * button, tapping again sends their Trusted Person a second text message. A
+ * press state answers the question before they ask it, which is worth more here
+ * than it would be almost anywhere else.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	button,
+	a.ask {
+		transition:
+			background-color 0.12s ease-out,
+			transform 0.06s ease-out;
+	}
+
+	button:active:not(:disabled),
+	a.ask:active {
+		transform: translateY(1px);
+	}
+}
+
+/* The default blue flash on tap is the browser's decision. This one is ours,
+   and it matches the focus ring so the two read as the same system. */
+button,
+a {
+	-webkit-tap-highlight-color: rgba(35, 80, 140, 0.18);
 }
