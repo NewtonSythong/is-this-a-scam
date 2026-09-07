@@ -23,6 +23,10 @@ export default function Home() {
 					looks like, and what to do about it.
 				</p>
 				<p>
+					<Link href="/helping">Helping someone who is being targeted</Link> — for the daughter,
+					the son, the neighbour: how to be the person they ring, and what to say when they do.
+				</p>
+				<p>
 					This is the web version of an Android app built for people in New Zealand who are being
 					targeted by scam texts. On a phone, the app adds <strong>Is this a scam?</strong> to the
 					menu that appears when you highlight a message, so there is nothing to copy or paste.
