@@ -43,6 +43,32 @@ npm run dev             # http://localhost:3000
 
 Both go in `.env.local`, which is git-ignored.
 
+## Does it actually work?
+
+Measured against a held-out corpus of sixteen messages the engine was never built
+against — [`bench/corpus.ts`](./bench/corpus.ts), run with `npm run bench`:
+
+| | Offline engine only | Both engines |
+| :-- | :-- | :-- |
+| Scams raised | 2/8 (25%) | 5/8 (63%) |
+| Legitimate messages left quiet | 8/8 | 8/8 |
+| — of those, genuine messages that look like scams | 5/5 | 5/5 |
+
+The deterministic half alone catches a quarter of unfamiliar scams; the model
+roughly doubles that. It currently raises no false alarms, which matters more
+than it sounds: an app that shouts at a real courier text teaches a frightened
+person to ignore it.
+
+**Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before quoting any
+of this.** The corpus is sixteen messages, only two of which could be sourced
+verbatim, and most of the rest were written by a language model — which is also
+half of what is being tested. The three scams that still get through all share
+one shape: no link worth checking and no organisation named.
+
+The benchmark has already earned its keep. Its first run caught the app calling a
+genuine NZ Post tracking text a scam, because NZ Post's own link shortener was
+missing from their record.
+
 ## Commands
 
 | Command | Action |
@@ -52,6 +78,8 @@ Both go in `.env.local`, which is git-ignored.
 | `npm test` | Run the test suite (Vitest) |
 | `npm run typecheck` | Type-check without emitting |
 | `npm run verify` | Both of the above — run this before pushing |
+| `npm run bench` | Score the held-out corpus with the offline engine (free) |
+| `npm run bench:full` | Score it with both engines (spends Anthropic credit) |
 
 `npm test` does not type-check, so a broken type can pass the tests. `npm run verify` is the one that catches both.
 
@@ -112,7 +140,8 @@ Messages are sent to the server to be checked and are not stored, logged, or kep
 
 - The Android app — the text-selection menu, share sheet, and quick-settings tile
 - `ACTION_PROCESS_TEXT` behaviour on Android 15/16 needs confirming against a real device ([ADR 0004](./docs/adr/0004-entry-points.md))
-- Effort is set to `medium` on judgement, not measurement — it needs a real corpus to tune against
-- The live path has been exercised by hand, not by anything repeatable: there is no end-to-end check that runs the real engines against known messages and fails if a verdict changes
+- Effort is set to `medium` on judgement, not measurement — the benchmark corpus is too small to tune against
+- Three scam shapes get through both engines: no link and no organisation named. See the end of `docs/benchmark-method.md`
+- The benchmark corpus needs to be an order of magnitude larger, and sourced from real reported messages rather than reconstructions
 - Rate limiting is in-memory only; a Vercel Firewall rule on `/api/check` would hold across restarts
 - Reports are kept in SQLite, which is durable locally but **not** on a serverless host — a deployment there refuses reports (503) rather than losing them, until a hosted store is chosen
