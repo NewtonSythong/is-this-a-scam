@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import type { CheckerIdentity, TrustedPerson } from "@/src/domain/types";
 import { isReachable } from "@/src/trusted/askForHelp";
+import { diagnose } from "@/src/trusted/phone";
 
 interface Props {
 	person: TrustedPerson | null;
@@ -12,6 +13,76 @@ interface Props {
 	onForget: () => void;
 	/** Set when the browser refused to remember them, so we can say so plainly. */
 	saveFailed: boolean;
+}
+
+/**
+ * What to say under a number that will not do what the Checker expects.
+ *
+ * Nothing here blocks the form. A number the app cannot use is still the number
+ * they typed, and they may well know something we do not — so this says what
+ * will happen and, where the number is recoverable, offers the fix as a button
+ * rather than an instruction to go and retype it.
+ *
+ * `whose` changes what the consequence actually is. A landline given as the
+ * Trusted Person's means the message never arrives; given as the Checker's own
+ * it means only the one-tap reply is lost. An overseas number is worth
+ * mentioning for the Checker and worth ignoring for the Trusted Person, because
+ * ADR 0006 keeping this app to New Zealand was never a reason to refuse to help
+ * somebody whose daughter lives in Sydney.
+ */
+function NumberAdvice({
+	phone,
+	whose,
+	them,
+	onUse,
+}: {
+	phone: string;
+	whose: "theirs" | "yours";
+	them: string;
+	onUse: (suggestion: string) => void;
+}) {
+	const verdict = diagnose(phone);
+
+	if (verdict.kind === "correctable") {
+		return (
+			<p className="hint" role="status">
+				Did you mean <strong>{verdict.suggestion}</strong>? A New Zealand mobile starts with
+				02.{" "}
+				<button type="button" className="link" onClick={() => onUse(verdict.suggestion)}>
+					Use that
+				</button>
+			</p>
+		);
+	}
+
+	if (verdict.kind === "landline") {
+		return (
+			<p className="hint" role="status">
+				{whose === "theirs"
+					? `That looks like a landline, and a text message will not arrive on one. Is there a mobile for ${them}?`
+					: `That looks like a landline, so ${them} cannot text an answer back to it. A mobile means they can answer you with one tap.`}
+			</p>
+		);
+	}
+
+	if (verdict.kind === "overseas" && whose === "yours") {
+		return (
+			<p className="hint" role="status">
+				{them} will still get your message. They will have to type their answer, though — the
+				one-tap reply only works to a New Zealand mobile.
+			</p>
+		);
+	}
+
+	if (verdict.kind === "unusable") {
+		return (
+			<p className="hint" role="status">
+				That does not look like quite enough digits for a phone number.
+			</p>
+		);
+	}
+
+	return null;
 }
 
 /**
@@ -102,6 +173,13 @@ export function TrustedPersonPanel({ person, checker, onSave, onForget, saveFail
 					autoComplete="tel"
 				/>
 
+				<NumberAdvice
+					phone={phone}
+					whose="theirs"
+					them={name.trim() === "" ? "them" : name.trim()}
+					onUse={setPhone}
+				/>
+
 				<p className="hint">
 					This stays on this device. It is never sent to us, and we never message them —
 					your phone does.
@@ -131,6 +209,13 @@ export function TrustedPersonPanel({ person, checker, onSave, onForget, saveFail
 						placeholder="021 555 0199"
 						inputMode="tel"
 						autoComplete="tel"
+					/>
+
+					<NumberAdvice
+						phone={yourPhone}
+						whose="yours"
+						them={name.trim() === "" ? "They" : name.trim()}
+						onUse={setYourPhone}
 					/>
 
 					<p className="hint">
