@@ -26,7 +26,7 @@
 import { existsSync } from "node:fs";
 
 import Anthropic from "@anthropic-ai/sdk";
-import { anthropicNarrativeCheck } from "../src/narrative/anthropic";
+import { NARRATIVE_MODEL, anthropicNarrativeCheck } from "../src/narrative/anthropic";
 import { CORPUS } from "./corpus";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
@@ -35,14 +35,43 @@ if (!process.env.ANTHROPIC_API_KEY) {
 	throw new Error("bench/narrative.ts needs ANTHROPIC_API_KEY — it is the thing being measured");
 }
 
-const narrative = anthropicNarrativeCheck(new Anthropic());
+/**
+ * `--model claude-haiku-4-5` runs the same corpus against another model.
+ *
+ * This is the half of the picture `bench:imc25` cannot give. That corpus is all
+ * scams, so it measures recall and a model that raises an alarm more readily
+ * scores better on it. The legitimate messages are only here, which makes this
+ * the only place a cheaper model's real cost can be seen — an app that cries
+ * wolf at genuine bank mail teaches a frightened person to ignore it, and no
+ * amount of recall makes up for that.
+ */
+const modelArg = process.argv.indexOf("--model");
+const MODEL = modelArg === -1 ? NARRATIVE_MODEL : (process.argv[modelArg + 1] ?? NARRATIVE_MODEL);
+
+console.log(`Model: ${MODEL}${MODEL === NARRATIVE_MODEL ? "  (the model the app runs on)" : "  (NOT the model the app runs on)"}`);
+console.log("");
+
+const narrative = anthropicNarrativeCheck(new Anthropic(), MODEL);
 
 let scamsReached = 0;
 let scamsTotal = 0;
 let falseAlarms = 0;
 
 for (const item of CORPUS) {
-	const signals = await narrative(item.message);
+	let signals: Awaited<ReturnType<typeof narrative>>;
+	try {
+		signals = await narrative(item.message);
+	} catch (error) {
+		// A call that never happened looks exactly like a message the engine
+		// found nothing in — which on the legitimate half would read as a clean
+		// bill of health. Stop rather than report that.
+		const why = error instanceof Error ? error.message : String(error);
+		console.error("");
+		console.error(`Stopped at ${item.id}: ${why.slice(0, 200)}`);
+		console.error("No result is reported, because an unanswered call would count here as");
+		console.error("a legitimate message the engine stayed quiet on.");
+		process.exit(1);
+	}
 	const fired = signals.map((signal) => signal.kind);
 	const spent = item.developedAgainst === undefined ? "" : " (no longer held out)";
 
@@ -60,8 +89,10 @@ for (const item of CORPUS) {
 }
 
 console.log("");
+const legitimate = CORPUS.filter((item) => item.kind === "legitimate").length;
+console.log(`Model: ${MODEL}`);
 console.log(`Scams the model alone saw something in: ${scamsReached}/${scamsTotal}`);
-console.log(`False alarms on legitimate messages:    ${falseAlarms}`);
+console.log(`False alarms on legitimate messages:    ${falseAlarms}/${legitimate}`);
 console.log("");
 console.log("A miss here is not necessarily a miss in the app: the Artifact Check may still");
 console.log("reach it. An ALARM here is always worth investigating, because it will surface");

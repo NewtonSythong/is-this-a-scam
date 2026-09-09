@@ -228,3 +228,213 @@ Zealand messages is now the scarcer half and the more valuable contribution.
 **The 126 misses are a wasting asset like any other.** The run prints their ids
 and says so. Reading them in order to fix them spends them, and their passing
 afterwards proves nothing.
+
+
+## A pattern for the wrong-number opener — written, not yet measured
+
+**Added 2026-09-09.** `wrong-number-opener` has been added to the catalogue in
+response to the 2/40 above. **Its effect on that score is unknown**, because the
+Anthropic balance was exhausted by the benchmark runs before a clean reading
+could be taken. Nothing here should be read as evidence that it works.
+
+What can be said without a number:
+
+- It was written from published descriptions of the fraud — the [FTC's April 2025
+  alert](https://consumer.ftc.gov/consumer-alerts/2025/04/unexpected-text-scam)
+  and [Netsafe's scam guidance](https://netsafe.org.nz/scams/understanding-scams),
+  both saying plainly that the reply itself is the harm — and **not** from the
+  messages it will be scored against. The forty wrong-number items in
+  `bench/imc25.csv` therefore remain genuinely held out, and the reading taken
+  after this change will still mean something. That is the opposite of how the
+  three patterns of 2026-09-07 were written, and the reason this one is worth
+  measuring at all.
+- It is `warning` rather than `scam` on purpose. A genuine misdirected text
+  cannot be told from a scam opener by its words — only by what follows. The
+  pattern is carried anyway because the advice is the same either way: do not
+  reply. That is the only pattern in the catalogue where being wrong costs the
+  reader nothing.
+- Two hard negatives were added to `bench/corpus.ts` — a courier at the door and
+  a tradesman running late — because "a stranger asking who you are" is a shape
+  ordinary life produces constantly. Neither was used to write the pattern.
+
+### The run that produced no number, and what it cost
+
+The first run of `bench:imc25` gave the 56.8% above and was clean. A second run,
+after this pattern was added, completed 86 of 292 calls and reported **69.8%** —
+a figure computed entirely from the messages that happened to get through before
+the credit ran out. It is not a result and it is recorded here only so nobody
+finds it in a terminal scrollback and believes it.
+
+The harness has been changed so this cannot recur quietly. A billing or
+authentication failure now stops the run outright instead of being retried, on
+the grounds that a call which never happened is indistinguishable in the output
+from a message the engine found nothing in — so a partial run does not report a
+lower score, it reports nothing at all.
+
+
+## The wrong-number pattern fires — measured on Haiku, not on the app's model
+
+**Added 2026-09-10. This run used `claude-haiku-4-5`. The app runs on
+`claude-opus-5`, so the overall figure below is not this project's number.**
+
+All 292 messages answered, no failed calls.
+
+| Scam type | Before (Opus, no pattern) | This run (Haiku, with pattern) |
+| :--- | :--- | :--- |
+| hey mum/dad | 10/12 — 83.3% | 11/12 — 91.7% |
+| government | 32/40 — 80.0% | 33/40 — 82.5% |
+| banking | 27/40 — 67.5% | 30/40 — 75.0% |
+| delivery | 28/40 — 70.0% | 28/40 — 70.0% |
+| spam | 24/40 — 60.0% | 29/40 — 72.5% |
+| telecom | 24/40 — 60.0% | 27/40 — 67.5% |
+| others | 19/40 — 47.5% | 22/40 — 55.0% |
+| **wrong number** | **2/40 — 5.0%** | **13/40 — 32.5%** |
+| Overall | 166/292 — 56.8% | 193/292 — 66.1% |
+
+### What can be concluded, and what cannot
+
+**Two things changed between these columns — the model and the catalogue — so
+the overall lift from 56.8% to 66.1% cannot be attributed to either.** Reading
+it as "the pattern is worth nine points" or as "Haiku beats Opus here" would both
+be wrong. The columns sit side by side because the corpus is identical, not
+because the runs are comparable.
+
+**What the run does show is that `wrong-number-opener` fires.** It appears 12
+times in the pattern tally, having been written from published descriptions of
+the fraud rather than from any message in this corpus, and the category it was
+written for moved from 2/40 to 13/40. A pattern that fires only on the messages
+it was written from has memorised rather than generalised; this one had no such
+messages to memorise. That is the first pattern in this project whose
+generalisation was established before anyone read the misses.
+
+It is still 13/40. The category remains the worst in the corpus by some way, and
+a wrong-number text that opens with nothing but a name is genuinely close to
+indistinguishable from a real one — which is the reason the pattern is a
+`warning` and not a `scam`.
+
+### The comparison still missing
+
+The clean reading is Opus with the new catalogue, which is both the app's real
+number and the only figure that isolates the pattern from the model. It costs
+several times what this run did. Until it is taken, the honest summary of this
+project's measured position is still **56.8% on Opus without the pattern**, plus
+the knowledge that the pattern fires.
+
+The second question this run raises and cannot settle is whether the app needs
+Opus at all. Haiku is a fifth the price and did not obviously struggle. That is
+worth a real experiment — the same catalogue on both models — rather than an
+inference from two runs that differ in two ways.
+
+
+## The clean reading: 59.9% on the app's own model
+
+**Added 2026-09-10, later the same day.** `claude-opus-5`, the model the app
+runs on, with the new catalogue. All 292 answered, no failed calls. **This is
+this project's number.**
+
+Three runs now exist over the identical corpus, and between the first two only
+the catalogue differs, so the pattern can finally be separated from the model.
+
+| Scam type | Opus, no pattern | **Opus, with pattern** | Haiku, with pattern |
+| :--- | :--- | :--- | :--- |
+| hey mum/dad | 10/12 — 83.3% | **11/12 — 91.7%** | 11/12 — 91.7% |
+| government | 32/40 — 80.0% | **32/40 — 80.0%** | 33/40 — 82.5% |
+| delivery | 28/40 — 70.0% | **28/40 — 70.0%** | 28/40 — 70.0% |
+| banking | 27/40 — 67.5% | **25/40 — 62.5%** | 30/40 — 75.0% |
+| spam | 24/40 — 60.0% | **24/40 — 60.0%** | 29/40 — 72.5% |
+| telecom | 24/40 — 60.0% | **24/40 — 60.0%** | 27/40 — 67.5% |
+| others | 19/40 — 47.5% | **18/40 — 45.0%** | 22/40 — 55.0% |
+| wrong number | 2/40 — 5.0% | **13/40 — 32.5%** | 13/40 — 32.5% |
+| Overall | 166/292 — 56.8% | **175/292 — 59.9%** | 193/292 — 66.1% |
+
+### What the pattern was worth
+
+**Nine messages: 56.8% to 59.9%, and eleven of the twelve movements are the
+wrong-number category going from 2/40 to 13/40.** Everything else is flat or
+within a message or two of flat, which is what a well-scoped pattern should look
+like — it caught the shape it was written for and did not start firing
+everywhere else. `wrong-number-opener` appears exactly 12 times in the tally on
+both models.
+
+Two categories moved *down* by one or two messages (banking 27 to 25, others 19
+to 18). Nothing was removed from the catalogue, so this is run-to-run variation
+in the model rather than a regression caused by the new pattern — but it is
+recorded rather than smoothed over, and it is a reminder that differences of one
+or two messages in a 40-item stratum are noise.
+
+### The uncomfortable result: the cheap model scored higher
+
+Haiku 4.5 and Opus 5 ran the **same catalogue over the same corpus**, so unlike
+the earlier comparison this one is clean. Haiku found something in **18 more
+messages** — 66.1% against 59.9% — at a fifth the price.
+
+**Do not act on that yet, and do not read it as "Haiku is better here."** This
+benchmark measures recall and nothing else. Every message in the corpus is a
+scam, so a model that is merely quicker to raise an alarm scores higher, and an
+engine that shouted at everything would score 100%. The number that would settle
+it — how often each model fires on a genuine message — is not in this report and
+has never been measured for Haiku at all.
+
+For this app that missing half is the more important one. A false warning costs
+a phone call; an app that cries wolf at real bank mail teaches a frightened
+person to ignore it, and that failure is invisible in a corpus made only of
+scams. Until `npm run bench:narrative` has been run on both models over the
+legitimate half, the correct summary is: **Haiku has higher recall and an
+unknown false-alarm rate.**
+
+That is a cheap experiment — ten messages, two models — and it is the next thing
+worth doing.
+
+
+## The false-alarm half, on both models — and why it settles less than it looks
+
+**Added 2026-09-10.** `bench/narrative.ts` now takes `--model`, so the
+legitimate half can be run against a cheaper model too
+(`npm run bench:narrative:haiku`). Both models were run over the 23-item corpus.
+
+| | Claude Opus 5 | Claude Haiku 4.5 |
+| :--- | :--- | :--- |
+| Scams the model's half saw something in | 13/13 | 13/13 |
+| **False alarms on legitimate messages** | **0/10** | **0/10** |
+
+Both new hard negatives — the courier at the door and the plumber running late —
+stayed quiet on both models. That is the result `wrong-number-opener` most needed:
+it fires on the wrong-number shape without firing on the ordinary life that
+shares it.
+
+### This does not license moving the app to Haiku
+
+It is tempting to put the two readings together — Haiku has higher recall on the
+held-out corpus (66.1% against 59.9%) and the same zero false alarms here — and
+conclude the app should run on the model that costs a fifth as much.
+
+**Ten legitimate messages cannot support that.** A model with a false-alarm rate
+of one in twenty would return 0/10 about three times in five. The two models are
+indistinguishable on this evidence not because they behave the same but because
+the sample is far too small to tell them apart, and the quantity that matters for
+this app — how often it shouts at a real message — is exactly the one the corpus
+is least able to measure.
+
+The honest statement is: **no false alarm was observed on either model, in a
+sample too small to detect a rate this app would consider unacceptable.**
+
+Closing that gap needs perhaps fifty to a hundred genuine New Zealand messages of
+the awkward kind — bank notifications, courier updates, government mail, the
+things that legitimately carry links and deadlines. That is the same bottleneck
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) already names, arriving from the other
+direction, and it is now the single thing blocking a decision worth a fivefold
+cut in what this app costs to run.
+
+### A correction
+
+Two hard negatives were described in the 2026-09-09 entry above as guarding
+`wrong-number-opener`. They were added to the file but landed inside the `CORPUS`
+export rather than the `LEGITIMATE` array, so **they were not in the corpus and
+were never being run.** `npm run verify` passed throughout, because `tsconfig.json`
+included only `src` and `app` — the benchmark directory was never typechecked.
+
+`bench` is now in the include list. Turning it on immediately found the broken
+array, two corpus items missing their required `source` field, and three unsafe
+index accesses. The numbers in the entries above stand — they came from
+`bench/imc25.csv`, which is read at runtime and was unaffected — but the claim
+that those two negatives were guarding anything was wrong until now.
