@@ -90,10 +90,21 @@ export function findingsFrom(parsed: unknown): NarrativeFinding[] {
  * get a Verdict (ADR 0003). Genuine transport failures are still allowed to
  * throw — that is `checkAsync`'s call to absorb, not this function's to hide.
  */
-export function anthropicNarrativeCheck(client: Anthropic = new Anthropic()): NarrativeCheck {
+/**
+ * The model the app runs on. Exported so a benchmark can name the same one it is
+ * measuring, and so a run against a cheaper model has to say so out loud rather
+ * than happen by accident — a number produced by a different model is a number
+ * about a different engine.
+ */
+export const NARRATIVE_MODEL = "claude-opus-5";
+
+export function anthropicNarrativeCheck(
+	client: Anthropic = new Anthropic(),
+	model: string = NARRATIVE_MODEL,
+): NarrativeCheck {
 	return async function narrative(message: string): Promise<Signal[]> {
 		const response = await client.messages.parse({
-			model: "claude-opus-5",
+			model,
 			max_tokens: 4000,
 			system: systemPrompt(),
 			thinking: { type: "adaptive" },

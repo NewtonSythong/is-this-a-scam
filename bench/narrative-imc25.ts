@@ -33,10 +33,11 @@
  * side, this for the recall side.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 
 import Anthropic from "@anthropic-ai/sdk";
-import { anthropicNarrativeCheck } from "../src/narrative/anthropic";
+import { NARRATIVE_MODEL, anthropicNarrativeCheck, systemPrompt } from "../src/narrative/anthropic";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
@@ -72,15 +73,54 @@ function parseCsv(csv: string): string[][] {
 const rows = parseCsv(readFileSync("bench/imc25.csv", "utf8")).slice(1).filter((r) => r.length >= 5);
 const items: Item[] = rows.map((r) => ({ id: r[0], tier: r[1], scamType: r[2], message: r[4] }));
 
-const narrative = anthropicNarrativeCheck(new Anthropic());
+/** `--model claude-haiku-4-5` to price a run differently. See the note below. */
+const modelArg = process.argv.indexOf("--model");
+const MODEL = modelArg === -1 ? NARRATIVE_MODEL : process.argv[modelArg + 1];
+
+const narrative = anthropicNarrativeCheck(new Anthropic(), MODEL);
+
+/**
+ * Answers already paid for, so a run that stops halfway — for a rate limit, an
+ * exhausted balance, a closed laptop — resumes instead of being bought twice.
+ *
+ * The key is the model, the *whole* system prompt and the message. That is the
+ * important part: the system prompt contains the pattern catalogue, so adding or
+ * editing a single pattern changes every key and the cache empties itself. A
+ * cache keyed on the message alone would silently serve answers from the engine
+ * as it was before the change, and the run would report a mixture of two
+ * engines as though it were one reading.
+ *
+ * Delete `bench/.imc25-cache.jsonl` to force a clean run.
+ */
+const CACHE = "bench/.imc25-cache.jsonl";
+const fingerprint = createHash("sha256").update(`${MODEL}\u0000${systemPrompt()}`).digest("hex").slice(0, 16);
+const keyFor = (message: string) =>
+	createHash("sha256").update(`${fingerprint}\u0000${message}`).digest("hex").slice(0, 24);
+
+const cached = new Map<string, string[]>();
+if (existsSync(CACHE)) {
+	for (const line of readFileSync(CACHE, "utf8").split("\n")) {
+		if (line.trim() === "") continue;
+		try {
+			const row = JSON.parse(line) as { key: string; fired: string[] };
+			cached.set(row.key, row.fired);
+		} catch {
+			// A half-written final line after a hard kill. Everything before it
+			// is still good, so read what parses and carry on.
+		}
+	}
+}
 
 /** Modest, so a benchmark run cannot look like an attack on the API. */
 const CONCURRENCY = 2;
 
+const queue: Item[] = [...items];
 const results: { item: Item; fired: string[]; failed: boolean; why?: string }[] = [];
 let done = 0;
+let reused = 0;
+let fatal: string | null = null;
 
-async function worker(queue: Item[]) {
+async function worker() {
 	for (;;) {
 		const item = queue.shift();
 		if (item === undefined) return;
@@ -89,11 +129,24 @@ async function worker(queue: Item[]) {
 		// benchmark that silently drops two thirds of its corpus reports a
 		// number computed from whatever happened to get through, which is worse
 		// than reporting nothing.
+		const key = keyFor(item.message);
+		const already = cached.get(key);
+		if (already !== undefined) {
+			results.push({ item, fired: already, failed: false });
+			reused += 1;
+			done += 1;
+			continue;
+		}
+
 		let attempt = 0;
 		for (;;) {
 			try {
 				const signals = await narrative(item.message);
-				results.push({ item, fired: signals.map((s) => s.kind), failed: false });
+				const fired = signals.map((s) => s.kind);
+				// Written the moment it arrives, not at the end, so a run killed
+				// mid-flight still keeps everything it paid for.
+				appendFileSync(CACHE, `${JSON.stringify({ key, id: item.id, fired })}\n`);
+				results.push({ item, fired, failed: false });
 				break;
 			} catch (error) {
 				attempt += 1;
@@ -104,10 +157,13 @@ async function worker(queue: Item[]) {
 				// run of this benchmark spent the credit the second needed, and
 				// the retries then dressed a billing message up as flakiness.
 				if (/credit balance|authentication|invalid x-api-key|permission/i.test(why)) {
-					console.error(`
-Stopping: this will not come right by retrying.
-  ${why.slice(0, 200)}`);
-					process.exit(1);
+					// Set down the work and let the other workers finish what is
+					// already in flight. Calling process.exit() here kills the
+					// loop mid-await, which on Windows trips a libuv assertion
+					// and loses answers that were already paid for.
+					fatal = why;
+					queue.length = 0;
+					break;
 				}
 				if (attempt >= 5) {
 					// A failed call is not a miss. Counting it as one would quietly
@@ -123,8 +179,23 @@ Stopping: this will not come right by retrying.
 	}
 }
 
-const queue = [...items];
-await Promise.all(Array.from({ length: CONCURRENCY }, () => worker(queue)));
+await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+
+// A run that stopped early reports nothing at all. Printing a table here would
+// be printing the very thing this harness exists to prevent: a percentage
+// computed from whichever messages happened to get an answer.
+if (fatal !== null) {
+	const paid = results.filter((r) => !r.failed).length;
+	console.error("");
+	console.error("Stopped: this will not come right by retrying.");
+	console.error(`  ${fatal.slice(0, 200)}`);
+	console.error("");
+	console.error(`${paid} of ${items.length} answered. They are saved in ${CACHE} and will be`);
+	console.error("reused, so re-running once this is resolved only pays for the remainder.");
+	console.error("");
+	console.error("No score is reported, because a score from a partial run is not a score.");
+	process.exit(1);
+}
 
 const answered = results.filter((r) => !r.failed);
 const seen = answered.filter((r) => r.fired.length > 0);

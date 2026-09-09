@@ -9,3 +9,6 @@ data/
 .vercel
 .env*
 !.env.example
+
+# benchmark answers already paid for — local to a machine, not a shared artefact
+bench/.imc25-cache.jsonl
