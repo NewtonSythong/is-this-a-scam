@@ -98,6 +98,41 @@ export function findingsFrom(parsed: unknown): NarrativeFinding[] {
  */
 export const NARRATIVE_MODEL = "claude-opus-5";
 
+const MAX_TOKENS = 4000;
+
+/**
+ * Whether a model takes adaptive thinking, or the older fixed budget.
+ *
+ * Adaptive thinking and `output_config.effort` arrived with the 4.6 generation.
+ * Ask Haiku 4.5 for adaptive thinking and the request is refused outright —
+ * "adaptive thinking is not supported on this model" — and `effort` is rejected
+ * on that model too. The shape of the request is therefore a property of the
+ * model, not a constant, which is the thing that has to be true before naming a
+ * different model can mean anything.
+ */
+function takesAdaptiveThinking(model: string): boolean {
+	return !/-4-5$|-4-5-|-3-|-3\.5-/.test(model);
+}
+
+/** How the request is tuned for whichever model is being asked. */
+export function tuningFor(model: string) {
+	const format = zodOutputFormat(FindingsSchema);
+
+	if (takesAdaptiveThinking(model)) {
+		return {
+			thinking: { type: "adaptive" as const },
+			output_config: { effort: "medium" as const, format },
+		};
+	}
+
+	// The nearest equivalent an older model has: a fixed budget, which must be
+	// at least 1024 and below `max_tokens`. No `effort` — it is refused here.
+	return {
+		thinking: { type: "enabled" as const, budget_tokens: 1024 },
+		output_config: { format },
+	};
+}
+
 export function anthropicNarrativeCheck(
 	client: Anthropic = new Anthropic(),
 	model: string = NARRATIVE_MODEL,
@@ -105,13 +140,9 @@ export function anthropicNarrativeCheck(
 	return async function narrative(message: string): Promise<Signal[]> {
 		const response = await client.messages.parse({
 			model,
-			max_tokens: 4000,
+			max_tokens: MAX_TOKENS,
 			system: systemPrompt(),
-			thinking: { type: "adaptive" },
-			output_config: {
-				effort: "medium",
-				format: zodOutputFormat(FindingsSchema),
-			},
+			...tuningFor(model),
 			messages: [{ role: "user", content: message }],
 		});
 

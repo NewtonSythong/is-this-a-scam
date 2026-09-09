@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NARRATIVE_PATTERNS } from "../engine/narrative";
-import { findingsFrom, systemPrompt } from "./anthropic";
+import { findingsFrom, systemPrompt, tuningFor } from "./anthropic";
 
 describe("systemPrompt", () => {
 	// Generated from the catalogue, so a pattern cannot be added in one place and
@@ -60,5 +60,42 @@ describe("findingsFrom", () => {
 	// arrive — but the app must not depend on that for its safety.
 	it("refuses a pattern outside the catalogue even though the schema forbids one", () => {
 		expect(findingsFrom({ findings: [{ pattern: "made-up", quote: "x" }] })).toEqual([]);
+	});
+});
+
+/*
+ * The request shape is a property of the model. A benchmark that names a
+ * cheaper model is worthless if the request it sends is refused, and the way
+ * that failed was invisible: every call 400d, the harness retried each one, and
+ * an hour of "progress" produced nothing at all.
+ */
+describe("tuningFor", () => {
+	it("asks a current model for adaptive thinking and an effort level", () => {
+		const tuning = tuningFor("claude-opus-5");
+
+		expect(tuning.thinking).toEqual({ type: "adaptive" });
+		expect(tuning.output_config).toHaveProperty("effort", "medium");
+	});
+
+	// Haiku 4.5 refuses both: "adaptive thinking is not supported on this model".
+	it("gives an older model a fixed budget and no effort", () => {
+		const tuning = tuningFor("claude-haiku-4-5");
+
+		expect(tuning.thinking).toEqual({ type: "enabled", budget_tokens: 1024 });
+		expect(tuning.output_config).not.toHaveProperty("effort");
+	});
+
+	it("keeps the thinking budget inside max_tokens", () => {
+		const tuning = tuningFor("claude-haiku-4-5");
+		const budget = "budget_tokens" in tuning.thinking ? tuning.thinking.budget_tokens : 0;
+
+		expect(budget).toBeGreaterThanOrEqual(1024);
+		expect(budget).toBeLessThan(4000);
+	});
+
+	it("always asks for the structured format, whichever model it is", () => {
+		for (const model of ["claude-opus-5", "claude-haiku-4-5", "claude-sonnet-5"]) {
+			expect(tuningFor(model).output_config, model).toHaveProperty("format");
+		}
 	});
 });

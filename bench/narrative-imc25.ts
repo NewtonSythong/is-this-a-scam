@@ -183,7 +183,13 @@ async function worker() {
 				// exhausted balance is the one that actually happened: the first
 				// run of this benchmark spent the credit the second needed, and
 				// the retries then dressed a billing message up as flakiness.
-				if (/credit balance|authentication|invalid x-api-key|permission/i.test(why)) {
+				// `invalid_request_error` belongs here too, and its absence cost an
+				// hour: a run against a model that refused the request shape
+				// retried all 292 messages five times each and reported nothing,
+				// while looking from the outside exactly like slow progress. A
+				// request the server calls malformed is malformed on every
+				// attempt.
+				if (/credit balance|authentication|invalid x-api-key|permission|invalid_request_error/i.test(why)) {
 					// Set down the work and let the other workers finish what is
 					// already in flight. Calling process.exit() here kills the
 					// loop mid-await, which on Windows trips a libuv assertion
