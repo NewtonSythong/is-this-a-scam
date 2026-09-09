@@ -324,3 +324,63 @@ The second question this run raises and cannot settle is whether the app needs
 Opus at all. Haiku is a fifth the price and did not obviously struggle. That is
 worth a real experiment — the same catalogue on both models — rather than an
 inference from two runs that differ in two ways.
+
+
+## The clean reading: 59.9% on the app's own model
+
+**Added 2026-09-10, later the same day.** `claude-opus-5`, the model the app
+runs on, with the new catalogue. All 292 answered, no failed calls. **This is
+this project's number.**
+
+Three runs now exist over the identical corpus, and between the first two only
+the catalogue differs, so the pattern can finally be separated from the model.
+
+| Scam type | Opus, no pattern | **Opus, with pattern** | Haiku, with pattern |
+| :--- | :--- | :--- | :--- |
+| hey mum/dad | 10/12 — 83.3% | **11/12 — 91.7%** | 11/12 — 91.7% |
+| government | 32/40 — 80.0% | **32/40 — 80.0%** | 33/40 — 82.5% |
+| delivery | 28/40 — 70.0% | **28/40 — 70.0%** | 28/40 — 70.0% |
+| banking | 27/40 — 67.5% | **25/40 — 62.5%** | 30/40 — 75.0% |
+| spam | 24/40 — 60.0% | **24/40 — 60.0%** | 29/40 — 72.5% |
+| telecom | 24/40 — 60.0% | **24/40 — 60.0%** | 27/40 — 67.5% |
+| others | 19/40 — 47.5% | **18/40 — 45.0%** | 22/40 — 55.0% |
+| wrong number | 2/40 — 5.0% | **13/40 — 32.5%** | 13/40 — 32.5% |
+| Overall | 166/292 — 56.8% | **175/292 — 59.9%** | 193/292 — 66.1% |
+
+### What the pattern was worth
+
+**Nine messages: 56.8% to 59.9%, and eleven of the twelve movements are the
+wrong-number category going from 2/40 to 13/40.** Everything else is flat or
+within a message or two of flat, which is what a well-scoped pattern should look
+like — it caught the shape it was written for and did not start firing
+everywhere else. `wrong-number-opener` appears exactly 12 times in the tally on
+both models.
+
+Two categories moved *down* by one or two messages (banking 27 to 25, others 19
+to 18). Nothing was removed from the catalogue, so this is run-to-run variation
+in the model rather than a regression caused by the new pattern — but it is
+recorded rather than smoothed over, and it is a reminder that differences of one
+or two messages in a 40-item stratum are noise.
+
+### The uncomfortable result: the cheap model scored higher
+
+Haiku 4.5 and Opus 5 ran the **same catalogue over the same corpus**, so unlike
+the earlier comparison this one is clean. Haiku found something in **18 more
+messages** — 66.1% against 59.9% — at a fifth the price.
+
+**Do not act on that yet, and do not read it as "Haiku is better here."** This
+benchmark measures recall and nothing else. Every message in the corpus is a
+scam, so a model that is merely quicker to raise an alarm scores higher, and an
+engine that shouted at everything would score 100%. The number that would settle
+it — how often each model fires on a genuine message — is not in this report and
+has never been measured for Haiku at all.
+
+For this app that missing half is the more important one. A false warning costs
+a phone call; an app that cries wolf at real bank mail teaches a frightened
+person to ignore it, and that failure is invisible in a corpus made only of
+scams. Until `npm run bench:narrative` has been run on both models over the
+legitimate half, the correct summary is: **Haiku has higher recall and an
+unknown false-alarm rate.**
+
+That is a cheap experiment — ten messages, two models — and it is the next thing
+worth doing.
