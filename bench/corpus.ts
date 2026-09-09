@@ -325,7 +325,39 @@ const LEGITIMATE: readonly CorpusItem[] = [
 	},
 ];
 
-export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE];
+export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE	// Added 2026-09-09 with `wrong-number-opener`. That pattern fires on a
+	// message from somebody who does not seem to know who they are writing to,
+	// which is a shape ordinary life produces constantly — a courier at the gate,
+	// a tradesman running late. Both of these must stay quiet, and neither was
+	// used to write the pattern.
+	//
+	// A genuinely misdirected text — a real stranger writing "sorry, wrong
+	// number" — is deliberately NOT here, and its absence is a judgement rather
+	// than an oversight. The pattern is meant to fire on that message. It cannot
+	// be told apart from the scam opener by its words, only by what follows, and
+	// the advice given either way is the same: do not reply. Scoring it as a
+	// false alarm would measure this pattern against a standard its own design
+	// rejects, so the honest thing is to say so here rather than to quietly
+	// exclude it.
+	{
+		id: "courier-genuine-at-the-door",
+		message:
+			"Hi, is that John? It's Ryan from the depot, I've got a parcel for number 14 and there's no answer at the door. Should I leave it round the side?",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		note: "Asks whether the reader is somebody, from a stranger, with no link and no organisation to check — the wrong-number shape exactly. It is genuine because it names a real delivery in progress.",
+	},
+	{
+		id: "tradesman-genuine-running-late",
+		message:
+			"Morning, is this Margaret? Dave here from Watertight Plumbing, running about 20 minutes behind for the 10 o'clock. Sorry about that.",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		note: "A stranger to the reader's phone, opening by checking who they are. Genuine because the sender identifies themselves and refers to an appointment that exists.",
+	},
+];
 
 /** Did the app do the right thing by this message? */
 export function isCorrect(item: CorpusItem, level: VerdictLevel): boolean {

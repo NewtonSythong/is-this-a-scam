@@ -228,3 +228,45 @@ Zealand messages is now the scarcer half and the more valuable contribution.
 **The 126 misses are a wasting asset like any other.** The run prints their ids
 and says so. Reading them in order to fix them spends them, and their passing
 afterwards proves nothing.
+
+
+## A pattern for the wrong-number opener — written, not yet measured
+
+**Added 2026-09-09.** `wrong-number-opener` has been added to the catalogue in
+response to the 2/40 above. **Its effect on that score is unknown**, because the
+Anthropic balance was exhausted by the benchmark runs before a clean reading
+could be taken. Nothing here should be read as evidence that it works.
+
+What can be said without a number:
+
+- It was written from published descriptions of the fraud — the [FTC's April 2025
+  alert](https://consumer.ftc.gov/consumer-alerts/2025/04/unexpected-text-scam)
+  and [Netsafe's scam guidance](https://netsafe.org.nz/scams/understanding-scams),
+  both saying plainly that the reply itself is the harm — and **not** from the
+  messages it will be scored against. The forty wrong-number items in
+  `bench/imc25.csv` therefore remain genuinely held out, and the reading taken
+  after this change will still mean something. That is the opposite of how the
+  three patterns of 2026-09-07 were written, and the reason this one is worth
+  measuring at all.
+- It is `warning` rather than `scam` on purpose. A genuine misdirected text
+  cannot be told from a scam opener by its words — only by what follows. The
+  pattern is carried anyway because the advice is the same either way: do not
+  reply. That is the only pattern in the catalogue where being wrong costs the
+  reader nothing.
+- Two hard negatives were added to `bench/corpus.ts` — a courier at the door and
+  a tradesman running late — because "a stranger asking who you are" is a shape
+  ordinary life produces constantly. Neither was used to write the pattern.
+
+### The run that produced no number, and what it cost
+
+The first run of `bench:imc25` gave the 56.8% above and was clean. A second run,
+after this pattern was added, completed 86 of 292 calls and reported **69.8%** —
+a figure computed entirely from the messages that happened to get through before
+the credit ran out. It is not a result and it is recorded here only so nobody
+finds it in a terminal scrollback and believes it.
+
+The harness has been changed so this cannot recur quietly. A billing or
+authentication failure now stops the run outright instead of being retried, on
+the grounds that a call which never happened is indistinguishable in the output
+from a message the engine found nothing in — so a partial run does not report a
+lower score, it reports nothing at all.

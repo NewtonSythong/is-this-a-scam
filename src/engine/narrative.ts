@@ -138,6 +138,53 @@ export const NARRATIVE_PATTERNS: readonly NarrativePattern[] = [
 			"about it. That is the trap. Ring your bank on the number on your own card, or use " +
 			"their app — never a link or number from the message itself.",
 	},
+	// Measured at 2/40 on `bench/imc25.csv` before this pattern existed — the
+	// worst category in that run by a wide margin, against 67-83% for banking,
+	// delivery and government. Not a weak pattern but a missing one: the
+	// catalogue had nothing for a message that asks for nothing.
+	//
+	// It is the opening move of the long investment and relationship frauds that
+	// `romance-pretext` describes the *later* stage of, and it works precisely
+	// because there is nothing in it to object to. Any reply at all — including
+	// "sorry, wrong number" — marks the number as belonging to a real person who
+	// answers strangers, which is the whole purpose of sending it.
+	//
+	// `warning`, never `scam`. Genuine wrong-number texts exist and are common,
+	// and a single message cannot distinguish one from the other; what separates
+	// them is what comes next. That would normally make a pattern like this too
+	// false-alarm-prone to carry — except that the advised action is *the same
+	// either way*. Not replying to a stranger who has the wrong number costs the
+	// reader nothing and costs a genuine sender nothing, so being wrong here is
+	// cheap in a way it is not for any other pattern in this catalogue.
+	//
+	// Sources, both saying plainly that the reply itself is the harm: US Federal
+	// Trade Commission, "Is that unexpected text a scam?", April 2025,
+	// https://consumer.ftc.gov/consumer-alerts/2025/04/unexpected-text-scam —
+	// and Netsafe (NZ), "Understanding scams",
+	// https://netsafe.org.nz/scams/understanding-scams. Both checked 2026-09-09.
+	//
+	// Written from those published descriptions and NOT from the messages it was
+	// measured on, so the forty wrong-number items in `bench/imc25.csv` remain
+	// genuinely held out and their score after this change still means something.
+	{
+		id: "wrong-number-opener",
+		severity: "warning",
+		description:
+			"An unsolicited message from someone who does not appear to know who they are " +
+			"writing to: asking whether the reader is some other person, saying they have the " +
+			"wrong number, or striking up a friendly conversation with a stranger for no stated " +
+			"reason. Three things that are NOT this pattern: a message naming a real delivery, " +
+			"order, appointment or booking the reader could be expecting; a message from " +
+			"somebody who identifies themselves and refers to actual shared business; and a " +
+			"message whose point is that a family member has a new number, which is " +
+			"`new-number-pretext`.",
+		reason:
+			"This message looks like it came to you by mistake, or is from somebody who does " +
+			"not seem to know who you are. Messages like this are sent to thousands of numbers " +
+			"on purpose, and any reply — even one telling them they have the wrong number — " +
+			"shows the sender that a real person is here and reads their texts. Do not answer " +
+			"it. If it truly was a mistake, nothing is lost by staying quiet.",
+	},
 	{
 		id: "romance-pretext",
 		severity: "warning",

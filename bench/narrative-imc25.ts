@@ -3,6 +3,12 @@
  *
  *   npm run bench:imc25            spends Anthropic credit, one call per message
  *
+ * That is 292 calls per run, and a run is not free. Check the balance before
+ * starting one: an exhausted balance halfway through does not read as an error,
+ * it reads as a lower score, because a call that never happened looks exactly
+ * like a message the engine found nothing in. This script stops dead rather than
+ * report a number computed from a partial run — see the catch below.
+ *
  * ## Why this exists
  *
  * `bench/corpus.ts` is spent. Every miss it ever showed has since been fixed by
@@ -69,22 +75,48 @@ const items: Item[] = rows.map((r) => ({ id: r[0], tier: r[1], scamType: r[2], m
 const narrative = anthropicNarrativeCheck(new Anthropic());
 
 /** Modest, so a benchmark run cannot look like an attack on the API. */
-const CONCURRENCY = 4;
+const CONCURRENCY = 2;
 
-const results: { item: Item; fired: string[]; failed: boolean }[] = [];
+const results: { item: Item; fired: string[]; failed: boolean; why?: string }[] = [];
 let done = 0;
 
 async function worker(queue: Item[]) {
 	for (;;) {
 		const item = queue.shift();
 		if (item === undefined) return;
-		try {
-			const signals = await narrative(item.message);
-			results.push({ item, fired: signals.map((s) => s.kind), failed: false });
-		} catch {
-			// A failed call is not a miss. Counting it as one would quietly
-			// understate the engine every time the network hiccuped.
-			results.push({ item, fired: [], failed: true });
+		// Rate limits are the normal case at this size, not an exception, so a
+		// call is retried with a widening pause before it is given up on. A
+		// benchmark that silently drops two thirds of its corpus reports a
+		// number computed from whatever happened to get through, which is worse
+		// than reporting nothing.
+		let attempt = 0;
+		for (;;) {
+			try {
+				const signals = await narrative(item.message);
+				results.push({ item, fired: signals.map((s) => s.kind), failed: false });
+				break;
+			} catch (error) {
+				attempt += 1;
+				const why = error instanceof Error ? error.message : String(error);
+				// Some failures will never come right by waiting, and retrying
+				// them turns one clear problem into hundreds of vague ones. An
+				// exhausted balance is the one that actually happened: the first
+				// run of this benchmark spent the credit the second needed, and
+				// the retries then dressed a billing message up as flakiness.
+				if (/credit balance|authentication|invalid x-api-key|permission/i.test(why)) {
+					console.error(`
+Stopping: this will not come right by retrying.
+  ${why.slice(0, 200)}`);
+					process.exit(1);
+				}
+				if (attempt >= 5) {
+					// A failed call is not a miss. Counting it as one would quietly
+					// understate the engine every time the network hiccuped.
+					results.push({ item, fired: [], failed: true, why });
+					break;
+				}
+				await new Promise((r) => setTimeout(r, 2 ** attempt * 1000 + Math.random() * 500));
+			}
 		}
 		done += 1;
 		if (done % 25 === 0) process.stderr.write(`  ${done}/${items.length}\n`);
@@ -131,7 +163,17 @@ for (const [p, n] of [...patterns].sort((a, b) => b[1] - a[1])) {
 	console.log(`  ${p.padEnd(32)} ${n}`);
 }
 
-const never = results.filter((r) => r.failed).length;
+const failures = results.filter((r) => r.failed);
+const never = failures.length;
+if (never > 0) {
+	const why = new Map<string, number>();
+	for (const f of failures) {
+		const key = (f.why ?? "unknown").slice(0, 60);
+		why.set(key, (why.get(key) ?? 0) + 1);
+	}
+	console.log("\nCALLS THAT NEVER SUCCEEDED, and why:");
+	for (const [k, n] of [...why].sort((a, b) => b[1] - a[1])) console.log(`  ${n} x ${k}`);
+}
 console.log(`\nOVERALL: the model's half found something in ${seen.length}/${answered.length}  (${pct(seen.length, answered.length)})`);
 if (never > 0) console.log(`         ${never} call(s) failed and are excluded rather than counted as misses`);
 console.log("\nThis is RECALL ONLY. Every message here is a scam, so nothing in this report");
