@@ -270,3 +270,57 @@ authentication failure now stops the run outright instead of being retried, on
 the grounds that a call which never happened is indistinguishable in the output
 from a message the engine found nothing in — so a partial run does not report a
 lower score, it reports nothing at all.
+
+
+## The wrong-number pattern fires — measured on Haiku, not on the app's model
+
+**Added 2026-09-10. This run used `claude-haiku-4-5`. The app runs on
+`claude-opus-5`, so the overall figure below is not this project's number.**
+
+All 292 messages answered, no failed calls.
+
+| Scam type | Before (Opus, no pattern) | This run (Haiku, with pattern) |
+| :--- | :--- | :--- |
+| hey mum/dad | 10/12 — 83.3% | 11/12 — 91.7% |
+| government | 32/40 — 80.0% | 33/40 — 82.5% |
+| banking | 27/40 — 67.5% | 30/40 — 75.0% |
+| delivery | 28/40 — 70.0% | 28/40 — 70.0% |
+| spam | 24/40 — 60.0% | 29/40 — 72.5% |
+| telecom | 24/40 — 60.0% | 27/40 — 67.5% |
+| others | 19/40 — 47.5% | 22/40 — 55.0% |
+| **wrong number** | **2/40 — 5.0%** | **13/40 — 32.5%** |
+| Overall | 166/292 — 56.8% | 193/292 — 66.1% |
+
+### What can be concluded, and what cannot
+
+**Two things changed between these columns — the model and the catalogue — so
+the overall lift from 56.8% to 66.1% cannot be attributed to either.** Reading
+it as "the pattern is worth nine points" or as "Haiku beats Opus here" would both
+be wrong. The columns sit side by side because the corpus is identical, not
+because the runs are comparable.
+
+**What the run does show is that `wrong-number-opener` fires.** It appears 12
+times in the pattern tally, having been written from published descriptions of
+the fraud rather than from any message in this corpus, and the category it was
+written for moved from 2/40 to 13/40. A pattern that fires only on the messages
+it was written from has memorised rather than generalised; this one had no such
+messages to memorise. That is the first pattern in this project whose
+generalisation was established before anyone read the misses.
+
+It is still 13/40. The category remains the worst in the corpus by some way, and
+a wrong-number text that opens with nothing but a name is genuinely close to
+indistinguishable from a real one — which is the reason the pattern is a
+`warning` and not a `scam`.
+
+### The comparison still missing
+
+The clean reading is Opus with the new catalogue, which is both the app's real
+number and the only figure that isolates the pattern from the model. It costs
+several times what this run did. Until it is taken, the honest summary of this
+project's measured position is still **56.8% on Opus without the pattern**, plus
+the knowledge that the pattern fires.
+
+The second question this run raises and cannot settle is whether the app needs
+Opus at all. Haiku is a fifth the price and did not obviously struggle. That is
+worth a real experiment — the same catalogue on both models — rather than an
+inference from two runs that differ in two ways.
