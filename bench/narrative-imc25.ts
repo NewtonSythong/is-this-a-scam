@@ -114,6 +114,33 @@ if (existsSync(CACHE)) {
 /** Modest, so a benchmark run cannot look like an attack on the API. */
 const CONCURRENCY = 2;
 
+// Said before anything is spent, not after, so a run can be abandoned while it
+// is still free. Rates are the published per-MTok prices for the two models this
+// is normally run against; they are a guide to the order of magnitude, not a
+// quote, and thinking tokens bill as output so the real figure runs higher.
+const RATES: Record<string, { input: number; output: number }> = {
+	"claude-opus-5": { input: 5, output: 25 },
+	"claude-haiku-4-5": { input: 1, output: 5 },
+};
+
+{
+	const remaining = items.filter((i) => !cached.has(keyFor(i.message))).length;
+	const rate = RATES[MODEL];
+	console.log("");
+	console.log(`Corpus     ${items.length} messages`);
+	console.log(`Model      ${MODEL}${MODEL === NARRATIVE_MODEL ? "  (the model the app runs on)" : "  (NOT the model the app runs on)"}`);
+	console.log(`Cached     ${items.length - remaining} already answered and paid for`);
+	console.log(`To buy     ${remaining}`);
+	if (rate !== undefined && remaining > 0) {
+		// ~1,000 input tokens per call (a ~936-token system prompt plus the
+		// message) and a few hundred out once thinking is counted.
+		const dollars = (remaining * 1000 * rate.input + remaining * 400 * rate.output) / 1_000_000;
+		console.log(`Very roughly $${dollars.toFixed(2)} — order of magnitude only`);
+	}
+	if (remaining === 0) console.log("Nothing to buy. Reporting from cache.");
+	console.log("");
+}
+
 const queue: Item[] = [...items];
 const results: { item: Item; fired: string[]; failed: boolean; why?: string }[] = [];
 let done = 0;
