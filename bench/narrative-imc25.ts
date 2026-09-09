@@ -71,11 +71,16 @@ function parseCsv(csv: string): string[][] {
 }
 
 const rows = parseCsv(readFileSync("bench/imc25.csv", "utf8")).slice(1).filter((r) => r.length >= 5);
-const items: Item[] = rows.map((r) => ({ id: r[0], tier: r[1], scamType: r[2], message: r[4] }));
+const items: Item[] = rows.map((r) => ({
+	id: r[0] ?? "",
+	tier: r[1] ?? "",
+	scamType: r[2] ?? "",
+	message: r[4] ?? "",
+}));
 
 /** `--model claude-haiku-4-5` to price a run differently. See the note below. */
 const modelArg = process.argv.indexOf("--model");
-const MODEL = modelArg === -1 ? NARRATIVE_MODEL : process.argv[modelArg + 1];
+const MODEL = modelArg === -1 ? NARRATIVE_MODEL : (process.argv[modelArg + 1] ?? NARRATIVE_MODEL);
 
 const narrative = anthropicNarrativeCheck(new Anthropic(), MODEL);
 
@@ -125,7 +130,7 @@ const RATES: Record<string, { input: number; output: number }> = {
 
 {
 	const remaining = items.filter((i) => !cached.has(keyFor(i.message))).length;
-	const rate = RATES[MODEL];
+	const rate = MODEL === undefined ? undefined : RATES[MODEL];
 	console.log("");
 	console.log(`Corpus     ${items.length} messages`);
 	console.log(`Model      ${MODEL}${MODEL === NARRATIVE_MODEL ? "  (the model the app runs on)" : "  (NOT the model the app runs on)"}`);
@@ -145,7 +150,10 @@ const queue: Item[] = [...items];
 const results: { item: Item; fired: string[]; failed: boolean; why?: string }[] = [];
 let done = 0;
 let reused = 0;
-let fatal: string | null = null;
+// A holder rather than a bare `let`: it is only ever assigned inside a worker
+// closure, and TypeScript's flow analysis cannot see that, so a plain variable
+// narrows to `never` at the check below.
+const run: { fatal: string | null } = { fatal: null };
 
 async function worker() {
 	for (;;) {
@@ -194,7 +202,7 @@ async function worker() {
 					// already in flight. Calling process.exit() here kills the
 					// loop mid-await, which on Windows trips a libuv assertion
 					// and loses answers that were already paid for.
-					fatal = why;
+					run.fatal = why;
 					queue.length = 0;
 					break;
 				}
@@ -217,11 +225,11 @@ await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
 // A run that stopped early reports nothing at all. Printing a table here would
 // be printing the very thing this harness exists to prevent: a percentage
 // computed from whichever messages happened to get an answer.
-if (fatal !== null) {
+if (run.fatal !== null) {
 	const paid = results.filter((r) => !r.failed).length;
 	console.error("");
 	console.error("Stopped: this will not come right by retrying.");
-	console.error(`  ${fatal.slice(0, 200)}`);
+	console.error(`  ${run.fatal.slice(0, 200)}`);
 	console.error("");
 	console.error(`${paid} of ${items.length} answered. They are saved in ${CACHE} and will be`);
 	console.error("reused, so re-running once this is resolved only pays for the remainder.");
@@ -272,7 +280,7 @@ const never = failures.length;
 if (never > 0) {
 	const why = new Map<string, number>();
 	for (const f of failures) {
-		const key = (f.why ?? "unknown").slice(0, 60);
+		const key = String(f.why ?? "unknown").slice(0, 60);
 		why.set(key, (why.get(key) ?? 0) + 1);
 	}
 	console.log("\nCALLS THAT NEVER SUCCEEDED, and why:");

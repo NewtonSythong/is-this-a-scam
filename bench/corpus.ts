@@ -323,9 +323,7 @@ const LEGITIMATE: readonly CorpusItem[] = [
 		provenance: "synthetic",
 		source: "n/a — an ordinary message, included as a false-alarm probe",
 	},
-];
-
-export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE	// Added 2026-09-09 with `wrong-number-opener`. That pattern fires on a
+	// Added 2026-09-09 with `wrong-number-opener`. That pattern fires on a
 	// message from somebody who does not seem to know who they are writing to,
 	// which is a shape ordinary life produces constantly — a courier at the gate,
 	// a tradesman running late. Both of these must stay quiet, and neither was
@@ -346,6 +344,7 @@ export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE	// Added 2
 		kind: "legitimate",
 		provenance: "synthetic",
 		hardNegative: true,
+		source: "n/a — an ordinary message, written as a false-alarm probe for wrong-number-opener",
 		note: "Asks whether the reader is somebody, from a stranger, with no link and no organisation to check — the wrong-number shape exactly. It is genuine because it names a real delivery in progress.",
 	},
 	{
@@ -355,9 +354,12 @@ export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE	// Added 2
 		kind: "legitimate",
 		provenance: "synthetic",
 		hardNegative: true,
+		source: "n/a — an ordinary message, written as a false-alarm probe for wrong-number-opener",
 		note: "A stranger to the reader's phone, opening by checking who they are. Genuine because the sender identifies themselves and refers to an appointment that exists.",
 	},
 ];
+
+export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE];
 
 /** Did the app do the right thing by this message? */
 export function isCorrect(item: CorpusItem, level: VerdictLevel): boolean {

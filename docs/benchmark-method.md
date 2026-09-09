@@ -384,3 +384,57 @@ unknown false-alarm rate.**
 
 That is a cheap experiment — ten messages, two models — and it is the next thing
 worth doing.
+
+
+## The false-alarm half, on both models — and why it settles less than it looks
+
+**Added 2026-09-10.** `bench/narrative.ts` now takes `--model`, so the
+legitimate half can be run against a cheaper model too
+(`npm run bench:narrative:haiku`). Both models were run over the 23-item corpus.
+
+| | Claude Opus 5 | Claude Haiku 4.5 |
+| :--- | :--- | :--- |
+| Scams the model's half saw something in | 13/13 | 13/13 |
+| **False alarms on legitimate messages** | **0/10** | **0/10** |
+
+Both new hard negatives — the courier at the door and the plumber running late —
+stayed quiet on both models. That is the result `wrong-number-opener` most needed:
+it fires on the wrong-number shape without firing on the ordinary life that
+shares it.
+
+### This does not license moving the app to Haiku
+
+It is tempting to put the two readings together — Haiku has higher recall on the
+held-out corpus (66.1% against 59.9%) and the same zero false alarms here — and
+conclude the app should run on the model that costs a fifth as much.
+
+**Ten legitimate messages cannot support that.** A model with a false-alarm rate
+of one in twenty would return 0/10 about three times in five. The two models are
+indistinguishable on this evidence not because they behave the same but because
+the sample is far too small to tell them apart, and the quantity that matters for
+this app — how often it shouts at a real message — is exactly the one the corpus
+is least able to measure.
+
+The honest statement is: **no false alarm was observed on either model, in a
+sample too small to detect a rate this app would consider unacceptable.**
+
+Closing that gap needs perhaps fifty to a hundred genuine New Zealand messages of
+the awkward kind — bank notifications, courier updates, government mail, the
+things that legitimately carry links and deadlines. That is the same bottleneck
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) already names, arriving from the other
+direction, and it is now the single thing blocking a decision worth a fivefold
+cut in what this app costs to run.
+
+### A correction
+
+Two hard negatives were described in the 2026-09-09 entry above as guarding
+`wrong-number-opener`. They were added to the file but landed inside the `CORPUS`
+export rather than the `LEGITIMATE` array, so **they were not in the corpus and
+were never being run.** `npm run verify` passed throughout, because `tsconfig.json`
+included only `src` and `app` — the benchmark directory was never typechecked.
+
+`bench` is now in the include list. Turning it on immediately found the broken
+array, two corpus items missing their required `source` field, and three unsafe
+index accesses. The numbers in the entries above stand — they came from
+`bench/imc25.csv`, which is read at runtime and was unaffected — but the claim
+that those two negatives were guarding anything was wrong until now.
