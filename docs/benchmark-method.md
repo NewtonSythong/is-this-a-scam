@@ -148,3 +148,83 @@ Two separate gaps, and both are worth stating because neither was visible in any
 **The Known Organisation list is the only route to a `scam` verdict for a message like this**, and Afterpay was not on it. With Afterpay added, the same email goes from `unclear` with no reasons to `scam` with "This message says it is from Afterpay, but the link goes to lahresour.inportal.nl, which is not a real Afterpay address."
 
 That second gap is the more uncomfortable one, because it means the app's confidence is bounded by a list of eight — now twelve — organisations, and everything outside it is capped at `warning` no matter how obvious. Expanding that list is not free: a link matching any organisation on it suppresses every link signal, so an incomplete domain set turns that organisation's genuine mail into a `scam` verdict. That is why the retailers and telcos most impersonated after these are deliberately still absent — they send marketing through third-party tracking domains, and one missed domain would have this app calling a real supermarket promotion a scam.
+
+
+## A fresh corpus, and the first reading it gave
+
+**Added 2026-09-09.** The corpus above is spent, and this page has said so since
+2026-09-07. It has now been supplemented rather than extended, with messages
+nobody on this project has read.
+
+[`bench/imc25.csv`](../bench/imc25.csv) holds 292 real reported smishing texts
+drawn from the public dataset released with Agarwal, Papasavva, Suarez-Tangil and
+Vasek, *"Fishing for Smishing: Understanding SMS Phishing Infrastructure and
+Strategies by Mining Public User Reports"*, ACM IMC 2025
+([dataset](https://github.com/reportsmishing/Smishing-Dataset-IMC25), CC BY 4.0,
+downloaded 2026-09-09). [`bench/build-imc25.mjs`](../bench/build-imc25.mjs)
+builds it and records exactly what was selected.
+
+**Not one word in it was invented.** The upstream text is anonymised — URLs,
+dates, phone numbers and, in 17,270 rows, the impersonated brand itself are
+replaced by tokens such as `<URL>`. Rather than fill those in, the build drops
+every row that would need a fabricated word. What survives is two tiers: 253
+`clean` messages carrying no placeholder at all, and 39 `brand-restored` ones
+whose only placeholder was `<NAMED_ENTITY>`, put back from the dataset's own
+column. Dropping every row with a `<URL>` is not a loss but the point: what is
+left is disproportionately the shape this engine is documented as weakest
+against, with no link to look up.
+
+Run it with `npm run bench:imc25`.
+
+### The first reading: 56.8%
+
+The Narrative Check alone found something in **166 of 292** real scams.
+
+| Scam type | Model's half saw something |
+| :--- | :--- |
+| hey mum/dad | 10/12 — 83.3% |
+| government | 32/40 — 80.0% |
+| delivery | 28/40 — 70.0% |
+| banking | 27/40 — 67.5% |
+| spam | 24/40 — 60.0% |
+| telecom | 24/40 — 60.0% |
+| others | 19/40 — 47.5% |
+| **wrong number** | **2/40 — 5.0%** |
+
+The two tiers agree closely — `clean` 56.5%, `brand-restored` 59.0% — which is
+weak evidence that restoring the brand name did not distort the result.
+
+### What this changes
+
+The last reading this project had of the model's half was **12/12**, on
+`bench/corpus.ts` after that corpus had been studied. This one is 56.8% on
+messages nobody here has seen. The gap between those two numbers is the cost of
+measuring an engine on items it was developed against, stated plainly for the
+first time, and it is the strongest argument yet for the rule in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md).
+
+**The wrong-number result is the finding.** At 5%, this is not a weak pattern but
+an absent one: the catalogue has nothing for a message that asks for nothing at
+all. A wrong-number text — *"Is this Sarah? Sorry, I must have the wrong
+number"* — carries no link, names no organisation, makes no threat and requests
+no money, so every existing pattern and the entire Artifact Check pass over it in
+silence. It is the opening move of relationship-and-investment fraud, the shape
+that costs victims the most money per incident, and it is aimed squarely at
+people who are lonely — which is to say, at a good part of the readership this
+app was built for.
+
+Adding a pattern for it is the single highest-value change available to the
+engine, and it can be written from published descriptions of the fraud rather
+than from the misses here.
+
+### Two things this reading cannot tell you
+
+**It measures recall only.** Every message in it is a scam, so it cannot see a
+false alarm, and an engine that shouted at everything would score 100%. The only
+false-alarm evidence this project has is still the eight legitimate messages in
+`bench/corpus.ts`, and that half has not grown. A corpus of legitimate New
+Zealand messages is now the scarcer half and the more valuable contribution.
+
+**The 126 misses are a wasting asset like any other.** The run prints their ids
+and says so. Reading them in order to fix them spends them, and their passing
+afterwards proves nothing.
