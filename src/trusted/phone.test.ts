@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dialable, isNewZealandMobile, smsLink, withoutInvisibles } from "./phone";
+import { diagnose, dialable, isNewZealandMobile, smsLink, withoutInvisibles } from "./phone";
 
 describe("dialable", () => {
 	it("strips everything a person writes a number with", () => {
@@ -86,5 +86,86 @@ describe("withoutInvisibles", () => {
 	// In a forwarded message the line breaks are sometimes the tell.
 	it("keeps newlines and ordinary text alone", () => {
 		expect(withoutInvisibles("Kia ora Māori\nsecond line")).toBe("Kia ora Māori\nsecond line");
+	});
+});
+
+/*
+ * The Checker's own number is silently dropped when it is not a New Zealand
+ * mobile, and until `diagnose` existed nothing told them so — the consequence
+ * appeared much later, on somebody else's phone, as a missing button. These
+ * tests are about what the app can now say, not about what it accepts: the gate
+ * is `isNewZealandMobile` and it has not moved.
+ */
+describe("diagnose: what to tell someone about the number they typed", () => {
+	it("says nothing about an empty field, because both are optional", () => {
+		expect(diagnose("")).toEqual({ kind: "empty" });
+		expect(diagnose("   ")).toEqual({ kind: "empty" });
+	});
+
+	it("passes a New Zealand mobile however it is written", () => {
+		for (const phone of [
+			"021 555 0100",
+			"0215550100",
+			"(021) 555-0100",
+			"+64 21 555 0100",
+			"64 21 555 0100",
+			"0064 21 555 0100", // the international prefix as email signatures write it
+		]) {
+			expect(diagnose(phone), phone).toEqual({ kind: "mobile" });
+		}
+	});
+
+	// The common slip, and the whole reason for the "suggestion" field: people
+	// give the number the way they say it aloud, which drops the leading zero.
+	it("offers the missing leading zero back", () => {
+		expect(diagnose("21 555 0100")).toEqual({ kind: "correctable", suggestion: "021 555 0100" });
+		expect(diagnose("27 555 0100")).toEqual({ kind: "correctable", suggestion: "027 555 0100" });
+	});
+
+	// The number they wrote, grouped as they grouped it — not a bare ten digits.
+	it("keeps the spacing they typed in the suggestion", () => {
+		expect(diagnose("21 555 0100")).toMatchObject({ suggestion: "021 555 0100" });
+		expect(diagnose("215550100")).toMatchObject({ suggestion: "0215550100" });
+	});
+
+	it("never suggests a number the gate would then refuse", () => {
+		for (const phone of ["21 555 010", "2155501000", "21 555 0100"]) {
+			const verdict = diagnose(phone);
+			if (verdict.kind === "correctable") {
+				expect(isNewZealandMobile(verdict.suggestion), verdict.suggestion).toBe(true);
+			}
+		}
+	});
+
+	// The one wrong answer where the message itself never arrives, rather than
+	// just the reply to it.
+	it("recognises a landline, which no text will ever reach", () => {
+		for (const phone of ["09 555 0100", "03 555 0100", "+64 4 555 0100"]) {
+			expect(diagnose(phone), phone).toEqual({ kind: "landline" });
+		}
+	});
+
+	// Not an error. ADR 0006 keeps the app to New Zealand; it is not a reason to
+	// refuse to help somebody whose daughter lives in Sydney.
+	it("treats a real overseas number as usable, not wrong", () => {
+		expect(diagnose("+61 412 345 678")).toEqual({ kind: "overseas" });
+		expect(diagnose("+44 7700 900123")).toEqual({ kind: "overseas" });
+	});
+
+	it("calls something too short to dial what it is", () => {
+		expect(diagnose("12345")).toEqual({ kind: "unusable" });
+		expect(diagnose("abc")).toEqual({ kind: "empty" });
+	});
+
+	// Premium rate must never be reachable by a suggestion either — the whole
+	// point of the 02 rule is that 0900 is excluded outright.
+	it("does not offer a route to a premium-rate number", () => {
+		for (const phone of ["900 12345", "0900 12345", "+64 900 12345"]) {
+			expect(diagnose(phone).kind, phone).not.toBe("mobile");
+			const verdict = diagnose(phone);
+			if (verdict.kind === "correctable") {
+				expect(verdict.suggestion, phone).not.toMatch(/^09/);
+			}
+		}
 	});
 });
