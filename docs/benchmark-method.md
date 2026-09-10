@@ -5,6 +5,11 @@
 explains what those numbers are worth, because a percentage with no method
 attached is worse than no percentage at all.
 
+It is kept as a log rather than rewritten. Sections are dated, later ones
+supersede earlier ones, and a number that has been overtaken is left standing
+with the reading that overtook it below it — because how a figure moved is
+usually more informative than the figure.
+
 ## Why a separate corpus exists
 
 `src/data/scamLibrary.nz.ts` is the regression suite. The engine was developed
@@ -12,7 +17,8 @@ against those examples and `scamLibrary.nz.test.ts` asserts their verdicts, so i
 passes them by construction. Measuring the engine there would be marking its own
 homework.
 
-`bench/corpus.ts` is held out: sixteen messages the engine was not built against,
+`bench/corpus.ts` is held out: 23 messages the engine was not built against —
+13 scams and 10 legitimate —
 nothing in `src/` imports it, and no message in it duplicates a library example.
 That is the only reason the numbers below are informative at all.
 
@@ -52,6 +58,9 @@ offline number matters because ADR 0003 promises a complete answer without a key
 or a network, and this is what that promise is actually worth.
 
 ## Five reasons to distrust these numbers
+
+**Written 2026-09-07, when the corpus was sixteen.** Reasons 1 and 2 have since
+been acted on — see the 292-message corpus below — and the rest still stand.
 
 1. **The corpus has sixteen messages.** Every percentage here moves by six
    points if one message changes. No confidence interval is quoted because none

@@ -1,5 +1,24 @@
 # Benchmark — both engines
 
+> **This page is a stale run and is kept only because nothing has replaced it.**
+> It reports 21 messages. The corpus is now 23: `courier-genuine-at-the-door`
+> and `tradesman-genuine-running-late` were added on 2026-09-09 to guard the
+> `wrong-number-opener` pattern, and neither has ever been through a both-engines
+> run. Both engines cost Anthropic credit per message, so this page is only as
+> current as the last time somebody paid for it.
+>
+> Two pages nearby are current. [`benchmark-offline.md`](./benchmark-offline.md)
+> is the deterministic half over all 23 and is free to regenerate.
+> [`benchmark-method.md`](./benchmark-method.md) carries the readings that
+> matter more than this one: the 292 held-out messages, and the language model's
+> half measured on its own.
+>
+> **To replace it:** `npm run bench:full:write`. The run prints what it will
+> cost before it spends anything — about $0.34 for 23 messages at the time of
+> writing — and saves each answer as it arrives, so it can be stopped and
+> resumed without paying twice. Regenerating this page also deletes this notice.
+
+
 Run 2026-09-07. Corpus: 21 messages, held out from the regression suite.
 
 | Measure | Result | What it means |

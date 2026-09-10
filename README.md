@@ -1,38 +1,3 @@
-The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is twenty-one messages the
-engine was never built against, run with `npm run bench`. Seven are `verbatim` —
-six transcribed by eye from screenshots ANZ and NZ Post publish, because New
-Zealand organisations release annotated images of scam texts rather than the
-text, and one pasted straight out of somebody's junk folder.
-
-| | Offline engine only | Both engines |
-| :-- | :-- | :-- |
-| Scams raised, never developed against | 6/9 (67%) | **9/9 (100%)** |
-| Legitimate messages left quiet | 8/8 | 8/8 |
-| — of those, genuine messages that look like scams | 5/5 | 5/5 |
-
-Four further scam messages are excluded from those figures. Narrative patterns
-were written after studying them, so they now pass by construction and measure
-nothing — they are flagged in the corpus and `npm run bench` says so on every
-run.
-
-**The headline hides the model's half.** Every recent addition carries a
-lookalike domain, so the deterministic rules reach them without the model being
-consulted — a narrative pattern could be completely broken and that number would
-not move. `npm run bench:narrative` runs the model's half with the rules taken
-away: it finds something in 12/12 scams, raises **zero** false alarms on all
-eight legitimate messages, and shows two of the three new patterns firing on real
-messages they were never written from. The third,
-`unauthorised-payment-pretext`, is still unvalidated for want of a real example.
-
-**Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before quoting
-any number from here.** It gives every reason to distrust these figures,
-including that most non-verbatim items were written by a language model, which is
-also half of what is being tested.
-
-The benchmark has earned its keep three times: it caught the app calling a
-genuine NZ Post tracking text a scam, it told us when it had stopped being a
-measurement, and it showed which of three new patterns had actually generalised.
-
 # Is This a Scam?
 
 An app that tells someone whether a text message or email they have received is a scam, in language they can act on without knowing anything about how scams work.
@@ -97,100 +62,68 @@ Both go in `.env.local`, which is git-ignored.
 
 ## Does it actually work?
 
-The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is sixteen messages the
-engine was never built against, run with `npm run bench`. It gave one clean
-reading, on 2026-09-07:
+The corpus in [`bench/corpus.ts`](./bench/corpus.ts) is 23 messages the engine
+was never built against — 13 scams and 10 legitimate — run with `npm run bench`.
+Seven of the scams are `verbatim`: six transcribed by eye from screenshots ANZ
+and NZ Post publish, because New Zealand organisations release annotated images
+of scam texts rather than the text, and one pasted straight out of somebody's
+junk folder.
 
 | | Offline engine only | Both engines |
 | :-- | :-- | :-- |
-| Scams raised | 2/8 (25%) | 5/8 (63%) |
-| Legitimate messages left quiet | 8/8 | 8/8 |
-| — of those, genuine messages that look like scams | 5/5 | 5/5 |
+| Scams raised, never developed against | 6/9 (67%) | 9/9 (100%) *(stale)* |
+| Legitimate messages left quiet | 10/10 | 8/8 *(stale)* |
+| — of those, genuine messages that look like scams | 7/7 | 5/5 *(stale)* |
 
-The deterministic half alone catches a quarter of unfamiliar scams; the model
-roughly doubles that. Neither raises a false alarm, which matters more than it
-sounds: an app that shouts at a real courier text teaches a frightened person to
-ignore it.
+The offline column is from 2026-09-10 and is free to regenerate with
+`npm run bench`. **The both-engines column is from 2026-09-07, when the corpus
+was 21**, because every message in it costs Anthropic credit.
+`npm run bench:full:write` replaces it: the run says what it will cost before it
+spends anything — about $0.34 for the current 23 — and caches each answer as it
+arrives, so stopping it and resuming later costs nothing extra.
+[`docs/benchmark.md`](./docs/benchmark.md) carries a notice saying it is stale,
+which that command removes.
 
-**That reading is the last one this corpus can give.** Three narrative patterns
-have since been written to catch the three scams it caught getting through, so
-those three now pass by construction and measure nothing. They are flagged in the
-corpus, the report counts them separately, and `npm run bench` will tell you so.
-Whether those patterns generalise is unknown until there are messages nobody has
-looked at. **Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before
-quoting any number from here** — it gives six reasons to distrust these figures,
-starting with the fact that only two of the sixteen could be sourced verbatim and
-most of the rest were written by a language model, which is also half of what is
-being tested.
+Four further scam messages are excluded from those figures. Narrative patterns
+were written after studying them, so they now pass by construction and measure
+nothing — they are flagged in the corpus and `npm run bench` says so on every
+run.
 
-The benchmark has already earned its keep twice. Its first run caught the app
-calling a genuine NZ Post tracking text a scam, because NZ Post's own link
-shortener was missing from their record. Its second told us it had stopped
-being a measurement.
+**The headline hides the model's half.** Most scams here carry a lookalike
+domain, so the deterministic rules reach them without the model being consulted:
+a narrative pattern could be completely broken and those numbers would not move.
+`npm run bench:narrative` runs the model's half with the rules taken away. Over
+this corpus it finds something in 13/13 scams and raises **zero** false alarms on
+all 10 legitimate messages — on Claude Opus 5 and on Claude Haiku 4.5 alike.
 
-## What a scammer can do with it
+**And that corpus is spent, so the model's half was measured somewhere else.**
+[`bench/imc25.csv`](./bench/imc25.csv) holds 292 real reported smishing texts
+from a published research dataset that nobody here had read. With the rules
+switched off, the model's half alone found something in **59.9%** of them
+(`npm run bench:imc25`) — against the 12/12 the small corpus had been reporting
+before it was retired. That gap is what it costs to measure an engine on messages
+somebody has already fixed it against.
 
-The app is deliberately free, account-less and — if it is open-sourced — readable, and each of those is reachable by someone who wants to use it as a weapon. What is done about that:
+The same run found a blind spot worth more than the headline. Wrong-number
+texts — *"is this Sarah? sorry, wrong number"*, the opening move of the long
+investment frauds — were caught **2 times in 40**, because nothing in the engine
+covered a message that asks for nothing, names nobody and links nowhere. A
+pattern written from the FTC's and Netsafe's published descriptions, rather than
+from any message in the corpus, took that to **13 in 40** with no new false
+alarms. It is the first pattern here whose generalisation was established before
+anybody read the misses.
 
-| The move | What stops it |
-| :-- | :-- |
-| Craft an `/asked` link that texts a premium-rate number | The reply number must be an NZ mobile (`02…`); `0900` cannot pass, and the destination is printed beside the button |
-| Put an organisation's name in the "who is asking" field | Names are cut to 24 characters, and whoever is named is cast as the person confused and asking for help |
-| Hide a hostname behind a right-to-left override | Invisible and bidirectional characters are stripped from everything shown |
-| Borrow the domain's credibility for their own text | A provenance line above it says the contents came from the link, not from us; nothing in a quoted message is ever clickable |
-| Submit drafts until one comes back "we can't tell" | Only partly. A per-caller cap and a provider spend cap ([ADR 0011](./docs/adr/0011-rate-limiting-and-spend.md)) are brakes, not a fix — see below |
-| Report genuine bank messages to poison the scam library | Reports are human-reviewed, and a library entry cannot be added without a `source` citing where the scam was published |
+**Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before quoting
+any number from here.** It gives every reason to distrust these figures,
+including that most non-verbatim items were written by a language model, which is
+also half of what is being tested — and it records where the numbers above are
+still too thin to decide anything, chiefly the false-alarm rate.
 
-**The endpoint is an oracle and cannot fully stop being one.** Anyone can submit a draft and learn whether it comes back as a scam. Nothing closes that while the app is free and has no accounts, and those are the two properties that make it reachable by the people it is for. Note also what the benchmark says: the offline rules catch 2/8 of unfamiliar scams on their own, so they are not a filter whose secrecy would be worth much. See [ADR 0013](./docs/adr/0013-the-trusted-person-can-answer.md) for the reasoning, including what was rejected.
-
-## Setup
-
-Requires Node.js `>=22.12.0`.
-
-```sh
-npm install
-bash scripts/setup.sh   # optional — walks you through the two API keys
-npm run dev             # http://localhost:3000
-```
-
-**No keys are needed to run it.** A missing key degrades the check rather than breaking it: without either, the deterministic rules still return a complete verdict.
-
-[`scripts/setup.sh`](./scripts/setup.sh) opens each console for you, explains what to click, hides your paste, and **proves each key with a real call before saving it** — so a key that is valid but whose API was never switched on is caught here rather than in front of the person you built this for. Either key can be skipped, and re-running the script picks up where you left off.
-
-| Variable | Effect when set |
-| :-- | :-- |
-| `ANTHROPIC_API_KEY` | Enables the Narrative Check — the half that catches scams with no link in them |
-| `SAFE_BROWSING_API_KEY` | Enables Safe Browsing lookups and shortened-link expansion |
-| `REVIEW_TOKEN` | Opens the review queue at `/review?token=…`. Unset means the queue refuses everything |
-| `REPORTS_DB_PATH` | Where reported scams are kept (default `./data/reports.db`) |
-
-Both go in `.env.local`, which is git-ignored.
-
-## Does it actually work?
-
-Measured against a held-out corpus of sixteen messages the engine was never built
-against — [`bench/corpus.ts`](./bench/corpus.ts), run with `npm run bench`:
-
-| | Offline engine only | Both engines |
-| :-- | :-- | :-- |
-| Scams raised | 2/8 (25%) | 5/8 (63%) |
-| Legitimate messages left quiet | 8/8 | 8/8 |
-| — of those, genuine messages that look like scams | 5/5 | 5/5 |
-
-The deterministic half alone catches a quarter of unfamiliar scams; the model
-roughly doubles that. It currently raises no false alarms, which matters more
-than it sounds: an app that shouts at a real courier text teaches a frightened
-person to ignore it.
-
-**Read [`docs/benchmark-method.md`](./docs/benchmark-method.md) before quoting any
-of this.** The corpus is sixteen messages, only two of which could be sourced
-verbatim, and most of the rest were written by a language model — which is also
-half of what is being tested. The three scams that still get through all share
-one shape: no link worth checking and no organisation named.
-
-The benchmark has already earned its keep. Its first run caught the app calling a
-genuine NZ Post tracking text a scam, because NZ Post's own link shortener was
-missing from their record.
+The benchmark has already earned its keep three times over. Its first run caught
+the app calling a genuine NZ Post tracking text a scam, because NZ Post's own
+link shortener was missing from their record. Its second told us it had stopped
+being a measurement. Its third found a whole category of scam the engine could
+not see.
 
 ## Commands
 
@@ -202,7 +135,14 @@ missing from their record.
 | `npm run typecheck` | Type-check without emitting |
 | `npm run verify` | Both of the above — run this before pushing |
 | `npm run bench` | Score the held-out corpus with the offline engine (free) |
-| `npm run bench:full` | Score it with both engines (spends Anthropic credit) |
+| `npm run bench:full` | Score it with both engines (spends credit; prints the price first) |
+| `npm run bench:full:write` | The same, and replace `docs/benchmark.md` with the result |
+| `npm run bench:narrative` | The model's half alone, over the held-out corpus |
+| `npm run bench:imc25` | The model's half over 292 real reported scams (the big one) |
+
+Every command that spends credit says roughly what it will cost before the first
+call and caches each answer as it arrives, so any of them can be stopped and
+resumed later without paying for the same message twice.
 
 `npm test` does not type-check, so a broken type can pass the tests. `npm run verify` is the one that catches both.
 
@@ -244,7 +184,7 @@ It sets the spend cap **before** it deploys anything. The app caps one caller at
 
 Free software under the [GNU AGPL, version 3 or later](./LICENSE). The network-copyleft licence is deliberate: the risk worth guarding against is not somebody reading this code, it is somebody deploying a quietly degraded copy that a frightened person trusts. The AGPL covers use over a network, so a fork's users can demand its source. The app carries a link to that source in its own footer, which is section 13's requirement and also the only thing that makes the numbers above checkable by anyone but us — set `NEXT_PUBLIC_SOURCE_URL` before deploying.
 
-The most useful contributions are not code. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) — a real scam text with a citation is worth more here than a refactor, because the benchmark's stated weakness is that the corpus is sixteen messages and only two of them are verbatim.
+The most useful contributions are not code. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) — a real scam text with a citation is worth more here than a refactor, because New Zealand publishes almost no scam text as text. The one contribution worth even more is duller: ordinary, genuine New Zealand messages that should *not* raise an alarm, which are what the false-alarm rate is currently too thin to measure.
 
 ## Structure
 

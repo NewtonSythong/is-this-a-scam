@@ -122,9 +122,10 @@ with the script. Stop and look at why before recording something else.
 
 - Watch it once with the sound off. If the argument does not survive that, it
   will not survive the feed.
-- Do not put an accuracy figure in the caption. The benchmark is twenty-one
-  messages, most of them written by a language model, and
-  `docs/benchmark-method.md` exists to explain why the number should not be
-  quoted loose. "It catches these and stays quiet on that" is a claim the video
+- Do not put an accuracy figure in the caption. The headline benchmark is 23
+  messages, most of them written by a language model, and the larger held-out
+  run sits at 59.9%, which is not a number to put under a video that shows three
+  catches. `docs/benchmark-method.md` exists to explain why no number here
+  should be quoted loose. "It catches these and stays quiet on that" is a claim the video
   actually demonstrates; a percentage is not.
 - Link the app, not the repo. The people this is for do not want the source.
