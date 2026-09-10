@@ -17,6 +17,7 @@
     "verify": "vitest run && tsc --noEmit",
     "bench": "tsx bench/run.ts",
     "bench:full": "tsx bench/run.ts --full",
+    "bench:full:write": "tsx bench/run.ts --full --write",
     "bench:narrative": "tsx bench/narrative.ts",
     "bench:imc25": "tsx bench/narrative-imc25.ts",
     "bench:resume": "tsx bench/narrative-imc25.ts --model claude-haiku-4-5",

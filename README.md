@@ -75,11 +75,14 @@ junk folder.
 | Legitimate messages left quiet | 10/10 | 8/8 *(stale)* |
 | — of those, genuine messages that look like scams | 7/7 | 5/5 *(stale)* |
 
-The offline column is from 2026-09-10 and is free to regenerate. **The
-both-engines column is from 2026-09-07, when the corpus was 21**, because every
-message in it costs Anthropic credit — see
-[`docs/benchmark.md`](./docs/benchmark.md), which says so at the top and will
-stop saying so once somebody pays for a fresh run.
+The offline column is from 2026-09-10 and is free to regenerate with
+`npm run bench`. **The both-engines column is from 2026-09-07, when the corpus
+was 21**, because every message in it costs Anthropic credit.
+`npm run bench:full:write` replaces it: the run says what it will cost before it
+spends anything — about $0.34 for the current 23 — and caches each answer as it
+arrives, so stopping it and resuming later costs nothing extra.
+[`docs/benchmark.md`](./docs/benchmark.md) carries a notice saying it is stale,
+which that command removes.
 
 Four further scam messages are excluded from those figures. Narrative patterns
 were written after studying them, so they now pass by construction and measure
@@ -132,7 +135,14 @@ not see.
 | `npm run typecheck` | Type-check without emitting |
 | `npm run verify` | Both of the above — run this before pushing |
 | `npm run bench` | Score the held-out corpus with the offline engine (free) |
-| `npm run bench:full` | Score it with both engines (spends Anthropic credit) |
+| `npm run bench:full` | Score it with both engines (spends credit; prints the price first) |
+| `npm run bench:full:write` | The same, and replace `docs/benchmark.md` with the result |
+| `npm run bench:narrative` | The model's half alone, over the held-out corpus |
+| `npm run bench:imc25` | The model's half over 292 real reported scams (the big one) |
+
+Every command that spends credit says roughly what it will cost before the first
+call and caches each answer as it arrives, so any of them can be stopped and
+resumed later without paying for the same message twice.
 
 `npm test` does not type-check, so a broken type can pass the tests. `npm run verify` is the one that catches both.
 

@@ -13,8 +13,10 @@
 > matter more than this one: the 292 held-out messages, and the language model's
 > half measured on its own.
 >
-> Regenerate this page with `npm run bench:full -- --write`, which will also
-> delete this notice.
+> **To replace it:** `npm run bench:full:write`. The run prints what it will
+> cost before it spends anything — about $0.34 for 23 messages at the time of
+> writing — and saves each answer as it arrives, so it can be stopped and
+> resumed without paying twice. Regenerating this page also deletes this notice.
 
 
 Run 2026-09-07. Corpus: 21 messages, held out from the regression suite.
