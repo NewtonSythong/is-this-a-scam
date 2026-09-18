@@ -357,6 +357,53 @@ const LEGITIMATE: readonly CorpusItem[] = [
 		source: "n/a — an ordinary message, written as a false-alarm probe for wrong-number-opener",
 		note: "A stranger to the reader's phone, opening by checking who they are. Genuine because the sender identifies themselves and refers to an appointment that exists.",
 	},
+	// Added 2026-09-18, BEFORE the run that scores the three catalogue changes of
+	// that date — `job-or-earnings-offer`, `false-familiarity`, and the widening
+	// of `unexpected-money` to cover a reward offered for completing a small
+	// task. The order matters: a negative added after seeing which ones were hit
+	// is not a test, it is a description of the result.
+	//
+	// Each of the three is the nearest genuine message to the pattern it guards,
+	// and none of them was used to write it.
+	{
+		id: "recruiter-genuine-followup",
+		message:
+			"Hi Newton, it's Priya from Kōrero Recruitment — following up on your application for the graduate analyst role. Are you free for a quick call Thursday afternoon?",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		source: "n/a — an ordinary message, written as a false-alarm probe for job-or-earnings-offer",
+		note: "An unexpected text about work, which is the whole shape of the pattern. Genuine because the sender is named and refers to an application the reader actually made — a false alarm here would warn somebody off their own job hunt.",
+	},
+	{
+		id: "friend-genuine-after-a-gap",
+		message:
+			"Hey stranger! It's been far too long, I keep meaning to message. Are you still up for that coffee we talked about?",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		source: "n/a — an ordinary message, written as a false-alarm probe for false-familiarity",
+		note:
+			"Warm, unsigned, and leaning on a shared history the message never names. This is the " +
+			"only false alarm this project has ever recorded, and it is why there is no " +
+			"`false-familiarity` pattern in the catalogue. That pattern was written on 2026-09-18 " +
+			"for the wrong-number misses that open with claimed intimacy — 'Honey I hope you don't " +
+			"forget our promise', 'Hi baby, here are the photos' — it fired on six of them, and it " +
+			"fired on this message too. It was withdrawn rather than narrowed, because narrowing a " +
+			"pattern while looking at the message that caught it is how the corpus above was spent. " +
+			"Keep this item. If somebody writes that pattern again, this is the message that has to " +
+			"stay quiet, and it has to stay quiet on a version nobody tuned against it.",
+	},
+	{
+		id: "retail-genuine-refund-receipt",
+		message:
+			"Briscoes: your refund of $24.50 for order 88210 has been processed and should appear on your card within 3 working days.",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		source: "n/a — an ordinary message, written as a false-alarm probe for unexpected-money",
+		note: "Money arriving unannounced, which `unexpected-money` fires on. Genuine because it is a receipt for a return the reader made, asks nothing and offers nothing — the exclusion clause added to that pattern on 2026-09-18 exists for this message.",
+	},
 ];
 
 export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE];

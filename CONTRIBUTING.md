@@ -81,6 +81,7 @@ These are decisions with reasons written down in [`docs/adr/`](./docs/adr). Disa
   they designed it on, and the people who do notice will not file an issue.
   `--edge` separates things and is exempt; `--field` bounds controls and is not.
 - **Do not tune the engine against the benchmark corpus.** Nothing in `src/` may import `bench/`. The moment the engine is developed against those 23 messages they stop measuring anything, and the number in the README becomes a claim about our own imagination. Fix a miss by principle, then see whether the fix generalises to cases you did not look at.
+- **Read the dev half. Never read the test half.** The 292 real messages in [`bench/imc25.csv`](./bench/imc25.csv) are cut permanently in two by `--split`. The `dev` half is there to be read: study its misses, write patterns from them, iterate as often as you like, and understand that its score is not this project's number and never will be. The `test` half is only ever *scored*. Do not print it, page through it, or open the CSV looking for the ids a run listed as missed — the moment you read one, the only instrument this project has for telling a real improvement from a memorised one is gone, and nothing can bring it back. `npm run bench:imc25:test` prints miss ids without their text on purpose. This rule exists because the corpus before it, `bench/corpus.ts`, died exactly this way: every miss it ever found was fixed by somebody reading the message that produced it, and it now passes everything by construction.
 
 ## Writing for the reader
 
@@ -96,9 +97,17 @@ npm run bench      # score the held-out corpus offline (free)
 ```
 
 ```sh
-npm run bench:full       # score the corpus with both engines (spends credit)
-npm run bench:narrative  # score the model's half alone (spends credit)
+npm run bench:full        # score the corpus with both engines (spends credit)
+npm run bench:narrative    # score the model's half alone, scams and legitimate (spends credit)
+npm run bench:imc25:dev    # 146 real scams you may read the misses of (spends credit)
+npm run bench:imc25:test   # the other 146, scored and never read — this is the number
 ```
+
+Every run prints what it will cost before it spends anything, and saves each
+answer as it arrives, so a run can be abandoned while it is still free and
+resumed without paying twice. The cache key includes the whole system prompt, so
+touching a single pattern empties it — which is correct, and is why a catalogue
+change costs a full run rather than a cheap one.
 
 `npm test` does not type-check, so a broken type can pass the tests. `npm run verify` is the one that catches both.
 

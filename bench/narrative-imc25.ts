@@ -71,12 +71,42 @@ function parseCsv(csv: string): string[][] {
 }
 
 const rows = parseCsv(readFileSync("bench/imc25.csv", "utf8")).slice(1).filter((r) => r.length >= 5);
-const items: Item[] = rows.map((r) => ({
+const all: Item[] = rows.map((r) => ({
 	id: r[0] ?? "",
 	tier: r[1] ?? "",
 	scamType: r[2] ?? "",
 	message: r[4] ?? "",
 }));
+
+/**
+ * `--split dev` or `--split test`. Omitted, the whole corpus runs, as it always has.
+ *
+ * ## Why a split exists at all
+ *
+ * A held-out corpus is a wasting asset, and the way it gets spent is that
+ * somebody reads the misses in order to fix them. `bench/corpus.ts` died of
+ * exactly that. Until this flag existed the same fate was scheduled for this
+ * corpus too: it was all held out, so the first improvement made by reading a
+ * miss would have spent all 292 at once and left the project with no instrument.
+ *
+ * So the corpus is cut in half, permanently. **`dev` is the half you are allowed
+ * to read.** Study its misses, write patterns from them, iterate as often as you
+ * like — it is understood to be spent, and its score is not this project's
+ * number. **`test` is never read.** It is only ever scored, and it is the only
+ * half whose figure means anything after a change.
+ *
+ * The cut is the file's own order alternated: rows are grouped by scam type in
+ * blocks of forty, so taking every other row splits each stratum exactly in
+ * half — 146 and 146, 20/20 within each type — without a random seed to record
+ * or a shuffle to reproduce. It is deterministic, so the same message is in the
+ * same half forever, which is the only property that matters.
+ */
+const splitArg = process.argv.indexOf("--split");
+const SPLIT = splitArg === -1 ? "all" : (process.argv[splitArg + 1] ?? "all");
+if (!["all", "dev", "test"].includes(SPLIT)) {
+	throw new Error(`--split must be dev, test or all; got ${SPLIT}`);
+}
+const items = SPLIT === "all" ? all : all.filter((_, i) => (i % 2 === 0) === (SPLIT === "dev"));
 
 /** `--model claude-haiku-4-5` to price a run differently. See the note below. */
 const modelArg = process.argv.indexOf("--model");
@@ -132,7 +162,7 @@ const RATES: Record<string, { input: number; output: number }> = {
 	const remaining = items.filter((i) => !cached.has(keyFor(i.message))).length;
 	const rate = MODEL === undefined ? undefined : RATES[MODEL];
 	console.log("");
-	console.log(`Corpus     ${items.length} messages`);
+	console.log(`Corpus     ${items.length} messages${SPLIT === "all" ? "  (both halves — a reading here mixes a spent half with a held-out one)" : `  (${SPLIT} half of ${all.length})`}`);
 	console.log(`Model      ${MODEL}${MODEL === NARRATIVE_MODEL ? "  (the model the app runs on)" : "  (NOT the model the app runs on)"}`);
 	console.log(`Cached     ${items.length - remaining} already answered and paid for`);
 	console.log(`To buy     ${remaining}`);
@@ -296,6 +326,17 @@ console.log("legitimate half is the only false-alarm evidence this project has."
 const missed = answered.filter((r) => r.fired.length === 0);
 console.log(`\n${missed.length} message(s) the model's half found nothing in. Their ids:`);
 console.log(missed.map((r) => r.item.id).join(" ") || "  (none)");
-console.log("\nReading those messages in order to fix them spends them, exactly as it spent");
-console.log("bench/corpus.ts. Record any you study, and treat their later passing as proof");
-console.log("of nothing.");
+
+// The ids alone are useless for writing a pattern and harmless to print. The
+// text is the opposite of both, so it comes out for the dev half only — the half
+// already understood to be spent. Printing it for `test` or `all` would spend
+// the held-out half in the act of looking at it, which is the failure this
+// split exists to prevent, so the harness refuses rather than trusting whoever
+// is reading to look away.
+if (SPLIT === "dev") {
+	console.log("\nThe dev half is the half you may read. Here are its misses in full:\n");
+	for (const r of missed) console.log(`  ${r.item.id}  [${r.item.scamType}]\n    ${r.item.message.replace(/\n/g, "\n    ")}\n`);
+} else {
+	console.log("\nTheir text is deliberately not printed. Run `--split dev` to read misses you");
+	console.log("are allowed to read; reading these would spend the half that measures the app.");
+}

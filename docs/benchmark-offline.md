@@ -1,16 +1,16 @@
 # Benchmark — offline engine only
 
-Run 2026-09-10. Corpus: 23 messages, held out from the regression suite.
+Run 2026-09-18. Corpus: 26 messages, held out from the regression suite.
 
 | Measure | Result | What it means |
 | :-- | :-- | :-- |
 | **Scams raised, never developed against** | **6/9** (67%) | **The headline. The only scam figure that measures the engine.** |
 | Scams raised, since developed against | 1/4 | Proves nothing — the engine was changed while looking at these |
 | — of which verbatim | 6/7 | The only items free of model-authorship bias |
-| Legitimate left quiet | 10/10 (100%) | Correctly returned `unclear` |
-| — hard negatives | 7/7 | Genuine messages wearing a scam's clothes |
+| Legitimate left quiet | 13/13 (100%) | Correctly returned `unclear` |
+| — hard negatives | 10/10 | Genuine messages wearing a scam's clothes |
 | All scams, held out or not | 7/13 (54%) | The flattering number. Do not quote it alone |
-| Overall | 17/23 (74%) | |
+| Overall | 20/26 (77%) | |
 
 > **4 of 13 scam messages no longer measure anything.** A held-out
 > corpus is a wasting asset: once somebody fixes a miss by studying the message
@@ -35,7 +35,7 @@ Run 2026-09-10. Corpus: 23 messages, held out from the regression suite.
 | pass | `anz-points-expiry-short-verbatim` | scam | verbatim |
 | pass | `nzpost-redelivery-verbatim` | scam | verbatim |
 
-### Legitimate messages — 10/10 (100%)
+### Legitimate messages — 13/13 (100%)
 
 | | id | verdict | provenance |
 | :-- | :-- | :-- | :-- |
@@ -49,6 +49,9 @@ Run 2026-09-10. Corpus: 23 messages, held out from the regression suite.
 | pass | `ordinary-personal` | unclear | synthetic |
 | pass | `courier-genuine-at-the-door` *(hard)* | unclear | synthetic |
 | pass | `tradesman-genuine-running-late` *(hard)* | unclear | synthetic |
+| pass | `recruiter-genuine-followup` *(hard)* | unclear | synthetic |
+| pass | `friend-genuine-after-a-gap` *(hard)* | unclear | synthetic |
+| pass | `retail-genuine-refund-receipt` *(hard)* | unclear | synthetic |
 
 ## Failures in detail
 

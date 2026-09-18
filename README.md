@@ -93,8 +93,18 @@ run.
 domain, so the deterministic rules reach them without the model being consulted:
 a narrative pattern could be completely broken and those numbers would not move.
 `npm run bench:narrative` runs the model's half with the rules taken away. Over
-this corpus it finds something in 13/13 scams and raises **zero** false alarms on
-all 10 legitimate messages — on Claude Opus 5 and on Claude Haiku 4.5 alike.
+this corpus it finds something in 13/13 scams, and on 2026-09-18 it raised its
+first false alarm in 13 legitimate messages.
+
+**That false alarm is worth more than the scores around it.** Three genuine
+messages were added to the corpus to guard some new patterns, and one of them —
+*"Hey stranger! It's been far too long… Are you still up for that coffee we
+talked about?"* — was flagged by `wrong-number-opener`, a pattern that had been
+shipped for nine days and had measured clean every time. It turns out to key on
+the literal word *"stranger"*, strongly enough to ignore its own rule about
+senders who sign their name. The earlier "zero false alarms" was a fact about
+what we had thought to write down, not about the engine.
+[`docs/benchmark-method.md`](./docs/benchmark-method.md) has the full account.
 
 **And that corpus is spent, so the model's half was measured somewhere else.**
 [`bench/imc25.csv`](./bench/imc25.csv) holds 292 real reported smishing texts
@@ -103,6 +113,15 @@ switched off, the model's half alone found something in **59.9%** of them
 (`npm run bench:imc25`) — against the 12/12 the small corpus had been reporting
 before it was retired. That gap is what it costs to measure an engine on messages
 somebody has already fixed it against.
+
+**Those 292 are now cut permanently in half**, because otherwise improving the
+engine destroys the only means of telling whether it improved. The `dev` half is
+there to be read and is spent by design; the `test` half is scored and never
+printed — `npm run bench:imc25:test` lists the ids it missed and refuses to show
+their text, so the half that measures the app cannot be spent by somebody
+debugging. The first reading off that half took the model's alone from
+**57.5% to 61.6%** (2026-09-18), on messages nobody has looked at, after two
+patterns written from the readable half and from the FTC's published guidance.
 
 The same run found a blind spot worth more than the headline. Wrong-number
 texts — *"is this Sarah? sorry, wrong number"*, the opening move of the long
@@ -138,7 +157,9 @@ not see.
 | `npm run bench:full` | Score it with both engines (spends credit; prints the price first) |
 | `npm run bench:full:write` | The same, and replace `docs/benchmark.md` with the result |
 | `npm run bench:narrative` | The model's half alone, over the held-out corpus |
-| `npm run bench:imc25` | The model's half over 292 real reported scams (the big one) |
+| `npm run bench:imc25` | The model's half over all 292 real reported scams |
+| `npm run bench:imc25:dev` | Half of those 292 — the half whose misses may be read |
+| `npm run bench:imc25:test` | The other half, scored and never read. **This is the number.** |
 
 Every command that spends credit says roughly what it will cost before the first
 call and caches each answer as it arrives, so any of them can be stopped and
