@@ -35,6 +35,18 @@ import type { VerdictLevel } from "../src/domain/types";
  * member asking for money.
  */
 
+/**
+ * `verbatim` — the words are the sender's own, reproduced from the message or
+ * from a published screenshot of it.
+ *
+ * A verbatim item MAY carry shape-preserving redaction: where a genuine message
+ * captured from a real inbox contained a person's name, account number, IP
+ * address or similar, it is replaced by a stand-in of the same shape and length.
+ * Blanking the field outright would change what is being measured, since a
+ * message with a name in it does not behave like one without. Every redacted
+ * item says so, and the unredacted originals are kept outside this repository —
+ * see the block above the 2026-09-21 additions.
+ */
 export type Provenance = "verbatim" | "reconstructed" | "synthetic";
 
 export interface CorpusItem {
@@ -403,6 +415,197 @@ const LEGITIMATE: readonly CorpusItem[] = [
 		hardNegative: true,
 		source: "n/a — an ordinary message, written as a false-alarm probe for unexpected-money",
 		note: "Money arriving unannounced, which `unexpected-money` fires on. Genuine because it is a receipt for a return the reader made, asks nothing and offers nothing — the exclusion clause added to that pattern on 2026-09-18 exists for this message.",
+	},
+	// ── Added 2026-09-21: the first genuine messages in this corpus that a New
+	// Zealander actually received ────────────────────────────────────────────
+	//
+	// Everything above this line in the legitimate half was written by us. That is
+	// the limitation `docs/jev-spike.md` names seven times: every false-alarm claim
+	// this project makes rested on thirteen messages of our own invention, and
+	// prose we wrote to look awkward is not the same thing as prose that is awkward
+	// because the world is.
+	//
+	// These fifteen were captured from two real Gmail accounts on 2026-09-21. Each
+	// one arrived unsolicited in a New Zealander's mailbox and each one is genuine.
+	//
+	// **They are redacted, and that is why `verbatim` needed its definition widened
+	// above.** This repository is public. Names, account numbers, donor and
+	// transaction IDs, IP addresses, number plates, phone numbers and email
+	// addresses have been replaced with stable stand-ins of the same shape and
+	// length. Nothing else was altered — the grammatical errors are the senders'
+	// own. The unredacted originals are kept outside this repository, at
+	// `Projects/corpus-sources-private/`, so any item here can be checked against
+	// what actually arrived.
+	//
+	// Long legal footers are dropped, because nobody pastes a legal footer into a
+	// scam checker. Subject line and body are kept.
+	//
+	// None of these was read before any pattern in the catalogue was written, and
+	// all fifteen were added BEFORE the run that scores them. That order is the
+	// whole point: a negative chosen after seeing which ones were hit describes a
+	// result instead of testing one.
+	{
+		id: "ird-genuine-login-alert",
+		message:
+			"Hi Jordan Hale,\n\nYour myIR account JordanHale was logged into from a new device or web browser.\n\nTime: 15-Sep-2026 10:25:14\nIP: 203.0.113.47\n\nIf this was you\n\nYou can ignore this message. There is no need to take any action.\n\nIf this was not you\n\nYou will need to reset your password, by selecting Forgot password? on the myIR log in page.\n\nIf you are unable to reset your password, see any unusual account activity or have any concerns, please contact us immediately on 0800 227 770.\n\nThanks,\nCustomer Services team",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Inland Revenue (alerts@ironline.ird.govt.nz), 15 Sep 2026. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"The single most valuable negative in this corpus. A real government agency, an unexpected security alert, a login from a new device, an IP address, a password-reset instruction and a phone number to ring — which is the exact inventory of `asb-fraud-team-callback`, a scam. Note also that the sender is `ironline.ird.govt.nz`, a subdomain rather than the bare `ird.govt.nz` that IRD's own guidance teaches people to look for.",
+	},
+	{
+		id: "google-genuine-signin-alert",
+		message:
+			"New sign-in to your account\njordan.hale@example.com\nWe noticed a new sign-in to your Google Account. If this was you, you don't need to do anything. If not, we'll help you secure your account.\nCheck activity",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Google (no-reply@accounts.google.com), 16 Sep 2026. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note: "The shortest form of the account-security alarm. Almost every credential-phishing campaign in existence imitates this message, which makes the genuine one a hard negative by construction.",
+	},
+	{
+		id: "anz-genuine-job-referral",
+		message:
+			"Hi Jordan,\n\nYou've been referred by an ANZ employee as someone who would be a great fit for the following role:\n\nJob title: Associate Private Banker\n\nRequisition number: 118742\n\nWe'd love for you to apply so we can hear more about your skills, experience and what you are looking for. You can read more about it, and apply, using the link below:\n\nPlease use this email address when logging in, to make sure their referral is acknowledge. You have an existing profile in our system - use \"Forget Password\" if you need to. You will receive a confirmation email once you have successfully submitted your application.\n\nhttps://careers.anz.com/job-invite/118742/?locale=en%5fGB&utm_campaign=rcmemployeereferral&utm_source=rcmemployeereferral",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ANZ PeopleHub (no-reply@talentandculture.anz.com), 14 Sep 2026. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"An unsolicited message from a bank, offering an opportunity, instructing the reader to log in, and containing a grammatical error — 'to make sure their referral is acknowledge'. Poor grammar in a message from a bank is the tell every scam-awareness page in New Zealand teaches, and here it is genuine. This is the hardest negative for `job-or-earnings-offer` and `verify-account-pretext` at once.",
+	},
+	{
+		id: "anz-genuine-interview-invite",
+		message:
+			"Hi Jordan,\n\nCongratulations! You have been selected to progress for the Customer Service Consultant, New Zealand Contact Centre, 114508 position, which will involve completing a short digital interview.\n\nWe ask that you complete your digital interview within the next 72 hours. We recommend that you complete the entire digital interview in one sitting. Please let us know should you require any additional time or have any special requirements.\n\nTo begin the digital Interview click here https://sau.hvue.io/XXXXXXXXXXXXXXXX to begin!\n\nThank you again for your interest!\n\nKind Regards,\n\nANZ Recruitment Team",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ANZ PeopleHub (no-reply@talentandculture.anz.com), 14 Sep 2026. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"'Congratulations! You have been selected', a 72-hour deadline, and a link to an unfamiliar third-party domain (`sau.hvue.io`) that carries neither the bank's name nor a word of English. Every deterministic signal this app has says scam. It is a real interview invitation from a real bank.",
+	},
+	{
+		id: "nzblood-genuine-appointment",
+		message:
+			"Kia ora Jordan,\n\nDonor ID: 3180000\n\nThanks for being a lifesaver and making an appointment to donate plasma. We really appreciate the time you're taking out of your day to help save lives. Confirmation of your appointment is below.\n\nAppointment Details\n\nDate and Time:\n\n20/11/2025 09:40 AM\n\nLocation: Dunedin Donor Centre\n\nAddress: Dunedin Donor Centre, 170 Crawford Street, Dunedin\n\nDonation Type: Plasma\n\nBlood Type: O Positive\n\nCan't make your appointment?\n\nIf you're no longer able to make your appointment and need to reschedule or cancel it we understand. You can change things online through our NZ Blood Donor App or by visiting nzblood.co.nz. Alternatively you can call us on 0800 448 325.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from New Zealand Blood Service (info@nzblood.co.nz), 17 Nov 2025. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"Our own `appointment-reminder` is a one-line invention. This is what a real New Zealand appointment confirmation looks like: a te reo greeting, an ID number, a date, an address, an 0800 number and a warm tone. The length alone is something an invented corpus never produces.",
+	},
+	{
+		id: "smithandsmith-genuine-booking",
+		message:
+			"Kia ora Jordan\n\nGreat news! Your booking is confirmed for 20/06/2022 8:45 a.m. at our Smith&Smith branch at 114 Cumberland Street, Dunedin Central. We expect your vehicle will be ready for you to drive away by 10:45 AM. Please let us know if you are unable to pick up your vehicle at that time as we only have limited parking onsite.\n\nDuring your service, our technician will complete a vehicle glass safety check, which includes inspecting your wiper blades to ensure that they are in good working condition. If they need replacing, we have a great range at competitive prices with free installation\n\nYour Information\n\nJordan Hale\n\n021 000 0000\n\njordan.hale@example.com\n\nSubaru Outback\n\nABC123\n\nNeed to update any details or contact us before your appointment date?\n\nEither login online by clicking here and use the email address you supplied above as well as this booking number 00900000 or call us on 0800 80 90 80.\n\nNgā mihi\n\nYour Customer Service team\nSmith&Smith",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Smith&Smith (contactus@smithandsmith.co.nz), 9 Jun 2022. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"'Great news!', an upsell, an instruction to log in, and the reader's own personal details quoted back at them — a technique scams use to manufacture credibility. Genuine, and thoroughly New Zealand.",
+	},
+	{
+		id: "nzpost-genuine-collected-verbatim",
+		message:
+			"We've collected your Naked Glass parcel\n\nGood news!\n\nWe've collected your parcel from Naked Glass. We expect to deliver it to you by 28 June 2023. If you live rurally, this may take a little longer (add 2-3 days).\n\nTRACKING NUMBER\n\n4579070025137501WLG001JN\n\nSTATUS\n\nCollected from Sender\n\nTrack my parcel\nAdd delivery instructions\n\nAny questions? Please contact our Customer Care Centre.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from NZ Post (noreply.notifications@nzpost.co.nz), 27 Jun 2023. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note:
+			"The genuine counterpart to four scams in this corpus. `nzpost-genuine-tracking` above is our reconstruction of this shape from NZ Post's own description; this is the article itself, and it is notably longer and chattier than we guessed.",
+	},
+	{
+		id: "nzpost-genuine-delivery-window",
+		message:
+			"We expect to deliver your parcel from Chemist Warehouse today\n\nGood news!\n\nWe expect to deliver your parcel from Chemist Warehouse between 11:45am - 2:45pm today.\n\nTRACKING NUMBER\n\n00494210334300158492\n\nSTATUS\n\nWith courier for delivery\n\nYou can keep an eye on its progress using our online tracking tool.\n\nTrack my parcel\nAdd delivery instructions\n\nAny questions? Please contact our Customer Care Centre.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from NZ Post (noreply.notifications@nzpost.co.nz), 20 Dec 2022. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note: "A same-day time window is a soft deadline, and the parcel is from a pharmacy — a purchase a scam would be glad to imitate.",
+	},
+	{
+		id: "nzpost-genuine-collected-duplicate",
+		message:
+			"We've collected your parcel from Chemist Warehouse\n\nGood news!\n\nWe've collected your parcel from Chemist Warehouse. We expect to deliver it to you by 19 December 2022. If you live rurally, this may take a little longer (add 2-3 days).\n\nTRACKING NUMBER\n\n00494210334300158492\n\nSTATUS\n\nCollected from Sender\n\nTrack my parcel\nAdd delivery instructions\n\nAny questions? Please contact our Customer Care Centre.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from NZ Post (noreply.notifications@nzpost.co.nz), 15 Dec 2022. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note:
+			"Deliberately kept despite being a near-duplicate of the item above, carrying the same tracking number at an earlier stage. Real inboxes contain the same event reported twice; invented corpora never do, and a model thrown by the repetition should be caught by it.",
+	},
+	{
+		id: "googleplay-genuine-points-expiry",
+		message:
+			"Your Play Points expire in 34 days\n\nWant to keep your points?\n\nYou have Google Play Points that will expire in 34 days. To keep your points, earn or use at least one point before August 19, 2025.\n\nVisit Play Points",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Google Play (googleplay-noreply@google.com), 17 Jul 2025. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note:
+			"The genuine twin of `anz-points-expiry-verbatim` and `bnz-rewards-expiry`, both scams here. Loyalty points, a countdown, a named deadline and a call to action. `benefit-expiry-pretext` fired on 73 of 145 messages in the Jev run, and this is the message that should say whether that pattern describes a pretext or merely describes a marketing email.",
+	},
+	{
+		id: "spotify-genuine-student-reverify",
+		message:
+			"Action required: Don't lose your Spotify Premium student discount\n\nReverify to keep your student discount.\n\nWe just want to let your know that your Premium Student discount period expires on 2025-04-14.\n\nTo keep your student discount for another year, you need to reverify that you're enrolled in an accredited college or university.\n\nREVERIFY NOW\n\nIf you don't reverify or if you've had a student discount for the maximum number of 4 years, your account will automatically switch to a Spotify Premium Individual subscription after your expiration date. You'll then be charged $18.99 a month until you cancel.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Spotify (no-reply@legal.spotify.com), 16 Mar 2025. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note:
+			"'Action required', a loss framed as a deadline, an instruction to reverify, and a charge that begins if the reader does nothing. It also carries the sender's own grammatical error, 'let your know'. This item probes `benefit-expiry-pretext` and `verify-account-pretext` together.",
+	},
+	{
+		id: "dyson-genuine-one-time-code",
+		message:
+			"Your code: 768543 – Log in to your MyDyson App\n\nYour code: 768543\n\nLog in to the MyDyson App using this code.\n\nIt will soon expire, so please use now.\n\nIf you didn't attempt to log in to your MyDyson App, we recommend ignoring this email and changing your password through the app.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Dyson New Zealand Limited (no-reply@cp.dyson.com), 13 May 2026. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note:
+			"`bank-genuine-2fa` above is our invention of this shape. This is the real thing from a New Zealand registered company, and it is harder than ours: it carries an urgency line, 'so please use now', that we did not think to write.",
+	},
+	{
+		id: "playstation-genuine-payment-problem",
+		message:
+			"There's been a problem processing your PlayStation Plus Essential recurring payment\n\nPlease Update Your Payment Details\n\nPlayStation ID: PlayerOne1234\n\nWe've had some trouble processing payment for your ongoing PlayStation Plus Essential subscription.\n\nDon't worry, we'll try again over the next few days, but in the meantime you may want to review the payment details on your account.\n\nIf we are unable to process your payment, your subscription will end and your account will lose access to its PlayStation Plus Essential benefits.\n\nUpdate Payment Details",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from PlayStation (sony@txn-email03.playstation.com), 6 Sep 2026. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"A payment failure, a threatened loss of access and a button marked 'Update Payment Details' — sent from `txn-email03.playstation.com`, which is not `playstation.com`. A rule that flags a host wearing the organisation's name without being its domain would flag the genuine article here.",
+	},
+	{
+		id: "spotify-genuine-payment-reminder",
+		message:
+			"Reminder: update your payment details\n\nWe still can't process your payment.\n\nWe encountered an issue with your payment method for this upcoming month. Your Spotify Premium will be discontinued going forward if we don't have a working payment method for your account. This could be because:\n\nThere's a problem with your bank or account; or\nYour payment card expired\n\nKindly update your payment information to avoid any service interruptions. We'll try your payment again over the next few days.\n\nUPDATE DETAILS",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Spotify (no-reply@spotify.com), 18 Jul 2025. Captured 2026-09-21.", // pragma: allow (institutional sender)
+		note:
+			"'Kindly update your payment information to avoid any service interruptions' is, almost word for word, the sentence scam-awareness material uses as its worked example of phishing prose. It is genuine. If the app cannot stay quiet on this one, the false-alarm problem is larger than thirteen invented messages could ever have shown.",
+	},
+	{
+		id: "paypal-genuine-receipt",
+		message:
+			"Receipt for Your Payment to Spotify AB\n\nHello, Jordan Hale\n\nYou paid $20.99 NZD to Spotify AB\n\nView or Manage Payment\n\nTransaction ID\n15F00000JX0000000\n\nTransaction date\n13/09/2026\n\nMerchant\nSpotify AB\nsupport@spotify.com\n\nInvoice ID\nP46X0000X0\n\nTotal $20.99 NZD\n\nCharge will appear on your credit card statement as \"PAYPAL *SPOTIFY*P46X000\"\n\nPaid Spotify AB with\nMastercard-0000 $20.99 NZD\n\nIssues with this transaction?\n\nYou have 180 days from the date of the transaction to open a dispute in the Resolution Center.\n\nPayPal is committed to preventing fraudulent emails. Emails from PayPal will always contain your full name. Learn to identify phishing", // pragma: allow (Spotify's own merchant support address, quoted inside the genuine receipt)
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from PayPal (service@intl.paypal.com), 13 Sep 2026. Captured 2026-09-21. Redacted.", // pragma: allow (institutional sender)
+		note:
+			"Money leaving an account, a transaction the reader may not remember authorising, and an invitation to dispute it — which is `bank-dispute-payment`'s entire shape, a scam in this corpus. The fake-receipt phishing genre imitates this message closely enough that PayPal spends a paragraph of the genuine one explaining how to tell them apart.",
 	},
 ];
 

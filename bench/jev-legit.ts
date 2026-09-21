@@ -1,5 +1,11 @@
 /**
- * Does Jev cry wolf? The thirteen legitimate messages, asked the same questions.
+ * Does Jev cry wolf? The legitimate messages, asked the same questions.
+ *
+ * As of 2026-09-21 there are 28 of them, fifteen of which are genuine New Zealand
+ * messages captured from real inboxes rather than written by us. The counts below
+ * are computed from the corpus, not hard-coded, so this file does not go stale
+ * when more are added — but the prose does, so treat any number written in a
+ * comment here as a date-stamped observation rather than a fact.
  *
  *   npm run bench:jev:legit        free until 25 Sep 2026, about a cent after
  *
@@ -10,10 +16,16 @@
  * nearest label scores exactly like a model that is right, and nothing in that run
  * can tell the two apart.
  *
- * These thirteen can. They are the only false-alarm evidence this project has, and
- * they are the cheapest measurement that can kill the 83.4% outright: if Jev fires
- * on genuine messages the way it fires on scams, the recall was noise and no
- * further money needs spending on the spike.
+ * These can. They are the only false-alarm evidence this project has, and they are
+ * the cheapest measurement that can kill the 83.4% outright: if Jev fires on
+ * genuine messages the way it fires on scams, the recall was noise and no further
+ * money needs spending on the spike.
+ *
+ * It did, twice. On the original thirteen it alarmed at eight. On the enlarged 28
+ * it alarmed at twenty-one, and — this is the part the thirteen could not show —
+ * it alarmed *harder* on the real messages than on ours. Our invented hard
+ * negatives drew 0.51 to 0.67; the genuine ones drew 0.83, 0.88, 0.91. We wrote
+ * negatives we thought were difficult and they turned out to be the easy half.
  *
  * ## Why quiet is the score here, and recall is not
  *
@@ -25,13 +37,16 @@
  *
  * ## What this is not
  *
- * Thirteen messages, ten of them written by a language model as deliberate hard
- * negatives, cannot measure a false-alarm *rate* — the interval on thirteen items
- * is far too wide to publish a percentage from. This is a smoke test. It can say
- * "this fires on genuine messages", which is decisive; it cannot say "this fires
- * on 8% of genuine messages", which would be a number with nothing underneath it.
- * Fifty to a hundred real New Zealand messages of the awkward kind is still the
- * highest-value thing anyone could add to this project.
+ * Twenty-eight messages still cannot measure a false-alarm *rate* — the interval
+ * on twenty-eight items is too wide to publish a percentage from, and thirteen of
+ * them are still our own prose. This is a smoke test. It can say "this fires on
+ * genuine messages", which is decisive; it cannot say "this fires on 75% of
+ * genuine messages", which would be a number with very little underneath it.
+ *
+ * The 2026-09-21 additions moved the bottleneck without clearing it. Fifty to a
+ * hundred genuine New Zealand messages remains the target; fifteen of them now
+ * exist, and the first fifteen were enough to change the conclusion, which is the
+ * best argument there is for finding the rest.
  */
 
 import { existsSync } from "node:fs";
@@ -100,9 +115,9 @@ for (const item of items) {
 			break;
 		} catch (error) {
 			const why = error instanceof Error ? error.message : String(error);
-			// No score from a partial run. With thirteen items one missing answer is
-			// 7.7% of the only false-alarm evidence there is, and a quiet rate
-			// computed over the other twelve would not say so.
+			// No score from a partial run. On a corpus this small one missing answer
+			// is several percent of the only false-alarm evidence there is, and a
+			// quiet rate computed over the remainder would not say so.
 			if (HOPELESS.test(why) || attempt >= 4) {
 				console.error(`\nStopped at ${item.id}: ${why.slice(0, 300)}`);
 				console.error("Answers bought so far are cached and reused next run. No score reported.");
@@ -180,6 +195,6 @@ if (tally.size === 0) console.log("  none — nothing fired on any genuine messa
 
 console.log(`\nSPENT: $${spent.toFixed(5)} on ${bought} call(s), as reported by the gateway.`);
 console.log("");
-console.log("Thirteen messages cannot produce a false-alarm rate — see the header of this");
+console.log("This many messages cannot produce a false-alarm rate — see the header of this");
 console.log("file. What they can do is say no. Record whatever comes back in");
 console.log("docs/jev-spike.md, including and especially a result that ends the spike.");

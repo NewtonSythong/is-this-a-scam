@@ -411,3 +411,79 @@ time: recall is measured at 61.0% and the false-alarm rate rests on thirteen
 messages we wrote ourselves. Fifty to a hundred genuine New Zealand messages of
 the awkward kind remains the single highest-value addition to this project, and
 it is worth more than Jev is.
+
+## 2026-09-21 — the first real messages arrive, and they are worse than ours
+
+Fifteen genuine New Zealand messages were captured from two real inboxes and added
+to the legitimate half of `bench/corpus.ts`, taking it from 13 to 28. They are
+redacted but otherwise untouched; provenance and method are in the block comment
+above them, and the unredacted originals are kept outside this public repository.
+
+`bench/jev-legit.ts` was re-run against all 28. The thirteen cached answers were
+reused and the fifteen new ones cost **$0.00** — the gateway billed nothing inside
+the free window. So the spike's running total is still zero.
+
+**The result is worse than the thirteen were able to show.**
+
+| cut-off | quiet | scams found (dev) |
+| :-- | :-- | :-- |
+| 0.4 | 4/28 — 14.3% | 91.0% |
+| **0.5** | **7/28 — 25.0%** | **83.4%** |
+| 0.6 | 16/28 — 57.1% | 73.1% |
+| 0.7 | 18/28 — 64.3% | 63.4% |
+
+At the 0.5 cut-off Jev alarms at **21 of 28 genuine messages**. On the original
+thirteen it alarmed at eight, which read as bad. On the enlarged corpus it reads
+as unusable.
+
+### The finding that only real messages could produce
+
+The genuine messages did not merely fire more often. **They fired harder.**
+
+Our own invented hard negatives drew probabilities of 0.51 to 0.67 — borderline,
+the shape of a model that is unsure. The captured ones drew 0.83, 0.86, 0.88, 0.89
+and 0.91. Jev is *more confident* that a real Google sign-in alert is a scam
+(`benefit-expiry-pretext`, 0.88) than that any message we wrote is.
+
+Neither the Google alert nor the Inland Revenue login alert (0.83) mentions a
+benefit, a reward, or an expiry of any kind. The pattern is not detecting its
+pretext; it is detecting *institutional email*, and on a corpus where every
+message was a scam there was no way to see that.
+
+This is exactly what we were unable to conclude in the stage-one section, and it
+took fifteen messages to conclude it.
+
+### It also kills the one-bad-pattern defence
+
+The earlier reading was that `benefit-expiry-pretext` alone was responsible, and
+that excluding it left Jev at 62.1% recall with all thirteen negatives quiet. That
+no longer holds. Set `benefit-expiry-pretext` aside on the 28 and **eight messages
+still fire**, on three further patterns:
+
+- `verify-account-pretext` — 4/28, including a genuine Spotify billing email and a
+  genuine PlayStation billing email
+- `manufactured-urgency` — 4/28, including a real ANZ interview invitation at 0.89
+- `job-or-earnings-offer` — 1/28, a real ANZ job referral
+- `code-request` — 1/28, a real Dyson one-time login code
+
+So the quiet rate with the worst pattern removed is 20/28, not 13/13. There was
+never one bad pattern; there was one pattern bad enough to hide the others.
+
+### What this changes
+
+- **Jev is finished as a candidate.** No further spend, and nothing to reconsider
+  when the free window closes on 25 September. The file stays as a record.
+- **The catalogue has a problem that is not about Jev at all.** Four patterns fire
+  on genuine institutional mail. Whether Opus does the same on these 28 is now the
+  open question, and unlike the head-to-head that was declined on 20 September, it
+  is a question with a settled corpus underneath it.
+- **The bottleneck moved but did not clear.** Fifteen of the fifty are in. The
+  argument for finding the other thirty-five is that the first fifteen reversed a
+  conclusion.
+
+### What is still not claimed
+
+Twenty-eight messages is not a false-alarm *rate*, and thirteen of them are still
+our own prose. "Jev alarms at 75% of genuine messages" is not a sentence this page
+will print. What twenty-eight can do is say no, twice, more loudly than thirteen
+did.
