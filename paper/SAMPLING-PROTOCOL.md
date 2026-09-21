@@ -282,7 +282,28 @@ a form anyone could act on. The shape is the data; the destination is not.
 
 ## Amendments, recorded as they were made
 
-*(none yet)*
+**1. Defanging is applied to the payload, not to every string that happens to be
+a URL.** Made 2026-09-22, while capturing the first two positives. The rule above
+says "every URL is defanged to a structurally identical placeholder on a reserved
+domain", and applying that literally would have destroyed the finding in one of
+the two messages. The toll phish is sent *through SurveyMonkey's genuine mailing
+infrastructure*, so every link a reader can see points at `surveymonkey.com` —
+which really is SurveyMonkey. That the visible links are legitimate is the whole
+of what makes the item interesting, and rewriting the host would have removed it.
+
+So the rule as applied is: a host is defanged when it is the attacker's, and kept
+when it is a real organisation's and is itself the data. What is always removed
+is the part a reader could act on or be identified by — the footer tracking
+tokens here are replaced with stand-ins of identical length and identical escape
+structure, because the token identifies the recipient while its shape does not.
+
+The same reading explains why the older scam items keep live lookalike domains
+like `anznzz.com`: there, the domain *is* the measurement. Two properties the
+engine can see — whether a host is a brand lookalike, and whether its ending is
+on the high-abuse list — must survive defanging or the item stops measuring
+anything. Neither captured message tripped either property, so nothing was lost
+in this round; a future capture whose payload host is a lookalike will force this
+choice properly, and it should be made in the open rather than by reflex.
 
 ## Part II, round 1 — 2026-09-22: the folder is thin, and that is the result
 
@@ -311,6 +332,38 @@ source are scarce, which is precisely why scam corpora get written rather than
 gathered, and why the provenance question matters more on the positive side
 than anyone has measured.
 
-The three are **not yet captured into `bench/corpus.ts`**: they need full bodies,
-shape-preserving redaction and URL defanging under the rule above. The walk,
-with senders and dates, is in `corpus-sources-private/inbox-captures-5.md`.
+The walk, with senders and dates, is in
+`corpus-sources-private/inbox-captures-5.md`. What happened when the three bodies
+were actually opened is the next section, and it changed the number.
+
+## Part II, capture — 2026-09-22: three qualified on sight, two survived reading
+
+The walk above was conducted from the list view: subject, sender and snippet
+only, per the contamination rule. Opening the three bodies in order to capture
+them settled a question the list view could not, and it cost the round an item.
+
+**Item 11 — the Inserve/Afterpay message — is not merely comparable to
+`afterpay-verify-account-verbatim`. It is that message.** Same sender, same body
+word for word, same Dutch ticketing footer. The corpus item recorded as reported
+from a user's junk mail on 2026-09-07 is this 28 August arrival, reached by a
+different route. Rule 5 excludes it as already held.
+
+That exclusion is worth more than the item was. `afterpay-verify-account-verbatim`
+carries a `developedAgainst` flag: the engine was changed while somebody was
+looking at it, and the corpus file says in terms that such an item proves
+nothing. Capturing it again under a fresh id would have re-entered a known
+contaminated message as though it were freshly held out, and every recall figure
+that touched it would have been wrong in a way no downstream check could catch.
+A rule written to stop double-counting turned out to be the thing standing
+between this corpus and a silently inflated number.
+
+**The round therefore yields two collected positives, not three**:
+`flybuys-security-setting-verbatim` and `linkt-toll-notification-verbatim`, both
+now in `bench/corpus.ts` with shape-preserving redaction, and neither run through
+the detector before the capture was committed. The corpus stands at 83 items.
+
+Two against a target of forty. Set beside 55 collected negatives gathered in two
+afternoons, that ratio is the Part II result, and it argues the paper's case
+better than forty captures would have: scam corpora are written rather than
+gathered because gathering them from one person's mail does not work. The next
+round of this work is measurement, not more sampling.

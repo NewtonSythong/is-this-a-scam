@@ -246,6 +246,43 @@ const SCAMS: readonly CorpusItem[] = [
 			"Screenshot published by NZ Post at https://www.nzpost.co.nz/contact-support/scams-and-fraud — transcribed 2026-09-07",
 		note: "The real version of nzpost-warehouse-verbatim's shape, which delivery-blocked-pretext was written from. The domain contains 'nzpost' but is not nzpost.co.nz.",
 	},
+	// ── Added 2026-09-22, captured under paper/SAMPLING-PROTOCOL.md Part II ──
+	//
+	// The first scam items here that were *sampled* rather than chosen. Inbox B's
+	// spam folder was walked in full under a rule written before the folder was
+	// opened, and these are the two messages that qualified. Neither was run
+	// through the detector before this capture was committed — that is the
+	// contamination rule, and F3 is what it exists to prevent happening twice.
+	//
+	// Note what sampling bought and what it cost. Both are live attacks with real
+	// sending infrastructure behind them, which no reconstruction can claim. There
+	// are only two, out of sixteen conversations in a month, and that scarcity is
+	// the Part II finding rather than a shortfall in the capture.
+	//
+	// Redaction mirrors the legitimate half: the shape is kept, the destination is
+	// not. Unredacted originals are in `corpus-sources-private/inbox-captures-5.md`.
+	{
+		id: "flybuys-security-setting-verbatim",
+		message:
+			"FLYBUYS\n\nYou are still using the old Email Security Setting\n\nStarting from September, 30 2026, Flybuy customers that are yet to update their email account will no longer be able to log into their account through email addresses due to recent upgrades.\n\nPlease follow the link below to update your account :\n\nOpen My Flybuys \u203a\n\nRegards,\nYour Flybuys Team\n\n\u00a9 2026 All rights resevered.",
+		kind: "scam",
+		provenance: "verbatim",
+		source:
+			"Captured 2026-09-22 from inbox B's spam folder under paper/SAMPLING-PROTOCOL.md Part II. Received 21 Sep 2026 from a compromised Singaporean ISP mailbox sending as \u201cFlybuys Membership\u201d. The button's live destination is not reproduced here; it is recorded in corpus-sources-private.",
+		note:
+			"A benefit-expiry pretext with no benefit and no money in it \u2014 the thing being withheld is the reader's own login, and the deadline is a real date eight days out. The button hides its destination, so the visible message carries no link at all: whatever the engine makes of this one, it makes it with no artifact to examine. \u201call rights resevered\u201d and \u201cFlybuy customers\u201d are the sender's own spelling.",
+	},
+	{
+		id: "linkt-toll-notification-verbatim",
+		message:
+			"LINKT\n\nNew toll notification\n\nReference #LT-2026-0912\n\nHello,\n\nYou have a new notification regarding your toll account.\n\nReference\n#LT-2026-0912\nDate\nAugust 29, 2026\nStatus\n\u25cf Active\n\nView details\n\nQuestions? Contact us\n\nAutomated message. Do not reply.\n\n\u00a9 2026. All rights reserved.\n\nhttps://es.surveymonkey.com/mp/legal/privacy/ https://es.surveymonkey.com/tr/v1/te/5URUxg6GaGeJP_2FUHce8URMDQA24SdGMnj3IH5gIQ2nyks8q8tgzO_2Fx60ehhAtFnpeWur_2FOXbljTMX_2BI2bl43idOZ_2Fjj7mKU1n6bTOqg3JEwwfdv8OHvq0h03YnYM_2F4KRva9V4XiLXG8MnfxkHqnycL8gcN9ELGTd_2FwKg8hVR2IirSvwucWBRIQgcG0idqjCf7bRgBWPDyiOh1Yuwc0P8z1341413J2CC0LGC9BpBJ3srbwC6T3cXdodl_2FhISu50oyWnLGXbyqou8hzZSQs4y78jiG8CtWW5HUYtJDSGCFqkGDO\nDesarrollado por\nhttps://es.surveymonkey.com/tr/v1/te/6gBkxtT4wmJp9_2FRGrNYBQDwRMMZGHr0rxVyr6O9qxtYIX9JIlC_2FiHUYpz5Z9aCmlJpI_2FzVsmqFhWB_2Fb5_2FDy5L1pssu4pvpbYZ_2BRShE7xXpl6bHkscWsFvcUiC1OooDn8T32Q2v2ozCCo0tBm0DQFODsL1_2BfrLRMKXPipa9nCsxVjOogBIM0xL7JHRe2Pj9TvQ8zXta9a9yq62vFZ3MmR5aigB6OeTwa0N8bVxIDOPbPpaQ30UwBt6uFrEoZBsrQB",
+		kind: "scam",
+		provenance: "verbatim",
+		source:
+			"Captured 2026-09-22 from inbox B's spam folder under paper/SAMPLING-PROTOCOL.md Part II. Received 31 Aug 2026 through SurveyMonkey's mailing infrastructure, with a reply-to on an unrelated throwaway domain. Redacted: the two SurveyMonkey tracking tokens are stand-ins of identical length and escape structure, because the token identifies the recipient.",
+		note:
+			"The road-toll genre, which this corpus had none of, and a case the deterministic half cannot win: every link a reader can see points at surveymonkey.com, which really is SurveyMonkey. The deception is carried entirely by the LINKT branding and a fabricated reference number, and a Spanish-language footer is the only visible seam.",
+	},
 ];
 
 /**
