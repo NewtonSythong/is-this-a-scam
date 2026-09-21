@@ -362,3 +362,52 @@ Draft abstract in `paper/ABSTRACT.md`, sized for the SaTML registration field.
 5. **Gap 5**, intervals on every number.
 6. **Gap 3** if the calendar allows — genuine negatives 16 to 50.
 7. **Anonymised artifact mirror**, within 3 days of submitting.
+
+---
+
+## 9. Toolchain — surveyed 2026-09-21, and the answer is mostly "you already have it"
+
+Checked what is on the machine before looking at what could be installed.
+
+**Already present, nothing to add:**
+
+| Tool | Version | What it covers |
+| :-- | :-- | :-- |
+| MiKTeX | 25.12 (pdfTeX 4.23) | Compiles the paper locally |
+| `IEEEtran.cls` | installed | **SaTML's required template, already there.** `\documentclass[conference]{IEEEtran}` compiles today. |
+| Pandoc | present | Markdown to LaTeX, so `PLAN.md` and `ABSTRACT.md` convert rather than being retyped |
+| Python | present | Fisher's exact and the Wilson intervals are eight lines of `math`; no SciPy needed |
+
+Run `miktex packages update` before the first real build — kpsewhich warns the
+package database has never been refreshed.
+
+**Local, zero-egress MCP servers worth adding (ranked by stars, all verified
+actively maintained):**
+
+| Server | Stars | Last push | Why |
+| :-- | --: | :-- | :-- |
+| [`54yyyu/zotero-mcp`](https://github.com/54yyyu/zotero-mcp) | 5,099 | 15 Sep 2026 | Highest-rated research MCP by some distance. Talks to a local Zotero library. Pays off across many papers rather than this one. |
+| [`blazickjp/arxiv-mcp-server`](https://github.com/blazickjp/arxiv-mcp-server) | 3,169 | 26 Aug 2026 | "Papers stay on disk." Original-LaTeX section reads and BibTeX straight from arXiv metadata — the citation pipeline, and the one that helps *this* paper. |
+| [`openags/paper-search-mcp`](https://github.com/openags/paper-search-mcp) | 2,672 | 21 Sep 2026 | Multi-source: arXiv, PubMed, bioRxiv, Semantic Scholar. Pushed the same day as this survey. |
+
+Also-rans: `takashiishida/arxiv-latex-mcp` (146), `andybrandt/mcp-simple-arxiv`
+(201), `JackKuo666/PubMed-MCP-Server` (129, untouched since May 2025). PubMed and
+the biomedical servers are off-topic for this paper.
+
+**Nothing hosted is recommended.** Every server above runs as a local process
+against public APIs. Anything that wants an API key to a third-party aggregator
+stays on hold until its safety is established.
+
+**The honest verdict: install nothing for this paper.** Its bibliography is
+perhaps fifteen works — the IMC'25 dataset paper, two FTC alerts, Netsafe, and a
+literature sweep not yet done. A hand-written `.bib` is half an hour. Zotero
+earns its place across a body of work, not across one submission.
+
+### The real gap is not a tool, it is related work
+
+A position paper whose thesis is *negatives must be collected, not written* has
+to know who has already said it. Synthetic-versus-real evaluation data, base-rate
+neglect in security classifiers, and benchmark contamination are all established
+literatures, and a reviewer at SaTML will know them. **This is the largest
+remaining risk to the submission and it is larger than any measurement gap in
+§4.** It is also the one job `arxiv-mcp-server` would genuinely accelerate.
