@@ -38,6 +38,7 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 
 import Anthropic from "@anthropic-ai/sdk";
 import { NARRATIVE_MODEL, anthropicNarrativeCheck, systemPrompt } from "../src/narrative/anthropic";
+import { type Item, loadCorpus, splitFromArgv, splitOf } from "./corpus-imc25";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
@@ -45,68 +46,14 @@ if (!process.env.ANTHROPIC_API_KEY) {
 	throw new Error("bench/narrative-imc25.ts needs ANTHROPIC_API_KEY — it is the thing being measured");
 }
 
-interface Item {
-	id: string;
-	tier: string;
-	scamType: string;
-	message: string;
-}
-
-function parseCsv(csv: string): string[][] {
-	const out: string[][] = [];
-	let row: string[] = [], field = "", quoted = false;
-	for (let i = 0; i < csv.length; i++) {
-		const c = csv[i];
-		if (quoted) {
-			if (c === '"' && csv[i + 1] === '"') { field += '"'; i++; }
-			else if (c === '"') quoted = false;
-			else field += c;
-		} else if (c === '"') quoted = true;
-		else if (c === ",") { row.push(field); field = ""; }
-		else if (c === "\n") { row.push(field); out.push(row); row = []; field = ""; }
-		else if (c !== "\r") field += c;
-	}
-	if (field !== "" || row.length > 0) { row.push(field); out.push(row); }
-	return out;
-}
-
-const rows = parseCsv(readFileSync("bench/imc25.csv", "utf8")).slice(1).filter((r) => r.length >= 5);
-const all: Item[] = rows.map((r) => ({
-	id: r[0] ?? "",
-	tier: r[1] ?? "",
-	scamType: r[2] ?? "",
-	message: r[4] ?? "",
-}));
-
 /**
- * `--split dev` or `--split test`. Omitted, the whole corpus runs, as it always has.
- *
- * ## Why a split exists at all
- *
- * A held-out corpus is a wasting asset, and the way it gets spent is that
- * somebody reads the misses in order to fix them. `bench/corpus.ts` died of
- * exactly that. Until this flag existed the same fate was scheduled for this
- * corpus too: it was all held out, so the first improvement made by reading a
- * miss would have spent all 292 at once and left the project with no instrument.
- *
- * So the corpus is cut in half, permanently. **`dev` is the half you are allowed
- * to read.** Study its misses, write patterns from them, iterate as often as you
- * like — it is understood to be spent, and its score is not this project's
- * number. **`test` is never read.** It is only ever scored, and it is the only
- * half whose figure means anything after a change.
- *
- * The cut is the file's own order alternated: rows are grouped by scam type in
- * blocks of forty, so taking every other row splits each stratum exactly in
- * half — 146 and 146, 20/20 within each type — without a random seed to record
- * or a shuffle to reproduce. It is deterministic, so the same message is in the
- * same half forever, which is the only property that matters.
+ * The corpus, its split, and why the split exists, all live in
+ * `bench/corpus-imc25.ts` so that every runner means the same thing by "the dev
+ * half". Read that file before changing anything about which messages are where.
  */
-const splitArg = process.argv.indexOf("--split");
-const SPLIT = splitArg === -1 ? "all" : (process.argv[splitArg + 1] ?? "all");
-if (!["all", "dev", "test"].includes(SPLIT)) {
-	throw new Error(`--split must be dev, test or all; got ${SPLIT}`);
-}
-const items = SPLIT === "all" ? all : all.filter((_, i) => (i % 2 === 0) === (SPLIT === "dev"));
+const all = loadCorpus();
+const SPLIT = splitFromArgv(process.argv);
+const items = splitOf(all, SPLIT);
 
 /** `--model claude-haiku-4-5` to price a run differently. See the note below. */
 const modelArg = process.argv.indexOf("--model");

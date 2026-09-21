@@ -23,7 +23,9 @@
     "bench:imc25:dev": "tsx bench/narrative-imc25.ts --split dev",
     "bench:imc25:test": "tsx bench/narrative-imc25.ts --split test",
     "bench:resume": "tsx bench/narrative-imc25.ts --model claude-haiku-4-5",
-    "bench:narrative:haiku": "tsx bench/narrative.ts --model claude-haiku-4-5"
+    "bench:narrative:haiku": "tsx bench/narrative.ts --model claude-haiku-4-5",
+    "bench:jev": "tsx bench/jev-imc25.ts --split dev",
+    "bench:jev:legit": "tsx bench/jev-legit.ts"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

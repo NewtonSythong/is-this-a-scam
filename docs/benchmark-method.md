@@ -765,3 +765,21 @@ fault above proves what that is worth — a corpus of our own imagination measur
 0/10 for nine days on an engine that was already wrong. Fifty to a hundred
 genuine New Zealand messages of the awkward kind is still the single highest-value
 thing anyone could add to this project.
+
+## The dev half's Opus baseline was never bought
+
+**Added 2026-09-21.** Written down because it was assumed otherwise, and the
+assumption was costing a plan a factor of three hundred.
+
+At the current catalogue's fingerprint (`036de0bd9e79d2c9`),
+`bench/.imc25-cache.jsonl` holds **146/146 answers for `test` and 0/146 for
+`dev`**. Every run paid for since the "hey stranger" clause went in went to the
+held-out half, which is the right place to spend money and the reason the 61.0%
+figure exists — but it means there is no same-catalogue Opus reading on `dev` to
+compare anything against. The published dev figure, 91/146 — 62.3%, is one
+catalogue behind.
+
+Anything that wants to be compared against Opus on the `dev` half therefore costs
+an Opus dev run, about $2.19, on top of its own. That is now the first paragraph
+of [`jev-spike.md`](./jev-spike.md), which is the brief for the next thing this
+project was going to do and had mispriced at a cent.
