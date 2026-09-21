@@ -123,6 +123,15 @@ debugging. The first reading off that half took the model's alone from
 **57.5% to 61.6%** (2026-09-18), on messages nobody has looked at, after two
 patterns written from the readable half and from the FTC's published guidance.
 
+**The number to quote is 61.0%** — 89/146 on the held-out half, `claude-opus-5`,
+measured 2026-09-21 on the catalogue that actually ships. The 61.6% above was one
+clause short of it: an exclusion added to `wrong-number-opener` to stop it
+alarming on *"hey stranger"* was feared to cost up to four points of recall in
+the weakest category, and the only way to know was to buy another 146-message
+run. Somebody bought it, and it cost nothing there — wrong number is 5/20 either
+way. Overall moved by a single message in 146, which is inside the run-to-run
+variation this project has recorded twice.
+
 The same run found a blind spot worth more than the headline. Wrong-number
 texts — *"is this Sarah? sorry, wrong number"*, the opening move of the long
 investment frauds — were caught **2 times in 40**, because nothing in the engine

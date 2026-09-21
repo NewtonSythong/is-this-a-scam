@@ -701,3 +701,67 @@ opener reads, and that stratum is already the weakest in the benchmark, so the
 exclusion could plausibly suppress true positives there. One more 146-message run
 on Opus, about $2.19, would settle it. Nobody should quote a post-fix figure until
 somebody has.
+
+## The clause was free: 61.6% to 61.0% on the held-out half
+
+**Added 2026-09-21.** `claude-opus-5`, the same 146 `test` messages, all
+answered, no failed calls. The entry above ended by saying nobody should quote a
+post-fix figure until somebody bought the run. Somebody bought it. The two
+columns differ by exactly one thing: the "hey stranger" exclusion added to
+`wrong-number-opener`.
+
+| Scam type | Before the clause | **After** |
+| :--- | :--- | :--- |
+| hey mum/dad | 6/6 — 100% | **6/6 — 100%** |
+| government | 17/20 — 85.0% | **17/20 — 85.0%** |
+| spam | 15/20 — 75.0% | **14/20 — 70.0%** |
+| delivery | 14/20 — 70.0% | **14/20 — 70.0%** |
+| telecom | 14/20 — 70.0% | **14/20 — 70.0%** |
+| others | 10/20 — 50.0% | **11/20 — 55.0%** |
+| banking | 9/20 — 45.0% | **8/20 — 40.0%** |
+| wrong number | 5/20 — 25.0% | **5/20 — 25.0%** |
+| **Overall** | **90/146 — 61.6%** | **89/146 — 61.0%** |
+
+**The stratum the clause was feared to damage did not move.** The worry was
+specific and reasonable: warm familiarity is also how a genuine scam opener
+reads, so telling the model that "hey stranger" between friends is not this
+pattern could plausibly have suppressed true positives in the weakest category in
+the corpus. Worst case was put at 4.1 points. It cost nothing there — wrong
+number is 5/20 either way, and `wrong-number-opener` still fires on five test
+messages.
+
+Overall moved by one message in 146. This page has twice recorded a single
+message in a stratum as inside run-to-run variation, and the same applies to a
+single message overall: it is not evidence that the clause cost recall, and it is
+not evidence that it was free either. What can be said is that **no effect large
+enough to see was found**, on the only comparison this project has ever run where
+the model, the messages and everything but one clause are held fixed.
+
+So the number to quote is now **61.0% on the held-out half, for the catalogue
+that actually ships** — which is the first time this project has had a figure
+with no "one clause away" attached to it.
+
+### What this cost, and the mistake worth not repeating
+
+$0.82, for 55 messages. The other 91 came from `bench/.imc25-cache.jsonl` free,
+because the run that started on 2026-09-18 wrote every answer to disk as it
+arrived and then refused to report a partial score. That refusal is worth
+keeping: the run stopped on a spend limit at message 91, and a harness that
+printed 57/91 as a percentage would have reported a catalogue regression that did
+not exist.
+
+The stop itself was not Anthropic's tier cap. It was a **self-imposed** monthly
+spend limit of $15 on the org, which reads as HTTP 400 `invalid_request_error`
+beginning *"You have reached your specified API usage limits"* and clears the
+moment the limit is raised, against a tier cap's HTTP 429 `rate_limit_error`
+which only support can clear. Three days were spent treating a two-click setting
+as a wait until 1 October. Settings → Billing → Spend limits → Adjust limit.
+
+### The false-alarm half is still the thing blocking everything
+
+Unchanged and now said four times on this page: recall is 61.0% and the
+false-alarm rate rests on 13 messages we wrote ourselves. The "hey stranger"
+fault above proves what that is worth — a corpus of our own imagination measured
+0/10 for nine days on an engine that was already wrong. Fifty to a hundred
+genuine New Zealand messages of the awkward kind is still the single highest-value
+thing anyone could add to this project.
