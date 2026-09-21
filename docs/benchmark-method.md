@@ -783,3 +783,87 @@ Anything that wants to be compared against Opus on the `dev` half therefore cost
 an Opus dev run, about $2.19, on top of its own. That is now the first paragraph
 of [`jev-spike.md`](./jev-spike.md), which is the brief for the next thing this
 project was going to do and had mispriced at a cent.
+
+## The shipping model, on the twenty-eight: 0/13 on ours, 5/15 on the real ones
+
+**Added 2026-09-21, later the same day.** `claude-opus-5` — the model the app
+actually runs — over all 41 items of `bench/corpus.ts` via `npm run
+bench:narrative`. All answered, no failed calls. This is the run the jev-spike
+page named as the open question, and it cost $0.62.
+
+| | Result |
+| :-- | :-- |
+| Scams the model's half saw something in | **13/13** |
+| False alarms on legitimate messages | **5/28** |
+
+Five is not twenty-one, so Opus is nothing like Jev. But the five are the entire
+finding, because of **where** they fall:
+
+| Legitimate half | False alarms |
+| :-- | :-- |
+| The 13 messages we wrote ourselves | **0/13** — every one quiet |
+| The 15 captured from real inboxes | **5/15** — 33.3% |
+
+**Every false alarm the shipping engine has is on a message we did not write.**
+The half of the corpus this project relied on for nine months of "0/10, both
+models" is silent on an engine that alarms at a third of genuine institutional
+mail. Fisher's exact test on that split gives **p = 0.031 one-sided, 0.044
+two-sided** — the first result in this repository with a p-value attached, and it
+is significant despite n=28.
+
+(The Wilson intervals overlap — 0/13 is [0, 22.8]% and 5/15 is [15.2, 58.3]% —
+which is the expected and well-known failure of reading overlap as
+non-significance. Fisher is the right test for a 2×2 this small; the intervals
+are quoted because the paper will need them, not because they contradict it.)
+
+### The five
+
+```
+ALARM anz-genuine-job-referral          job-or-earnings-offer
+ALARM googleplay-genuine-points-expiry  benefit-expiry-pretext
+ALARM spotify-genuine-student-reverify  benefit-expiry-pretext, verify-account-pretext
+ALARM playstation-genuine-payment-problem   verify-account-pretext, benefit-expiry-pretext
+ALARM spotify-genuine-payment-reminder      verify-account-pretext, benefit-expiry-pretext
+```
+
+Three patterns, and they are **the same three the Jev run implicated**:
+`benefit-expiry-pretext`, `verify-account-pretext`, `job-or-earnings-offer`. The
+difference between the two models is degree, not kind. Jev read those
+descriptions loosely enough to fire on a courier and a two-factor code; Opus
+reads them narrowly enough to stay quiet on those, and still fires on every
+subscription-billing email in the corpus.
+
+So the catalogue finding survives the model change, which is what makes it a
+finding rather than an anecdote about a cheap model. **`benefit-expiry-pretext`
+cannot distinguish a loyalty-points scam from a loyalty-points marketing email,
+and `verify-account-pretext` cannot distinguish "your payment failed, update your
+card" sent by a phisher from the same sentence sent by Spotify.** On the evidence
+here neither distinction exists in the message text at all, which would mean the
+patterns are asking a question the words cannot answer.
+
+### This is a live defect, not only a measurement
+
+The app, as deployed, will tell somebody that a genuine Spotify payment reminder,
+a genuine PlayStation billing notice and a genuine Google Play points expiry are
+worth worrying about. That is the specific harm ADR 0001 and every page in this
+directory says the project fears most, and it has been shipping.
+
+**It is not being fixed in this entry, deliberately.** Narrowing three patterns
+while looking at the five messages that caught them is exactly how
+`bench/corpus.ts` was spent the first time, and `false-familiarity` was withdrawn
+rather than narrowed on 2026-09-18 for this reason. The five stay in the corpus
+with the story attached. Any fix must be written from published descriptions of
+the pretexts — as `wrong-number-opener` and `job-or-earnings-offer` were — and
+measured on messages nobody has read.
+
+### What this settles, and what it does not
+
+**Settled:** the nine days of "0/10 false alarms on both models" was a property of
+the corpus, not the engine, and now there is a controlled demonstration of it
+rather than a single anecdote about the word "stranger". Fifteen real messages
+were enough to take a measured zero to a measured third.
+
+**Not settled:** 5/15 is not a false-alarm rate. Its 95% interval runs from 15%
+to 58%, which is the difference between an irritation and an unusable app. The
+argument for the other thirty-five genuine messages is now arithmetic rather than
+rhetorical.
