@@ -1,8 +1,22 @@
 # The Jev spike: what it asks, what it costs, and what would make it a yes
 
-**Written 2026-09-21. Nothing here has been run.** This is the brief for a spike
-that has not started, written so that whoever starts it — including a later
-session of this project — does not have to reconstruct the reasoning first.
+**Written 2026-09-21 as a brief, and finished the same day with results.** The
+sections up to "Getting access" are the plan as it stood before anything ran;
+everything from "Stage one" onward is what actually came back. The order is kept
+deliberately, so a reader can see which expectations survived contact.
+
+> **What this page is not a measurement of.** It asks whether one model can drop
+> into a pipeline built around a different one. The questions put to Jev are the
+> fourteen pattern descriptions from `src/engine/narrative.ts` **verbatim** —
+> prose written for Anthropic models, never tuned for Jev, deliberately unchanged
+> so the comparison measured the models rather than two sets of wording. That is
+> the right control for "can we swap it in" and the wrong one for "how good is
+> this model", and the numbers below should not be lifted out as the latter. The
+> false-alarm figures rest on **thirteen** messages, ten of which this project
+> wrote itself. And the clearest finding here — one pattern description that Jev
+> reads far more loosely than Opus does — is at least as much a fault in our
+> catalogue as in the model. Anyone evaluating Jev properly should write their
+> own questions and use more than thirteen negatives.
 
 The short version: Jev cannot replace the Narrative Check, because it cannot
 quote. It might replace the *half* of the Narrative Check that decides which
