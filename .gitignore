@@ -11,8 +11,4 @@ data/
 !.env.example
 
 # benchmark answers already paid for — local to a machine, not a shared artefact
-bench/.imc25-cache.jsonl
-bench/.jev-cache.jsonl
-
-# benchmark answers already paid for — local to a machine, not a shared artefact
-bench/.full-cache.jsonl
+bench/.*-cache.jsonl
