@@ -8,37 +8,38 @@ closing each gap costs. Read this before writing any of the paper itself.
 
 ## 1. The verdict, first
 
-**There is enough data for a paper. There is not enough data for the paper that
-was first asked for.**
+**Newton confirmed F2 as the spine on 2026-09-22, and this section was rewritten
+that day.** The position-paper verdict it replaced is in git history; do not
+restore it.
 
-The opening framing was *"how good are AI systems at generating security
-systems — is a Claude Code-built scam detector any good?"* That question cannot
-be answered from this repository, and it is worth being blunt about why:
+The paper makes one measured claim: **a detector's false-alarm rate depends on
+whether its negatives were *collected* or *written*, and written ones make the
+detector look quieter than it is.** Model and task are held fixed, only the
+provenance of the negative varies, and the difference is significance-tested.
+The two-round literature sweep in §2 found no paper that runs that contrast.
 
-- **n = 1 system.** One detector, built one way, by one person. No control arm
-  built without an LLM, no second system, no ablation over how it was authored.
-- **No baseline.** The engine has never been compared against an existing
-  smishing classifier, a commercial filter, or a bag-of-words baseline. Without
-  one, 61.0% recall is a number with nothing to sit beside.
-- **No construct validity for "secure."** The benchmark measures which of three
-  words the app picks. It does not measure whether a frightened person behaves
-  more safely, which is the thing the app exists for.
+What this paper is not, and why each alternative was ruled out:
 
-A reviewer would reject that framing in the first paragraph, and would be right
-to. Any of the three objections alone is fatal.
+- **Not "how good is an LLM-built scam detector?"** — the question this project
+  opened with. It cannot be answered from this repository: n = 1 system, built
+  one way by one person; no baseline against an existing smishing classifier or
+  even a bag-of-words control; no control arm built without an LLM; and no
+  construct validity for "secure", since the benchmark measures which of three
+  words the app picks, not whether a frightened person behaves more safely. Any
+  one of those is fatal on its own, and a reviewer would say so in the first
+  paragraph.
+- **Not F1, "recall-only corpora reward crying wolf."** It is true, it motivates
+  the work, and it is already owned — Axelsson (ACM CCS 1999) and Arp et al.
+  (USENIX Security 2022). **Cite it as motivation; never claim it.** This was the
+  headline recommended on 21 Sep, and the sweep showed it was wrong.
 
-**What the repository does carry is stronger, and it is a different paper.** It
-is one of the few fully-logged records of an LLM-authored, LLM-powered fraud
-detector being *measured*, in which the measurement apparatus itself failed
-three separate times, each failure was caught, and each is quantified. The
-contribution is methodological: **evaluating LLM-based fraud detectors is
-systematically harder than it looks, in ways that make published numbers
-optimistic by default.**
+F4 — prompt-rule catalogues do not port across models — is the second
+contribution, not the spine. F3 is a methods-section note about corpus erosion.
 
-That is publishable. The rest of this file assumes it.
-
----
-
+**The single largest exposure is that one Fisher test at p = 0.031 carries the
+entire claim.** Closing it is Gap 3: grow the collected negatives from 15 to
+roughly 50–60 and re-run. It costs collection time, not money, and it is first
+in §8.
 ## 2. The four findings, and how strong each one is
 
 ### F1 — Recall-only corpora reward crying wolf, and hide it completely
@@ -141,6 +142,55 @@ fixed and exactly one sentence changed. It is the only fully controlled
 comparison in the project, it cost $0.82, and it demonstrates the standard the
 other comparisons fall short of. Use it in the methods section as the
 counter-example, not as a finding.
+
+### Novelty, checked against the literature — 2026-09-21
+
+Checked before committing to a research question, because strength and novelty
+are different axes and this repository had only ever been rated on strength.
+**The verdicts below reverse the ordering in §2.** These hold whichever question
+the paper ends up asking.
+
+| Finding | Verdict | What already exists |
+| :-- | :-- | :-- |
+| **F1** recall-only corpora reward crying wolf | **Well covered** | Axelsson, *The Base-Rate Fallacy and its Implications for the Difficulty of Intrusion Detection*, ACM CCS 1999. Arp et al., *Dos and Don'ts of Machine Learning in Computer Security*, USENIX Security 2022 — names sampling bias, inappropriate performance measures and base-rate fallacy as measured pitfalls across 30 top-tier papers. PhreshPhish (arXiv 2507.10854) builds base-rate-adjusted suites. **Cite this, do not claim it.** |
+| **F2** self-authored negatives understate false alarms | **Novel** | No paper found that holds model and task fixed, varies only negative *provenance*, and reports a significance test. Verified against the two papers most likely to pre-empt it (below), plus a sweep of malware, IDS, spam and fraud. |
+| **F4** prompt-rule catalogues do not port | **Partial** | Palla et al., *Policy-as-Prompt*, ACM FAccT 2025 formalises policy-as-English-prompt and **measures** interpretation instability: GPT-4o-mini over 2,115 items, accuracy 0.76–0.80 on prompt structure alone, and *predictive multiplicity* — near-identical prompts giving different verdicts on the same samples. Its appendix A.3 does run several models, but reports **aggregate accuracy per model only**. The unmeasured cell is a rule's *extension* — which messages it fires on — for a **fixed** rule across **different** models. |
+
+**The two near-misses, checked in full text rather than by abstract:**
+
+- **PhreshPhish** cannot run the provenance contrast: *all* its negatives are
+  collected — 366,201 benign samples from Webroot browsing telemetry and brand
+  search results. What it does is prevalence adjustment across five base rates.
+  That is F1, not F2.
+- **Fragility of Phishing Detection Models** (BDCC 10(7):211, 2026) uses six
+  collected public corpora. Its "artifact learning" result is corpus-identity
+  learnability (0.9722 accuracy for Logistic Regression and 0.9806 for Linear
+  SVC, predicting which corpus a message came from) —
+  corpus mismatch, not provenance. Full text pulled and searched directly:
+  **zero** occurrences of "synthetic", "authored", "hand-crafted" or
+  "simulated", and no appendix or supplementary section exists.
+
+**The near-miss that helps.** *ML-Based Behavioral Malware Detection Is Far From
+a Solved Problem* (arXiv 2405.06124) reports AUC dropping 87.5% → 62.6%
+depending purely on which benign set the model is evaluated against. That is
+difficulty composition *within* collected negatives, so it is distinct from
+provenance — and it establishes that the field already accepts that negative-set
+construction moves headline numbers.
+
+**On the n = 13/15 objection.** The field's precedent is friendlier than §2
+assumed: XSTest (Röttger et al., NAACL 2024) is 250 *hand-written* safe prompts
+and is a standard over-refusal benchmark. Small hand-built negative sets are
+accepted when their construction is principled. The exposure is not the sample
+size but that a single Fisher test at p = 0.031 carries the whole claim. Growing
+the collected negatives to roughly 50–60 and re-running moves p off the boundary.
+
+**Every citation above was verified against the actual paper on 2026-09-22.**
+The record — full bibliographic entries, the verbatim sentence carrying each
+claim, and what each check could not establish — is `paper/CITATIONS.md`. Six of
+the seven held; the Palla row was wrong and the table above now carries the
+corrected reading. Anything added to §2 after this date is an unverified lead
+again until it appears in `CITATIONS.md`: a fabricated citation in a paper about
+honest measurement would be fatal in a way it would not be elsewhere.
 
 ### The vignette that anchors the ethics section: "hey stranger"
 
@@ -343,24 +393,47 @@ thirteen did. They do not give a rate.
 
 ## 7. Working title and abstract
 
-> **Position: Your Scam Detector's Benchmark Is Lying to You**
-> *Three ways evaluation fails for LLM-based fraud detection, measured on a
-> deployed system*
+> **Written Negatives Make Detectors Look Quiet**
+> *False-alarm rates depend on where the negatives came from: a
+> provenance-controlled measurement on a deployed LLM fraud detector*
 
-Draft abstract in `paper/ABSTRACT.md`, sized for the SaTML registration field.
+Rewritten 2026-09-22 when F2 was confirmed as the spine. The superseded title was
+*"Position: Your Scam Detector's Benchmark Is Lying to You — three ways
+evaluation fails for LLM-based fraud detection"*, which went with the F1 framing
+the literature sweep ruled out as a claim.
+
+**`paper/ABSTRACT.md` is stale.** It was sized for the SaTML registration field
+and still argues the three-failures position. Rewrite it against the title above
+before it is used anywhere, and drop the length constraint — SaTML is abandoned
+on purpose (§5).
 
 ---
 
 ## 8. The order of work
 
-1. **Register the SaTML abstract** — 22 Sep, ~20 minutes. Buys the option.
-2. **Buy Gap 1**, Opus on the 28 genuine messages, ~$0.42. Needed before the
-   abstract's claims are load-bearing; do it the same day if possible.
-3. **Gap 4**, the deterministic baseline. Free, and it closes the obvious hole.
-4. **Draft**, 5–8 pages. F1 and F2 are the paper; F3 and F4 are the two sections
-   after them.
-5. **Gap 5**, intervals on every number.
-6. **Gap 3** if the calendar allows — genuine negatives 16 to 50.
+The SaTML clock was released on 2026-09-22, so nothing below is dated against a
+submission. The order is by what unblocks what.
+
+1. ~~**Gap 3 — grow the collected negatives from 15 to roughly 50–60.**~~
+   **DONE 2026-09-22, at 55.** Two capture rounds under
+   `paper/SAMPLING-PROTOCOL.md`; the corpus is now 81 items, 13 scams and 68
+   legitimate, of which 13 written and 55 collected. Cost nothing but time.
+2. ~~**Verify every citation in §2 against the actual paper.**~~
+   **DONE 2026-09-22.** All seven pulled and read; the record is
+   `paper/CITATIONS.md`. Six held exactly, including every number quoted from
+   PhreshPhish and the 87.5% → 62.6% benign-set drop. One did not: Palla et al.
+   *does* measure interpretation instability, and has a multi-model appendix, so
+   the old "measures no cross-model firing rates" line would have read as a
+   false claim to any reviewer who knew the paper. F4's verdict is unchanged at
+   Partial; its justification is narrower. Cost nothing but time.
+3. **Gap 4**, the deterministic baseline. Free, and it closes the question every
+   security reviewer asks first.
+4. **Re-run F2** on the enlarged negative set and re-test. Same model as the
+   original run — a measurement moved to a cheaper model measures a different
+   system.
+5. **Gap 5**, a confidence interval on every number, and a stated
+   minimum-detectable-effect for the ablation.
+6. **Draft**, 5–8 pages. F2 is the paper; F4 is the section after it.
 7. **Anonymised artifact mirror**, within 3 days of submitting.
 
 ---
@@ -382,7 +455,9 @@ Run `miktex packages update` before the first real build — kpsewhich warns the
 package database has never been refreshed.
 
 **Local, zero-egress MCP servers worth adding (ranked by stars, all verified
-actively maintained):**
+actively maintained)** — *this ranking was superseded the same day; the download
+figures below reverse it, and the table is left standing as the reading that was
+overtaken:*
 
 | Server | Stars | Last push | Why |
 | :-- | --: | :-- | :-- |
@@ -398,16 +473,102 @@ the biomedical servers are off-topic for this paper.
 against public APIs. Anything that wants an API key to a third-party aggregator
 stays on hold until its safety is established.
 
-**The honest verdict: install nothing for this paper.** Its bibliography is
-perhaps fifteen works — the IMC'25 dataset paper, two FTC alerts, Netsafe, and a
-literature sweep not yet done. A hand-written `.bib` is half an hour. Zotero
-earns its place across a body of work, not across one submission.
+**Citation management: install nothing.** Its bibliography is perhaps fifteen
+works — the IMC'25 dataset paper, two FTC alerts, Netsafe, and a literature sweep
+not yet done. A hand-written `.bib` is half an hour. Zotero earns its place
+across a body of work, not across one submission.
 
-### The real gap is not a tool, it is related work
+### The real gap is not a tool, it is related work — re-surveyed 2026-09-21
 
 A position paper whose thesis is *negatives must be collected, not written* has
 to know who has already said it. Synthetic-versus-real evaluation data, base-rate
 neglect in security classifiers, and benchmark contamination are all established
 literatures, and a reviewer at SaTML will know them. **This is the largest
 remaining risk to the submission and it is larger than any measurement gap in
-§4.** It is also the one job `arxiv-mcp-server` would genuinely accelerate.
+§4.**
+
+Checked the Claude Code plugin marketplace first (`SearchPlugins`, keywords
+`research`/`citations`/`arxiv`/`zotero`/`latex`/`bibliography`) — nothing
+relevant is published there; the official catalog has no research-search
+plugin. So the tool has to come from the open MCP ecosystem, same as the table
+above. Re-pulled live GitHub stats for the earlier candidates and two more
+found via glama.ai's academic-research listing:
+
+**Stars are the wrong metric, and they rank these three backwards.** PyPI
+download counts (mirror-excluded, last 60 days) against the star counts above:
+
+| Server | Stars | 60d downloads | Downloads per star |
+| :-- | --: | --: | --: |
+| [`blazickjp/arxiv-mcp-server`](https://github.com/blazickjp/arxiv-mcp-server) | 3,170 | **133,937** | 42.3 |
+| [`openags/paper-search-mcp`](https://github.com/openags/paper-search-mcp) | 2,673 | 28,258 | 10.6 |
+| [`54yyyu/zotero-mcp`](https://github.com/54yyyu/zotero-mcp) | 5,100 | 20,808 | 4.1 |
+
+`zotero-mcp` has the most stars and the least use — roughly one download per
+star, which is the signature of a project people bookmark rather than run.
+`arxiv-mcp-server` is run ten times more per star. Stars measure intent to try;
+downloads measure use. (Downloads are inflated by CI and by `uvx`-style
+re-fetches, so read them as an order of magnitude, not a user count.)
+
+**The reachability test matters more than either metric, and it is the one
+nobody publishes.** Every server here is a thin wrapper over a public API, so
+what decides whether it works is whether that API answers an unauthenticated
+client. Tested directly, 21 Sep 2026:
+
+| Source | Result |
+| :-- | :-- |
+| arXiv (`export.arxiv.org/api/query`) | **HTTP 200**, results returned, no key |
+| Semantic Scholar (`api.semanticscholar.org`) | **HTTP 429** — shared anonymous pool exhausted; free key is a form application |
+| dblp (`dblp.org/search/publ/api`) | **Bot-gated** — Anubis proof-of-work challenge, fails a plain client and a browser User-Agent alike |
+| IEEE Xplore, ACM DL | API key required |
+
+This kills the case for `paper-search-mcp` *on this paper*. It was worth
+recommending for dblp and IACR ePrint — the CS and security venue coverage that
+arXiv alone lacks — and dblp is currently unreachable by any HTTP client,
+wrapper or not. Its Semantic Scholar connector inherits the same 429. What is
+left working is arXiv, which `arxiv-mcp-server` already does with five times the
+usage.
+
+**Action: install nothing for this paper.** This is the same verdict §9 already
+reached for Zotero, applied consistently: an MCP server is machinery for a
+recurring need, and the related-work sweep is a one-time job eight days before a
+deadline. The sources that answer — arXiv's API and ordinary web search — are
+reachable from this session today with no install, no venv, and no dependency
+footprint in a Windows Store Python that has neither `uv` nor a clean global
+site-packages.
+
+**If a second paper happens, the pick is `arxiv-mcp-server`**, on the download
+evidence rather than the star count, and the Semantic Scholar key is worth
+applying for before that point rather than during it.
+
+**Nothing in the Claude Code plugin ecosystem does literature search.** Checked
+the official catalog, `anthropics/claude-plugins-community` (4 plugins),
+`wshobson/agents` (94), `ananddtyagi/cc-marketplace` (119),
+`trailofbits/skills-curated` (29), `obra/superpowers-marketplace` (10) and
+`numman-ali/n-skills` (5). No academic search, no citation management, no
+BibTeX. The gap is real, and it stays unfilled — building one to save a single
+half-hour `.bib` would cost more than the `.bib`.
+
+### The plugin that does matter here is a prose one
+
+The survey turned up one thing with direct bearing on acceptance, and it is not
+a search tool. **`humanizer`** (in `trailofbits/skills-curated`, 505★ — a
+security firm's vetted list) detects and strips the markers of machine-generated
+prose. `wshobson/agents` carries the same idea as `avoid-ai-writing`, and
+`obra/superpowers-marketplace` carries `elements-of-style`, Strunk-based prose
+guidance. One of the three is worth enabling; all three would collide.
+
+This is load-bearing rather than cosmetic. §6 already commits this paper to a
+full generative-AI disclosure, and the disclosure is unusually broad: the system
+under test was built with Claude Code, half the engine is a language model, most
+non-verbatim corpus messages were model-authored, and this plan was written by a
+model. A paper that *discloses* heavy model authorship and then *reads* like it
+hands a sceptical reviewer a reason to discount the argument before reaching the
+numbers. The honesty is the contribution; the prose has to not undercut it.
+
+**Note on the metrics in this section.** Claude Code plugins have no downloads,
+no views, no ratings and no reviews anywhere — not in `marketplace.json`, and
+not on buildwithclaude.com, which indexes 28,000+ plugins and publishes no
+per-item numbers at all. Marketplace-repo stars and last-push dates are the only
+signals that exist, and as the table above shows, stars are a poor proxy for
+use. Any plugin recommendation here rests on weaker evidence than the MCP
+download figures, and should be read that way.

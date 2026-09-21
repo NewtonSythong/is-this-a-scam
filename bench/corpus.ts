@@ -607,6 +607,477 @@ const LEGITIMATE: readonly CorpusItem[] = [
 		note:
 			"Money leaving an account, a transaction the reader may not remember authorising, and an invitation to dispute it — which is `bank-dispute-payment`'s entire shape, a scam in this corpus. The fake-receipt phishing genre imitates this message closely enough that PayPal spends a paragraph of the genuine one explaining how to tell them apart.",
 	},
+
+/**
+ * Collected negatives, round 2 — captured 2026-09-22 under a pre-registered rule.
+ *
+ * The fifteen collected negatives above were chosen by judgement, and that is a
+ * weakness F2 cannot argue its way out of: if the collected side was picked for
+ * looking scam-like and the written side was not, the contrast measures the
+ * chooser. So this round was sampled mechanically instead, against a rule
+ * written down before any message was read —
+ * `paper/SAMPLING-PROTOCOL.md`. Machine-sent, genuine, self-contained, at most
+ * three per sending domain counting what this file already held, working
+ * backwards from the most recent message. Nothing was selected or rejected for
+ * how alarming it looked, and `hardNegative` below was assessed afterwards.
+ *
+ * That is why three plainly easy messages are in here. They are not padding;
+ * a negative set made only of hard cases is its own cherry-pick, and a
+ * false-alarm *rate* has to be measured against the mix that actually arrives.
+ *
+ * Every message here is redacted shape-preservingly. The unredacted originals
+ * are in `corpus-sources-private/inbox-captures-3.md`, outside this repository,
+ * along with the tally of what the rule passed over and why.
+ */
+
+	{
+		id: "orcid-genuine-verify-email",
+		message:
+			"Your ORCID iD: 0009-0000-0000-0000\nYour ORCID record is https://orcid.org/0009-0000-0000-0000\n\nWelcome to ORCID,\nCongratulations on creating your new ORCID iD! This persistent digital identifier, that you own and control, will distinguish you from every other researcher and reduce your burden when you use it in manuscript and grant submission systems.\n\nVerifying your email address unlocks advanced editing features in your ORCID record. Until then you will only be able to manage your names and email addresses in your ORCID record.\n\nHow do I verify my email address?\nSimply click the button below to sign into your ORCID record and complete verification.\n\nVerify your email address\n\nOr, copy and paste the link below into your browser's address bar:\n\nhttps://orcid.org/verify-email/b31sdC9wV1J0aUh5WFF2WTJFWWxrYjdjbVdONWtZWCtMdFFEcENRNkV3RnZXSzRxeEdKMDd1cFlUVjJrdjRKVg?lang=en\n\nPlease visit our researcher homepage for more information on how to get the most out of your ORCID record.\n\nWarm Regards,\nORCID Support Team\nhttps://support.orcid.org",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ORCID (DoNotReply@verify.orcid.org), 21 Sep 2026. Captured 2026-09-22. Redacted.",  // pragma: allow (institutional sender)
+		note:
+			"Almost the complete phishing grammar in one genuine message: 'Congratulations', an account you have just created, a benefit withheld until you act, an instruction to verify, and a hundred-character opaque token in the URL. `afterpay-verify-account-verbatim` in the scam half is the same shape.",
+	},
+	{
+		id: "anz-talent-genuine-job-alert",
+		message:
+			"New jobs posted from careers.anz.com\n\nYou are receiving this email because you joined the ANZ Banking Group Limited Talent Community on 11/09/2026. You will receive these messages every 7 day(s). Your Job Alert matched the following jobs at careers.anz.com.\n\nJobs\nStrategy & Innovation Manager - Melbourne, AU\nSenior Lead Strategy - Melbourne, AU\nManager, Capital & Provisioning Analytics - Melbourne, AU\nSmall Business Specialist - Melbourne, AU\nSoftware Engineer - Melbourne, AU\nSenior Advisor - NFR Operational Risk and Resilience (Third Party) - Melbourne, AU\nSenior Manager Operations Risk, Group Operations - Melbourne, AU\nProcurement Change and Delivery Lead - Melbourne, AU\nChange Manager-Melbourne or Sydney - Melbourne, AU\nAudit Manager - Technology and Information Security - Melbourne, AU",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ANZ Talent Community (anzbanking-jobnotification@noreply10.jobs2web.com), 18 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A bank's name throughout the body, sent from `noreply10.jobs2web.com` \u2014 a domain with no relationship to the bank in the text. This is the false positive `playstation-genuine-payment-problem` warns about, in its purest form.",
+	},
+	{
+		id: "hirevue-genuine-interview-reminder",
+		message:
+			"Newton,\n\nThis is a reminder that you have not yet submitted your on-demand interview for the Customer Service Consultant, New Zealand Contact Centre, GB3 opportunity.\n\nSubmit your responses.\n\nIf you need technical assistance, please visit the Help Centre.\n\nMarisa Vella\nANZ\nMarisa.Vella2@anz.com\n\nClick here to unsubscribe",  // pragma: allow (Marisa.Vella2@anz.com is the shape-preserving stand-in for a real recruiter; the original is in corpus-sources-private)
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ANZ via HireVue (noreply@mail.hirevue-app.com.au), 16 Sep 2026. Captured 2026-09-22. Redacted: the sending recruiter's name and address are stand-ins of the same shape.",  // pragma: allow (institutional sender)
+		note:
+			"Four lines long, chases an incomplete action, signs off with a named individual at a bank and is sent from an Australian third-party domain. Brevity is usually treated as a scam signal; here it is what a genuine reminder looks like.",
+	},
+	{
+		id: "hirevue-genuine-interview-invite",
+		message:
+			"Hi Jordan Hale,\n\nThank you for your interest in the Customer Service Consultant, New Zealand Contact Centre, GB3 position at ANZ.\n\nYou are invited to complete a video interview\n\nWhen you begin the interview, you'll have the opportunity to view helpful resources before responding to interview questions.\n\nTake time to read all instructions carefully before responding. Some questions may require you to respond in a specific format, within a set time limit or with limited retakes.\n\nAfter completing and submitting your interview, a notification will be sent to your recruiter at ANZ for review.\n\nGet started\n\nKind regards,\nANZ Recruitment Team\nANZ\n\nNeed help?\n\nHelp Centre\n\nIf the button above isn't working, copy and paste this link in a browser.\n[https://sau.hvue.io/QtBK7X24LmVRfqa_]",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ANZ via HireVue (noreply@mail.hirevue-app.com.au), 14 Sep 2026. Captured 2026-09-22. Redacted: recipient name and the single-use interview token.",  // pragma: allow (institutional sender)
+		note:
+			"The companion to `anz-genuine-interview-invite`, sent by the vendor rather than the bank. Same `sau.hvue.io` host, a domain that carries neither organisation's name and reads as a random string.",
+	},
+	{
+		id: "anz-genuine-application-received",
+		message:
+			"Hi Jordan,\n\nThank you for applying for the Associate Private Banker 122134 role at ANZ. We appreciate the time and effort you have invested in your application.\n\nWe are currently reviewing applications and will be in touch with an update as soon as possible. In the meantime, we encourage you to visit the ANZ Careers site to explore current opportunities. You can also keep your candidate profile up to date and set up job alerts so you're among the first to hear about new roles that match your interests and experience.\n\nAt ANZ, we believe the diverse backgrounds, perspectives and experiences of our people help create a workplace where people and communities can thrive. We are committed to providing an inclusive, respectful and positive recruitment experience for everyone. To learn more, visit Diversity and Inclusion at ANZ.\n\nIf you require accessibility support or adjustments during the recruitment process, we're here to help. This may include support such as an interpreter, wheelchair access, or adjustments to assessments for vision or hearing needs. Please contact us to discuss how we can support you.\n\nANZ is committed to maintaining a recruitment process that is safe, respectful and free from harassment. If at any stage of the recruitment process you experience or witness harassment, discrimination, bullying, or other inappropriate behaviour, please contact us. We take all concerns seriously and will review them appropriately and confidentially.\n\nThank you again for considering ANZ as your next career move. We wish you every success with your application.\n\nKind Regards,\n\nANZ Recruitment Team",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from ANZ PeopleHub (no-reply@talentandculture.anz.com), 15 Sep 2026. Captured 2026-09-22. Redacted.",  // pragma: allow (institutional sender)
+		note:
+			"Included because the sampling rule reached it, not because it is difficult \u2014 it asks for nothing and threatens nothing. A negative set made only of hard cases is its own kind of cherry-pick, and the easy ones are what a false-alarm *rate* has to be measured against.",
+	},
+	{
+		id: "ird-genuine-login-alert-september",
+		message:
+			"Hi Jordan Hale,\n\nYour myIR account JordanHale was logged into from a new device or web browser.\n\nTime: 15-Sep-2026 10:25:14\nIP: 203.0.113.47\n\nIf this was you\n\nYou can ignore this message. There is no need to take any action.\n\nIf this was not you\n\nYou will need to reset your password, by selecting Forgot password? on the myIR log in page.\n\nCheck for any unusual log in attempts or activity:\n\nSelect manage my profile\nSelect I want to... tab\nSelect View activity\nIf you are unable to reset your password, see any unusual account activity or have any concerns, please contact us immediately on 0800 227 770.\n\nThanks,\nCustomer Services team\n\nBeware of tax related scams\n\nInland Revenue will never send you an email requesting you to confirm, update or disclose confidential details through an unsecure channel such as email.\n\nYou should always independently verify the source of the email and the web address you are being directed to before taking any action. If you receive a suspicious communication of this nature, do not respond to it or follow any links. Forward it to phishing@ird.govt.nz.\n\nThis email has been sent to this email address as it has been registered with Inland Revenue.\n\nPlease do not reply to this email as this inbox is not monitored.\n\nInland Revenue, 55 Featherston Street, Wellington, New Zealand.",  // pragma: allow (phishing@ird.govt.nz is Inland Revenue's published reporting address, printed in their own genuine boilerplate)
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Inland Revenue (alerts@ironline.ird.govt.nz), 15 Sep 2026. Captured 2026-09-22. Redacted: recipient name, myIR username and IP address.",  // pragma: allow (institutional sender)
+		note:
+			"A tax agency, an account name quoted back at the reader, an IP address, a password-reset instruction and an urgent 0800 number. It also spends four paragraphs warning about scams, which is itself a phishing technique \u2014 and here it is the genuine article doing it.",
+	},
+	{
+		id: "ird-genuine-login-alert-duplicate",
+		message:
+			"Hi Jordan Hale,\n\nYour myIR account JordanHale was logged into from a new device or web browser.\n\nTime: 10-Sep-2026 15:37:17\nIP: 198.51.100.212\n\nIf this was you\n\nYou can ignore this message. There is no need to take any action.\n\nIf this was not you\n\nYou will need to reset your password, by selecting Forgot password? on the myIR log in page.\n\nCheck for any unusual log in attempts or activity:\n\nSelect manage my profile\nSelect I want to... tab\nSelect View activity\nIf you are unable to reset your password, see any unusual account activity or have any concerns, please contact us immediately on 0800 227 770.\n\nThanks,\nCustomer Services team\n\nBeware of tax related scams\n\nInland Revenue will never send you an email requesting you to confirm, update or disclose confidential details through an unsecure channel such as email.\n\nPlease do not reply to this email as this inbox is not monitored.\n\nInland Revenue, 55 Featherston Street, Wellington, New Zealand.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Inland Revenue (alerts@ironline.ird.govt.nz), 10 Sep 2026. Captured 2026-09-22. Redacted: recipient name, myIR username and IP address.",  // pragma: allow (institutional sender)
+		note:
+			"Kept deliberately alongside the 15 September alert, for the same reason as the NZ Post pair: a real inbox receives the same notification repeatedly with two fields changed, and an invented corpus never does.",
+	},
+	{
+		id: "paypal-genuine-microsoft-receipt",
+		message:
+			"Receipt for Your Payment to Microsoft New Zealan...\n\nHello, Jordan Hale\n\nYou paid $3.00 NZD to Microsoft New Zealan...\n\nView or Manage Payment\n\nTransaction ID\n04500000PS800000B\n\nTransaction date\n7/09/2026\n\nMerchant\nMicrosoft New Zealan...\n\nInvoice ID\nZ00QXM0TUPB0\n\nDescription Unit price Qty Amount\nMicrosoft 365 Basic $3.00 NZD 1 $3.00 NZD\nSubtotal $3.00 NZD\nTotal $3.00 NZD\nPayment $3.00 NZD\nCharge will appear on your credit card statement as \"PAYPAL *MICROSOFTNE\"\nPaid Microsoft New Zealan... with\nMastercard-0000 $3.00 NZD\nView or Manage Payment\n\nIssues with this transaction?\n\nYou have 180 days from the date of the transaction to open a dispute in the Resolution Center.\n\nPayPal is committed to preventing fraudulent emails. Emails from PayPal will always contain your full name. Learn to identify phishing",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from PayPal (service@intl.paypal.com), 7 Sep 2026. Captured 2026-09-22. Redacted: recipient name, transaction and invoice identifiers, card suffix.",  // pragma: allow (institutional sender)
+		note:
+			"The merchant name arrives truncated mid-word \u2014 'Microsoft New Zealan...' \u2014 which reads as exactly the sloppiness scam-awareness material tells people to distrust. It is how PayPal's own template renders a long merchant name.",
+	},
+	{
+		id: "paypal-genuine-uber-authorization",
+		message:
+			"You have authorized a payment to Uber BV\n\nHello, Jordan Hale\n\nYou authorized a payment of $12.19 NZD to Uber BV\n\nView or Manage Transaction\n\nThis purchase will appear as a pending transaction until Uber BV processes your order. To see the full transaction details, log in to your PayPal account. Keep in mind, it may take a few moments for this transaction to appear. Thanks for using PayPal.\n\nTransaction ID\n7J200000K10000000\n\nTransaction date\n19/08/2026\n\nMerchant\nUber BV\n\nInstructions to merchant\nYou haven't entered any instructions.\n\nInvoice ID\n3Du0NFuGfg0iBrVpHumEdVa0\n\nDescription Unit price Qty Amount\n$12.19 NZD 1 $12.19 NZD\nSubtotal $12.19 NZD\nTotal $12.19 NZD\nSent from jordan.hale@example.com\n\nThe amount shown above may not be the final payment amount. If the merchant completes the transaction and the final amount is greater than the above, we'll send you an additional receipt that shows the final payment amount. Otherwise, this will be your final receipt.\n\nFunding Sources Used (Total)\nMastercard-0000 $12.19 NZD\nView or Manage Transaction\n\nIssues with this transaction?\n\nYou have 180 days from the date of the transaction to open a dispute in the Resolution Center.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from PayPal (service@intl.paypal.com), 19 Aug 2026. Captured 2026-09-22. Redacted: recipient name and address, transaction and invoice identifiers, card suffix.",  // pragma: allow (institutional sender)
+		note:
+			"Money authorised, an instruction to log in, and a dispute window \u2014 the shape of `bank-dispute-payment`, which sits in the scam half of this corpus. The give-away that it is genuine is not in the text.",
+	},
+	{
+		id: "seek-genuine-profile-strength",
+		message:
+			"Jordan, your profile is almost there!\n\nYour profile strength\n\nWant to be 3x more visible to employers?\nHi Jordan,\n\nYour profile is strong! Take a moment now to make sure it's up to date. By adding your resume and keeping your profile fresh, you're 3x more likely to be seen by employers actively searching for candidates like you.\n\nA strong profile can help us match you with the right opportunities. Plus, set a minimum salary expectation to help the right role - at the right salary - come to you.\n\nBoost my profile strength\n\nAlready updated your profile today? The profile strength indicated above may not yet reflect your most recent updates.\n\nHere's what's waiting for you:\n\nStay ahead of the curve with the SEEK app.\nFind jobs that match your skills, track applications and get career insights anytime, anywhere.\n\nTake control of your earning potential.\nAdd salary expectations to attract the right roles and ensure opportunities align with your value.\n\nThe team at SEEK\n\nAt SEEK, we're committed to helping you stay safe online in your job search. Learn more.\n\nThis email was sent to you as a registered user of nz.seek.com",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from SEEK (noreply@email.seek.co.nz), 24 Aug 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"Personalised in the subject line, urging the reader towards an incomplete account and a financial field. Employment-platform impersonation is a live NZ pretext, which makes the genuine version of it a fair test.",
+	},
+	{
+		id: "seek-genuine-application-activity",
+		message:
+			"Hi Jordan,\n\nThere's been recent activity in jobs you applied for on SEEK.\n\nEach employer's recruitment process is different, so you might not always hear from them. Keep track of your applied jobs and discover more below.\nCustomer Service Representative - 28th of September 2026\n\nDatacom\n\nJob no longer advertised\nReally want a job you applied to?\n\nMark up to 3 applied jobs as highly interested each month and we'll let employers know.\n\nShow strong interest\nSimilar jobs you might like\nPayroll Advisors, Education Payroll Limited, Wellington Central, Wellington (Hybrid), $61,816 per year\nCustomer Service Representative, Randstad - Business Support, Wellington Central, Wellington (Hybrid), $60k - $65k p.a.\nContact Centre Representative, Credit Consultants Group NZ Limited, Wellington Central, Wellington, $25 - $28 per hour\n\nNever provide your bank or credit card details when applying for a job. Find out more about protecting yourself online.\nNot seeing all of your applied jobs?\n\nWe can only provide updates on jobs where the employer uses SEEK to manage their applications. These updates are based on job activity last week.\n\nThis email was sent to you as a registered user of nz.seek.com",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from SEEK Applications (noreply@s.seek.co.nz), 1 Sep 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"An ordinary platform digest. Carries its own anti-fraud warning about bank details, which is a phrase a keyword rule could easily read as the subject of the message rather than its footer.",
+	},
+	{
+		id: "seek-genuine-job-closed",
+		message:
+			"Hi Jordan,\n\nThe Customer Service Representative - 28th of September 2026 job you applied for at Datacom has now expired on SEEK and is no longer taking applications. Rest assured, the employer has your application and you may still hear back from them.\n\nKeep track of your applied jobs and discover more below.\nCustomer Service Representative - 28th of September 2026\n\nDatacom\n\nApplied on 18 Aug\nApplication insights\n\nMore than 100 candidates applied for this job.\nSimilar jobs you might like\nPayroll Advisors, Education Payroll Limited, Wellington Central, Wellington (Hybrid), $61,816 per year\nCustomer Service Representative - Wellington Fixed Term, Bluebridge, Wellington Central, Wellington\nJobseeker and Employment Coordinator / Support Officer, I'm In, Lower Hutt, Wellington, $60,412 - $75,542 per year\n\nNever provide your bank or credit card details when applying for a job. Find out more about protecting yourself online.\n\nThis email was sent to you as a registered user of nz.seek.com",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from SEEK Applications (noreply@s.seek.co.nz), 28 Aug 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"An expiry notice with nothing to click and nothing to lose. The easy end of the collected set, and it belongs here for the same reason as the ANZ acknowledgement.",
+	},
+	{
+		id: "gradconnection-genuine-fujitsu",
+		message:
+			"Fujitsu is hiring for the 2027 Graduate Program, apply before 1 October 2026!\n\nAre you ready to kickstart your career with a global technology leader? At Fujitsu, we're passionate about creating a world that's more sustainable by building trust in society through innovation. For more than 50 years, we've helped power some of Australia and New Zealand's most critical infrastructure, supporting organisations, communities and industries every day.\n\nOur award winning 2027 Fujitsu Graduate Program is now open for applications until 01 October 2026. We have opportunities across consulting, technology and corporate functions. You don't need a technology degree to apply. We welcome graduates from all disciplines who are curious, adaptable, collaborative and eager to learn.\n\nAs a graduate, you'll be part of a supportive and collaborative community while gaining real-world experience. Throughout our 12-month program, you'll:\n\nWork alongside industry experts on meaningful projects.\nAccess personalised technical and professional development.\nBuild your network through mentoring, coaching and career conversations.\nBe supported by a Graduate Buddy and dedicated mentor.\n\nSpotlight role: Uvance Wayfinders Business Consulting Graduate\n\nAmong the exciting opportunities available this year is the chance to join Fujitsu Oceania's Uvance Wayfinders team, a consulting practice that helps organisations unlock the potential of AI, data and emerging technologies to drive transformational outcomes.\n\nLearn more about the Business Consulting opportunity\n\nSee what a day in the life of a Fujitsu Graduate is like: Watch the video\n\nJoin a graduate program designed to help you learn, grow and make an impact from day one!\n\nApply Now\n\nForgot your password? | Unsubscribe",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from SEEK Grad / GradConnection (mail@gradconnection.com), 17 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A dated deadline in the subject line, an opportunity framed as scarce, a call to action, and a 'Forgot your password?' link in the footer \u2014 sent from `gradconnection.com`, which is neither of the two brands named in the message.",
+	},
+/**
+ * Collected negatives, round 3 — captured 2026-09-22, same pre-registered rule.
+ *
+ * Numbering trap, because three files count differently and all three are right
+ * about their own sequence. This comment counts capture rounds into the corpus
+ * (15 by judgement, then 13, now 27), so these are round 3.
+ * `paper/SAMPLING-PROTOCOL.md` counts only the rounds run *under* the rule, so
+ * it calls them round 2. The private capture files are numbered by file, so they
+ * are in `corpus-sources-private/inbox-captures-4.md`. Same 27 messages.
+ *
+ * The previous round swept `category:updates`. This one swept the strata that
+ * left: Gmail's Promotions category, then the Primary inbox, then Forums — which
+ * holds nothing in this account, and is recorded as an empty stratum rather than
+ * left unmentioned. The per-domain cap of three did most of the work: SEEK,
+ * Inland Revenue, NZ Post, PayPal and ANZ PeopleHub were already at it, which is
+ * why this round reads so differently from the last. That is the rule behaving
+ * as intended, not a change of taste.
+ *
+ * One amendment was made during this round and is recorded in the protocol: a
+ * message identical to one already captured apart from a trivial substitution —
+ * a single word, a date — is skipped as a duplicate template rather than taken.
+ * It is a tightening, and it cost this round one hard negative — a second
+ * Coronet Peak survey differing from the captured one by a single word.
+ *
+ * Every message here is redacted shape-preservingly. The unredacted originals
+ * and the full skip tally are in that private capture file, outside this
+ * repository.
+ */
+
+	{
+		id: "seek-genuine-salary-guide",
+		message:
+			"What could you be earning as a Workshop Facilitator?\n\nHi Jordan,\n\nAre you earning enough in your current role? Explore SEEK's salary guide to find out and get the information you need before you apply.\n\nWhat could I be earning?\nDiscover what you could be earning in your current role\n\nFilter salaries by state, and by annual or hourly salaries\n\nExplore average annual salaries, including the lowest and highest ranges\n\nScroll to explore salaries for similar roles\n\nNot the role you're looking for? Make sure your profile is up to date so we can send you the most relevant insights and job recommendations.\n\nHere's what's waiting for you:\n\nStay ahead of the curve with the SEEK app.\nFind jobs that match your skills, track applications and get career insights anytime, anywhere.\n\nTake control of your earning potential.\nAdd salary expectations to attract the right roles and ensure opportunities align with your value.\n\nThe team at SEEK\n\nAt SEEK, we're committed to helping you stay safe online in your job search. Learn more.\n\nThis email was sent to you as a registered user of nz.seek.com",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from SEEK (noreply@email.seek.co.nz), 21 Sep 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"Names the reader's actual job title in the subject line and opens on whether they are being paid enough — personalisation plus a money hook, which is the opening move of the employment-scam genre this corpus already holds on the scam side.",
+	},
+	{
+		id: "seek-genuine-top-companies",
+		message:
+			"Better culture? Better pay? The top companies looking to hire new talent.\n\nHi Jordan,\n\nExplore the top companies looking to hire and gain insights into their cultures, values, perks, and salaries to understand what the right fit is for you.\n\nPlus, explore authentic employee reviews to understand what it's really like to work there, or share your own experience to help fellow professionals make informed career moves.\n\nExplore top companies\n\nThe team at SEEK\n\nAt SEEK, we're committed to helping you stay safe online in your job search. Learn more.\n\nProfile Privacy Contact Us Update Preferences Unsubscribe\nThis email was sent to you as a registered user of nz.seek.com\n\nSEEK Limited Level 10, 2 Commerce Street Auckland, 1010, New Zealand",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from SEEK (noreply@email.seek.co.nz), 27 Aug 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"The quiet end of the same sender. It is here because the rule took it, and because a false-alarm rate measured only on a sender's alarming messages is not a rate.",
+	},
+	{
+		id: "coronet-peak-genuine-survey",
+		message:
+			"Kia ora Jordan\n\nThanks for skiing or riding with us at Coronet Peak recently! We'd love to hear about your experience and how we can continue improving what we do! Please take a few minutes to share your feedback with us by clicking on the button below.\n\nTake Survey Now\n\nAs an expression of our thanks, if you complete our survey within the next 2 days you'll go our draw to win a 3 Peak Season Pass for 2027!\n\nOnly two questions in this survey are linked back to your individual customer profile: we record your 'overall satisfaction' and 'likelihood to recommend' to help understand your unique experience and how we can better serve you in the future. The rest of the survey is entirely confidential, unless you give permission for us to contact you by responding 'yes' to a question you'll find later in the survey.\n\nIf for any reason you need to stop the survey part way through, simply close the browser window and continue later by clicking on the button above again.\n\nThanks for your help, and our very best wishes for the rest of the season!\n\nNga mihi\nMartin Hale\nSki Area Manager - Coronet Peak\nNZSki Ltd\n\nT: 0800 697 547 (NZ)\n\nNZSki Privacy Policy\nTo unsubscribe from this survey, please click here.\n\nPowered by get smart",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Coronet Peak (coronet-peak@gssurvey.co), 12 Jul 2026. Captured 2026-09-22. Redacted: recipient name and the signing manager's name.",  // pragma: allow (institutional sender)
+		note:
+			"A prize draw, a two-day window and a single call-to-action link, sent to a New Zealand skier from `gssurvey.co` — a .co domain belonging to neither the ski field nor its parent company. Every structural feature of a prize-draw phish, and entirely genuine.",
+	},
+	{
+		id: "animates-genuine-feedback-survey",
+		message:
+			"Hi Jordan,\nWe'd love you to share your feedback about your recent experience at Animates Porirua.\n\nYour opinion will go a long way to making us better, so please take a few minutes to fill out our survey, starting with the question below:\n\nBased on your recent experience at Animates Porirua how likely would you be to recommend us to other pet parents?\n\nPlease answer on a scale of 0 to 10, where 0 means you are not at all likely to recommend and 10 means you are extremely likely to recommend.\nExtremely unlikely Extremely likely\n0 1 2 3 4 5 6 7 8 9 10\n\nUnsubscribe\n\nThis email has been sent by Watermelon Research on behalf of Animates. Survey Ref: WM05. Watermelon Research, Suite 101, 59 Marlborough Street, Surry Hills, NSW 2010, Australia.\n\nThis message has been sent to Jordan at jordanwhitcombe@example.com. These details are included to help provide assurance that this is a genuine email from Animates.\n\nAnimates Support Office, 2 Robert Street, Ellerslie, Auckland 1051, New Zealand\n\nAnimates is a registered trademark of Animates NZ Holdings Pty Ltd ABN 86 607 613 552",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Animates (Feedback@survey.animates.co.nz), 14 May 2026. Captured 2026-09-22. Redacted: recipient name and email address.",  // pragma: allow (institutional sender)
+		note:
+			"Names the reader's local branch, quotes their own email address back at them, is sent by a third party nobody has heard of, and then asserts in so many words that it is genuine. Claiming to be genuine is a scam tell, and here it is in a message that is.",
+	},
+	{
+		id: "animates-genuine-welcome",
+		message:
+			"Hi Jordan,\n\nWelcome to Animates! We're so excited to have you join the pack. We believe life is better with pets. Whether you're after expert pet care or every day essentials, we're here to support you and your pet every step of the way.\n\nShop now\n\nDog Cat Fish Small Pet Bird Reptile\n\nKeep up with us on socials\n#AnimatesNZ\n\nEmail sent 8 May 2026.\n\nYou have received this email because you are subscribed to Animates.\nUnsubscribe from future emails here at any time.\nAnimates HQ, 2 Robert Street, Ellerslie, Auckland 1051.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Animates (animates@mail.animates.co.nz), 8 May 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"A loyalty-signup welcome with nothing urgent in it and nothing to lose. It sits in the corpus beside the same brand's survey mail, which arrives from a different subdomain and reads far worse.",
+	},
+	{
+		id: "gazley-genuine-privacy-policy",
+		message:
+			"Is this email displaying correctly? If not click here to view this email online\n\nHi,\n\nThanks for your inquiry with Gazley Motor Group.\n\nYour privacy is important to us.\n\nPlease find below a link to our full Privacy Policy.\n\nhttps://gazley.com/privacy-policy/\n\nKind Regards,\n\nSam Harding\nSales Executive\nPh: 0800 668 668\nM: 021 000 0000\nsam.harding@gazley.com\nhttp://www.gazley.com/\n\nClick to Reply\n\nVist Us:\n38 Kent Terrace\nTe Aro\n\nPhone: 0800 668 668\n021 000 0000\n\n2022 Gazley. All rights reserved http://www.gazley.com/\n\nTo ensure you are kept up to date with the latest communication from Gazley please add us to your address book.\n\nIf you have problems opting out from the below link, please reply to this email with the subject line Unsubscribe If you no longer want to receive our monthly specials. Click Here",  // pragma: allow (sam.harding@gazley.com is the shape-preserving stand-in for a real salesperson; the original is in corpus-sources-private)
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Gazley Motor Group (info@gazley.com), 10 Mar 2026. Captured 2026-09-22. Redacted: the sales executive's name, mobile number and email address are stand-ins of the same shape.",  // pragma: allow (institutional sender)
+		note:
+			"An automated bulk send wearing an individual salesperson's signature, with a mobile number in it, a typo in the body, and a copyright line four years stale. It arrives after a car enquiry the reader may not remember making, which is the pretext half of the genre exactly.",
+	},
+	{
+		id: "zoom-genuine-new-year-offer",
+		message:
+			"Start the New Year with AI-powered productivity that transforms how you work\n\nMake 2026 your most productive year yet with Zoom Workplace, our AI-first work platform that brings everything together in one place. Say goodbye to juggling multiple tools and hello to focusing on what truly matters to you.\n\nFor a limited time, lock in 20% off your next three months of Zoom Workplace Pro before January 31st.\nRedeem offer\n\nRing in the New Year with Pro and be the first to experience cutting-edge features beyond Meetings, including:\n\nAI Companion* - Get more done in and out of meetings\nWhiteboard - Collaborate complex ideas on a digital canvas\nDocs - Turn conversations into collaborative docs instantly\nMail and Calendar - Integrate email and scheduling tools in one app\nTasks - Conquer your to-do lists with automated task management\nClips Plus - Record and send short videos\nZoom Hub - Organize all your Zoom assets all in one place\nCustom Avatars - Use a lifelike AI version of yourself to scale and personalize video creation\nMeetings - Host meetings across any device up to 30 hours\nCloud Storage - Never miss an important detail with 10GB of Cloud Storage\n\nRedeem offer",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Zoom (teamzoom@e.zoom.us), 16 Jan 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A discount with a deadline and a single redeem link. Ordinary software marketing, and structurally not far from an account-upgrade lure.",
+	},
+	{
+		id: "zoom-genuine-cyber-monday",
+		message:
+			"Cyber Monday savings end\n\nReshape how you work with AI and productivity tools\nWith Zoom Workplace, our AI work platform everything is in one place - so you spend less time juggling tools and focus on what matters most to you.\n\nFor a limited time, lock in 30% off your next three months of Zoom Workplace Pro. Offer ends tonight.\nRedeem offer\n\nWith Pro, experience the latest features beyond Meetings first hand including:\n\nAI Companion* - Get more done in and out of meetings\nWhiteboard - Collaborate complex ideas on a digital canvas\nDocs - Turn conversations into collaborative docs instantly\nMail and Calendar - Integrate email and scheduling tools in one app\nTasks - Conquer your to-do lists with automated task management\nClips Plus - Record and send short videos\nZoom Hub - Organize all your Zoom assets all in one place\nCustom Avatars - Personalize videos with an AI version of yourself",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Zoom (teamzoom@e.zoom.us), 6 Dec 2025. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"'Offer ends tonight' over the same template as the item above. The pair is here to show that genuine senders manufacture urgency on a schedule, which is the feature a deadline heuristic keys on.",
+	},
+	{
+		id: "shoeclinic-genuine-back-to-school",
+		message:
+			"We'll donate $10 to your given school when you purchase school shoes in-store!\n\nHello jordan,\n\nGet Back to School sorted for 2026!\n\nYour kids spend a lot of time at school, so getting school shoes that fit correctly are essential for comfort and foot health.\n\nShoe Clinic are your fitting experts, so come into store and the team will make sure the fit is correct for the upcoming school year.\n\nWe also donate $10 to your child's school with every school footwear purchased in-store. Simply give a staff member the name of your school and they will note it down*.\n\n*Offer valid with in-store purchases only, not available online.\n\nMens Womens Kids\n\nAscent Contest Senior (D) RRP $200\nAscent Apex (B) Senior RRP $180\nAscent Apex Youth (C) RRP $160\nAscent Apex (D) Senior RRP $180\nAscent Apex Youth (D) RRP $160\nBirkenstock Milano Birko-Flor Black RRP $220\nASICS 550TR Kids RRP $150 Senior RRP $260\n\nPlease note: Models may vary between stores.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Shoe Clinic (marketing@shoeclinic.co.nz), 12 Jan 2026. Captured 2026-09-22. Redacted: recipient name, preserving the sender's lower-case rendering of it.",  // pragma: allow (institutional sender)
+		note:
+			"Retail marketing addressed to a reader with no children, in lower case, offering a donation for an in-store visit. The lower-case name is kept because a mail-merge that does not capitalise is exactly the artefact a reader is taught to treat as a tell.",
+	},
+	{
+		id: "shoeclinic-genuine-christmas-guide",
+		message:
+			"Hello jordan,\n\nWith the Christmas season now in full swing the entire team at Shoe Clinic would like to take a moment to thank you for all your support throughout 2025!\n\nWe invite you to check out this years Christmas Gift Guide for any last minute gift ideas.\n\nShop our range of Footwear, Accessories and Gift Vouchers both in-store and online.\n\nASICS - SHOP ASICS\nNEW BALANCE - SHOP NEW BALANCE\nBROOKS - SHOP BROOKS\nMIZUNO - SHOP MIZUNO\n\nPadded performance socks for any exercise activity for your ultimate comfort - SHOP THORLO\n\nLight-weight moisture wicking performance socks for any exercise activity to help prevent blistering - SHOP DRYMAX\n\nSHOP BIRKENSTOCK\nARCHIES - SHOP ARCHIES\nOofos - SHOP OOFOS\n\nGive the gift of choice this Christmas and get a Shoe Clinic Gift Voucher!\nSHOP GIFT VOUCHERS\n\nShoe Clinic Goal Chaser $39.90\nHelping you achieve your running and exercise goals.\nSHOP GOAL CHASER",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Shoe Clinic (marketing@shoeclinic.co.nz), 12 Dec 2025. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"A seasonal gift guide that is mostly brand names and links. Nearly all link text and very little prose, which is the shape that gives a text-only classifier the least to work with.",
+	},
+	{
+		id: "shoeclinic-genuine-birkenstock",
+		message:
+			"Hello jordan,\n\nThis Christmas season all new Birkenstocks have just arrived in store and there's a great range of new and classic styles to choose from!\n\nBirkenstock styles/models vary from store to store so pop into your local Shoe Clinic to get fitted and check out their current range!\n\nArizona\nHabana Oiled Leather $279.90\nCognac Oiled Leather $279.90\nTobacco Oiled Leather $279.90\nMocca Birkibuc $239.90\nNew Beige Birko-flor $219.90\nStone Coin Birko-flor $219.90\nPoporn EVA $119.90\nWhite EVA $119.90\nKhaki EVA $119.90\n\nMayari\nBlack Oiled Leather $279.90\nTobacco Oiled Leather $279.90\nSandcastle Birko-for $219.90\n\nGizeh\nTobacco Oiled Leather $279.90\nMocca Birkibuc $239.90\nBlack Birko-Flor $219.90\n\nBoston\nHabana Oiled Leather $349.90\nFaded Khaki Suede $369.90\nBlack Oiled Leather $349.90\n\nPlease note: Models may vary between stores.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Shoe Clinic (marketing@shoeclinic.co.nz), 8 Dec 2025. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"Two sentences of prose and then a price list, including two spelling errors the sender never fixed. A message that is almost entirely money amounts, which is the false-alarm probe a payment-oriented rule most deserves.",
+	},
+	{
+		id: "perplexity-genuine-spaces-launch",
+		message:
+			"Introducing: Spaces\n\nWe're excited to unveil Spaces — an intuitive way to organize your Threads and, for Pro subscribers, search your documents and files (images, PDFs, spreadsheets, and more).\n\nHere's what you need to know:\n\nCollections are now Spaces: All your existing Collections are still here. You can now access Spaces directly from the left panel on web.\n\nOrganize your threads. Planning a trip, preparing for an exam, or researching a specific topic? You can now group your Threads into a Space to keep your knowledge organized.\n\n[Pro subscribers only] Store and search your documents and files. Pro users can upload files type (images, PDFs, spreadsheets) to a Space. We'll consider these files in addition to internet search when answering a question. These files are stored in the Space and you can return to search through them whenever — no need to re-upload previous files.\n\nStart creating",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Perplexity (team@mail.perplexity.ai), 19 Oct 2024. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A product announcement signed with a first name in the From line — 'Eliot at Perplexity' — which is a genuine company using the false-familiarity opener this corpus tests on the scam side.",
+	},
+	{
+		id: "perplexity-genuine-mobile-app",
+		message:
+			"Your search for information just got easier\n\nThe Perplexity mobile app puts all the world's knowledge right in your pocket.\n\nLooking for last minute restaurant recommendations? Need a quick fact to settle a debate? With our mobile app, the answers you need are always in reach, no matter where your curiosity leads you.\n\nInstall our free app and start exploring today.\n\nStay curious,\n\nThe Perplexity Team\n\nYou are receiving this email because you opted-in to receive updates from Perplexity\nPerplexity, 115 Sansome St, Suite 900\nUnsubscribe",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Perplexity (team@mail.perplexity.ai), 28 Sep 2024. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"An app-install prompt, which is the action a malware-delivery message wants and therefore an action worth being able to see without alarming at.",
+	},
+	{
+		id: "perplexity-genuine-discover-daily",
+		message:
+			"As we wrap up our onboarding series, we want to introduce you to a feature that keeps you informed and inspired.\n\nPerplexity Discover\n\nEvery day, our team finds the most fascinating headlines in science, AI, and technology and transforms them into engaging content crafted by Perplexity.\n\nDiscover is your gateway to staying on top of the latest trends and innovations. Check it out on our website or in our mobile app.\n\nDiscover Daily\n\nPrefer to listen? We've partnered with ElevenLabs to create a first-of-its-kind AI-generated podcast: Discover Daily. In just a few minutes, you can catch up on the most important tech headlines. It's the perfect companion for your morning commute.\n\nWe're always eager to hear your thoughts and feedback. Let us know what you think of Discover.\n\nStay curious,\n\nEliot from Perplexity\n\nP.S. Want to get started with Perplexity? Check out our guide.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Perplexity (team@mail.perplexity.ai), 24 Sep 2024. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"Signed with a bare first name and closing with a P.S., both of which are hand-written registers appearing in a bulk send. The third and last message the domain cap allowed from this sender.",
+	},
+	{
+		id: "anthropic-genuine-enterprise-launch",
+		message:
+			"Claude for Enterprise\nContact Sales\n\nToday, we're launching the Claude Enterprise plan to help orgs securely collaborate with Claude using internal knowledge. It offers a 500K context window, increased capacity, and a GitHub integration to work on codebases with Claude. Enterprise security features include SSO, role-based permissions, and admin tools. To get started, contact our sales team.\n\nEnterprise-grade control\nWith the Enterprise plan, you get critical security and admin controls, including:\nSingle sign-on (SSO) and domain capture: Securely manage user access and centralize provisioning control.\nRole-based access with fine-grained permissioning: Designate a primary owner for your workspace to enhance security and information management.\nAudit logs: Trace system activities for security and compliance monitoring. Audit logs will be available in the coming weeks.\nSystem for Cross-domain Identity Management (SCIM) support for user management.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Anthropic (support+news@mail.anthropic.com), 7 Sep 2024. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"Dense security vocabulary — SSO, audit logs, permissions, domain capture — in a genuine product announcement. A keyword rule built around security language has to stay quiet here.",
+	},
+	{
+		id: "openai-genuine-route-planning",
+		message:
+			"Know what's ahead\n\nShare your travel route and timing, then get a simple plan and pre-drive checks.\n\nStart planning\n\nChatGPT can turn a route and departure time into a simple plan for your drive, with things to double-check like road conditions, weather, and parking.\n\nWas this email useful?\nUseful Not useful\n\nOpenAI\n1455 3rd Street\nSan Francisco, CA 94158\nUnsubscribe\nPrivacy · Terms",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from ChatGPT (noreply@email.openai.com), 10 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"Barely a hundred words around a single button. Near the floor of what the self-contained rule admits, and kept for that reason: a short message gives a narrative check almost nothing to reason over.",
+	},
+	{
+		id: "openai-genuine-translation",
+		message:
+			"Help your message land\n\nShare your wording and audience, then get a localized translation of any phrase.\n\nStart translating\n\nAsk ChatGPT to adapt your draft for the place and tone you have in mind. ChatGPT can keep the meaning while making the wording sound natural to the people reading it.\n\nWas this email useful?\nUseful Not useful\n\nOpenAI\n1455 3rd Street\nSan Francisco, CA 94158\nUnsubscribe\nPrivacy · Terms",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from ChatGPT (noreply@email.openai.com), 5 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"Same template as the item above with different copy, which is why the duplicate-template rule did not exclude it. Three of these were taken because the domain cap allowed three, not because they are interesting.",
+	},
+	{
+		id: "openai-genuine-image-edit",
+		message:
+			"Make the next edit clearer\n\nShare an image you'd like to edit, then get a cleaner request with what to keep and change.\n\nStart editing\n\nAsk ChatGPT to turn feedback on an image into specific editing prompt. It can help organize what feels wrong, what should stay, and how to say it clearly for the next pass.\n\nWas this email useful?\nUseful Not useful\n\nOpenAI\n1455 3rd Street\nSan Francisco, CA 94158\nUnsubscribe\nPrivacy · Terms",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from ChatGPT (noreply@email.openai.com), 29 Aug 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"The third and last from this domain. It carries a grammatical slip — 'specific editing prompt' — in a message from a company whose product is language, which is a reminder that sloppy writing is not evidence of anything.",
+	},
+	{
+		id: "companion-animals-genuine-newsletter",
+		message:
+			"Hi Jordan,\n\nThere's plenty happening across CANZ as we head towards spring, with opportunities to get involved, new resources to explore and some wonderful people to celebrate.\n\nIn this edition, you can have your say in new research into catios, catch up on the latest videos in our Safe Dogs and Safe Communities series, learn more about our Election Manifesto, and meet the inspiring recipients of this year's Te Tohu Maimoa awards.\n\nSurvey for cat owners - catios\n\nWe want to hear from cat guardians about catios!\n\nA catio (short for cat patio) is an enclosed outdoor space designed for cats. We're conducting a survey to better understand why cat owners choose to install (or not install) a catio, what factors influence these decisions, and - for those who have one - how cats use them once installed.\n\nWhether you have a catio, have considered getting one, or just want to share your thoughts, we would love to hear from you.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Companion Animals New Zealand (welfare@companionanimals.nz), 7 Sep 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"A charity newsletter with a survey invitation in it. The easy end of the set, and a useful counterweight to the two survey requests in this round that do look alarming.",
+	},
+	{
+		id: "gradconnection-genuine-commbank-deadline",
+		message:
+			"Last chance to apply for CommBank's Summer Intern & Graduate Program\n\nHi there,\n\nThinking about applying for CommBank's Summer Intern Program or Graduate Program?\n\nNow's the time to apply. Applications close on 8 September at 11:55pm (Sydney/Melbourne time).\n\nWhether you're interested in technology, data, product, banking or business, you'll have the opportunity to work on meaningful projects, build valuable skills and gain hands-on experience from day one.\n\nOpportunities are available across a range of pathways, including:\n\nBanking Products\nTechnology and AI\nBanking Relationship Management\nRegional and Agribusiness Banking\nRisk Management\nFinance Accounting | Procurement\nMarketing and Corporate Affairs\n\nDon't miss your chance to launch your career at one of Australia's leading organisations.\n\nApplications close 8 September at 11:55pm.\n\nApply Now\n\nForgot your password? | Unsubscribe",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from SEEK Grad / GradConnection (mail@gradconnection.com), 7 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A named bank, a deadline stated twice to the minute, 'Last chance', 'Don't miss your chance', and a 'Forgot your password?' link — from a domain that is neither the bank's nor the job board's. The same shape as the Fujitsu item, from the same sender, six days earlier.",
+	},
+	{
+		id: "gradconnection-genuine-job-alert",
+		message:
+			"We've found Jobs that match your preferences\n\nView and edit your alert preferences here\n\n2026/27 EY Vacationer Program – Computer Science\nEY\nCanberra and 4 other locations\nClosing: 03:59 PM, 17th Sep 2026\n\n2026/27 EY Vacationer Program – Data Analytics\nEY\nCanberra and 4 other locations\nClosing: 03:59 PM, 17th Sep 2026\n\nWork Ready Virtual Experience Program\nSEEK Grad\nCanberra and 5 other locations\nClosing: 12:59 PM, 17th Sep 2026\n\nStrategy Academy Lab - Melbourne\nBoston Consulting Group (BCG)\nMelbourne\nClosing: 01:59 PM, 18th Sep 2026\n\nCapgemini Graduate Program AUNZ, March 2027: General Application\nCapgemini\nCanberra and 5 other locations\n$70,000 - $80,000\nClosing: 10:59 AM, 1st Mar 2027\n\nView more jobs on SEEK Grad website\n\nForgot your password?\n\nUnsubscribe\n\nAlert Preference\n\nCareer Advice\n\nYou're receiving this email as you've subscribed to job alerts.",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from SEEK Grad / GradConnection (mail@gradconnection.com), 15 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A job-alert digest naming four real employers and a salary band, with closing times given to the minute. The third and last from this domain.",
+	},
+	{
+		id: "workable-genuine-datacom-rejection",
+		message:
+			"Hi Jordan\n\nThank you for your interest in the Customer Service Representative - 28th of September 2026 role here at Datacom. We really appreciate the time and energy you've put into your application. Sadly, although this is not the response you were hoping for, we will not be proceeding further with your application.\n\nWith that in mind, please know your application was carefully considered by our team here at Datacom. On this occasion, out of the applications received, we are proceeding with those who more closely align to the role requirements.\n\nWe encourage that you keep an eye on any other positions within Datacom that you may be interested in. These can be found on our website https://datacom.com/ under the Career tab.\n\nOnce again, thank you for applying for this position and we wish you success in your job search.\n\nKind Regards,\n\nTalent Acquisition | Datacom",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Datacom Recruitment (noreply@candidates.workablemail.com), 18 Aug 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"A rejection from a named New Zealand employer, delivered from `workablemail.com` — an applicant-tracking vendor whose name appears nowhere in the body. Brand in the text, stranger on the envelope, which is the mismatch a domain check is built to catch.",
+	},
+	{
+		id: "workable-genuine-application-copy",
+		message:
+			"Your application for the Customer Service Representative - 28th of September 2026 job was submitted successfully.\n\nHere's a copy of your application data for safekeeping.\n\nPersonal information\n\nName Jordan Whitcombe\n\nEmail jordanwhitcombe@example.com\n\nProfile\n\nEducation\n\nn/a - 2025 Bachelor of Science (Software Engineering) Massey University\nn/a - 2025 Bachelor of Science Massey University\n\nExperience\n\n2023 - 2026 Workshop Facilitator at Tech Access Aotearoa (about 3 years)\n\nResume resume20260818-15-4883lv.pdf\n\nDetails\n\nAnswers\n\nHow many weeks' notice are you required to give your current employer?\n\n0\n\nWhat are your salary expectations? (Numerical figure only)\n\n52,000\n\nHave you previously worked at Datacom?\nNo\n\nWithdraw this application\nPowered by Workable",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Workable (noreply@candidates.workablemail.com), 18 Aug 2026. Captured 2026-09-22. Redacted: recipient name, email address, university, employer and salary expectation, each replaced by a stand-in of the same shape.",  // pragma: allow (institutional sender)
+		note:
+			"Reads back the reader's name, email, degrees, employment history and salary expectation in one block. A message that recites what it knows about you is the classic extortion and account-compromise opener, and this one is a routine acknowledgement.",
+	},
+	{
+		id: "seek-onboarding-genuine-nudge",
+		message:
+			"Hi Jordan,\n\nYou're on the right track with SEEK! Don't forget to complete these recommended actions to keep up your job seeking progress.\nDownload the SEEK app\n\nDiscover personalised job matches, apply on-the-go, and track applications - all from your phone with the SEEK app.\n\nDiscover our career advice content\n\nExplore expert career insights and actionable advice to help you land better jobs, grow your skills, and advance faster in your chosen field.\n\nCheck out career advice\nWhy did I receive this?\n\nYou received this email based on your activity on SEEK in the past 7 days.\n\nWas this email useful?\nYes No\n\nUnsubscribe Privacy Contact us\nThis email was sent to you as a registered user of nz.seek.com\n\nSEEK Limited, 60 Cremorne St, Cremorne VIC 3121 Australia",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from SEEK Onboarding (noreply@s.seek.co.nz), 23 Aug 2026. Captured 2026-09-22. Redacted: recipient name.",  // pragma: allow (institutional sender)
+		note:
+			"An engagement nudge that says outright it was triggered by the reader's activity in the last seven days — surveillance stated plainly, by a sender entitled to it. The third and last from this domain.",
+	},
+	{
+		id: "google-genuine-security-alert",
+		message:
+			"New sign-in to your account\njordanwhitcombe@example.com\n\nWe noticed a new sign-in to your Google Account. If this was you, you don't need to do anything. If not, we'll help you secure your account.\n\nCheck activity\n\nYou can also see security activity at\nhttps://myaccount.google.com/notifications\n\nYou received this email to let you know about important changes to your Google Account and services.\n\n2026 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from Google (no-reply@accounts.google.com), 22 Sep 2026. Captured 2026-09-22. Redacted: recipient email address.",  // pragma: allow (institutional sender)
+		note:
+			"The single most imitated genuine message there is: a sign-in alert naming the reader's own address, with a button to check activity. The corpus already holds a 16 Sep sibling of it, and both are here because the domain cap allowed them, not because security alerts were sought out.",
+	},
+	{
+		id: "anz-talent-genuine-melbourne-digest",
+		message:
+			"You are receiving this email because you joined the ANZ Banking Group Limited Talent Community on 11/09/2026. You will receive these messages every 7 day(s). Your Job Alert matched the following jobs at careers.anz.com.\n\nJobs\nAssociate Private Banker - Melbourne, AU\nDirector/Executive Director, Funds - Financial Institutions Group (Melbourne/Sydney) - Melbourne, AU\nManager - Thematic Reviews (Operational Risk) - Melbourne, AU\nEmployee Relations Specialist, AUS - Sydney, Melbourne or Brisbane, AU\nSenior Manager, Op Risk - Wealth Solutions & Portfolio Management - Melbourne, AU\nAssociate, Operational Risk - Procurement, Property, Transformation & GCC - Melbourne, AU\nSenior Associate, NFR Governance and Reporting - Melbourne, AU\nSenior Manager, Op Risk - Products & Deposits - Melbourne, AU\nSenior Associate, Operational Risk (Corporate Centre) - Melbourne, AU\nLead Engineer - Melbourne, AU",
+		kind: "legitimate",
+		provenance: "verbatim",
+		hardNegative: true,
+		source: "Received from ANZ Talent Community (anzbanking-jobnotification@noreply10.jobs2web.com), 11 Sep 2026. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"A bank's name in every line of the body, and a sending domain — `jobs2web.com` — that is not the bank's. The second of three this domain is allowed; the first is `anz-talent-genuine-job-alert`, a week later.",
+	},
+	{
+		id: "zoom-genuine-black-friday",
+		message:
+			"Black Friday savings end\n\nReshape how you work with AI and productivity tools\nWith Zoom Workplace, our AI work platform, everything is in one place - so you spend less time juggling tools and more time focusing on what matters.\n\nFor a limited time, lock in 30% off your next three months of Zoom Workplace Pro before November 28th.\nRedeem offer\n\nWith Pro, experience the latest features beyond Meetings first hand including:\n\nAI Companion* - Get more done in and out of meetings\nWhiteboard - Collaborate complex ideas on a digital canvas\nDocs - Turn conversations into collaborative docs instantly\nMail and Calendar - Integrate email and scheduling tools in one app\nTasks - Conquer your to-do lists with automated task management\nClips Plus - Record and send short videos\nZoom Hub - Organize all your Zoom assets all in one place\nCustom Avatars - Personalize videos with an AI version of yourself\nMeetings - Host meetings across any device up to 30 hours",
+		kind: "legitimate",
+		provenance: "verbatim",
+		source: "Received from Zoom (teamzoom@e.zoom.us), 29 Nov 2025. Captured 2026-09-22.",  // pragma: allow (institutional sender)
+		note:
+			"The third and last from this domain, and the reason the duplicate-template amendment needed a threshold rather than a feeling: four other sends of this template were skipped as trivial restatements, and this one was taken because its opening paragraph is genuinely rewritten.",
+	},
 ];
 
 export const CORPUS: readonly CorpusItem[] = [...SCAMS, ...LEGITIMATE];
