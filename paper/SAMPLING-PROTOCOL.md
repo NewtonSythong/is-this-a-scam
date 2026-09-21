@@ -182,3 +182,135 @@ Nothing in a hundred conversations was of uncertain authenticity, and nothing wa
 too thin to classify. An inbox that clean is not a neutral place to draw genuine
 mail from, and the paper should say so.
 
+
+---
+
+# Part II — the positive side
+
+**Written 2026-09-22, before a single message in the source folder had been
+opened, and to be treated the same way as Part I: not changed once reading
+began, and any departure recorded below with its reason.**
+
+Everything above governs *negatives*. The scam half of the corpus was built by
+judgement, from published bank screenshots and reconstruction, and it is the
+scarcer half — 13 items against 68. The obvious fix is a real spam folder. But
+a corpus whose scams were picked because they looked like good examples has
+exactly the selection weakness F2 exists to expose, and it would be
+self-defeating to expose it on the negative side while committing it on the
+positive side. Hence a second pre-registration.
+
+## The source
+
+**Inbox B's spam folder.** Inbox B is the author's secondary personal Gmail
+account; the letter is mapped to an address only in
+`corpus-sources-private/README.md`, outside this public repository. It is a
+different account from inbox A, which supplied every collected negative, and it
+is used here because its spam folder is far more prolific.
+
+Gmail deletes spam after 30 days, so this sample is necessarily a sample of one
+month's arrivals. Say so in the paper; do not describe it as "a spam folder" as
+though folders were interchangeable.
+
+## The rule
+
+Walk the spam folder backwards from the most recent message. **Walk it in
+order** — do not scan for interesting senders first. Take every message
+satisfying all of:
+
+1. **A scam**, by the test in the next section.
+2. **Self-contained** — enough text to classify from the body alone. An
+   image-only message is skipped and counted.
+3. **English** — the detector under test is English-only, so a non-English
+   message measures the language gap, not the detector. Skipped and counted.
+4. **Distinct campaign** — at most **three** per sending domain, and at most
+   **three** per recognisable campaign family (same pretext, same template,
+   different throwaway domains). One botnet must not become the finding.
+5. **Not already in the corpus** in substance.
+
+## What counts as a scam, decided in advance
+
+A message is a positive if it attempts to obtain **money, credentials, personal
+information, or an action of value** from the reader **by deception** — by
+impersonating an organisation or person, by inventing a circumstance, or by
+misrepresenting what will happen if the reader complies.
+
+Explicitly **not** positives, however unwanted:
+
+- Bulk marketing from a business that is genuinely that business.
+- Newsletters, political mail, charity appeals that are what they claim to be.
+- Advertising for products of dubious merit that does not lie about who is
+  sending it or what the reader is being asked to do.
+
+Gmail's spam classifier is **not** the label. It selects the folder; it does not
+decide the item. A message in the spam folder that is merely unwanted is
+excluded and counted as such — and that count is itself worth reporting, since
+it says what fraction of "spam" a scam corpus drawn this way would misrepresent.
+
+**The unavoidable asymmetry, stated rather than hidden.** A negative could be
+qualified from its envelope before the body was read. A positive cannot: deciding
+whether a message deceives requires reading it. So the guard here is different
+in kind — it is *take every qualifying message in walk order*, never a selection
+among them, with every exclusion counted and reasoned. Where authenticity or
+intent is genuinely uncertain, the message is **skipped and counted as
+uncertain**, never guessed at and never quietly dropped.
+
+## The contamination rule, which matters more here than above
+
+**No message captured under this protocol may be run through the detector, in
+any engine, until the capture is closed and committed.** Not to check a hunch,
+not to see if it is interesting. A scam half assembled with knowledge of what
+the engine catches would make every subsequent recall number meaningless, and
+this project has already spent one corpus that way (F3).
+
+For the same reason, `hardNegative`-style difficulty judgements and any note
+about *why* a message is interesting are written **after** capture closes.
+
+## Target and stopping condition
+
+Walk until **40** messages qualify, or the folder is exhausted, whichever comes
+first. Stated in advance so the sample cannot be stopped at a flattering point.
+If the folder is exhausted first, report the number reached and the folder's
+total size; a short sample is a finding about the source, not a failure.
+
+## Redaction
+
+As Part I: shape-preserving, unredacted originals to `corpus-sources-private/`,
+and `bench/redaction.test.ts` must pass. Scam messages carry live payloads, so
+in addition: **every URL is defanged to a structurally identical placeholder on
+a reserved domain**, and no phone number, wallet address or reply-to survives in
+a form anyone could act on. The shape is the data; the destination is not.
+
+## Amendments, recorded as they were made
+
+*(none yet)*
+
+## Part II, round 1 — 2026-09-22: the folder is thin, and that is the result
+
+Walked inbox B's spam folder in full. **It holds 16 conversations**, not the
+prolific source it was expected to be, and the composition is the finding:
+
+| | Count | |
+| :-- | :-- | :-- |
+| Marketing from one genuine sender | **11** | A language-learning app the reader actually signed up to, re-sending four templates. Not scams by the test above, and duplicates of each other besides. |
+| Qualifying scams | **3** | A loyalty-scheme "account maintenance" deadline pretext; a road-toll notification; an Afterpay "confirm your account" carried under an unrelated Dutch subject line. |
+| Uncertain, skipped and counted | **1** | An IPTV subscription advert sent from a hijacked university account. It misrepresents its sender but makes no false claim about what it is selling, which the rule does not cleanly resolve. Recorded, not guessed at. |
+| Excluded — non-scam bulk | **1** | |
+
+Target was 40. The folder yields **3**, and would have yielded 3 however long
+the walk continued, because there is nothing else in it.
+
+**Read this as a fact about spam folders, not a failed capture.** A personal
+spam folder is mostly ordinary marketing that a classifier disliked, with a
+handful of real attacks in it; Gmail's 30-day deletion means it is also only
+ever a one-month window. Anyone planning to build a scam corpus from "my junk
+mail" should know that a month of one account bought three usable items.
+
+It also sharpens the asymmetry the paper is about. Collected *negatives* were
+abundant — 55 without difficulty. Collected *positives* from the same kind of
+source are scarce, which is precisely why scam corpora get written rather than
+gathered, and why the provenance question matters more on the positive side
+than anyone has measured.
+
+The three are **not yet captured into `bench/corpus.ts`**: they need full bodies,
+shape-preserving redaction and URL defanging under the rule above. The walk,
+with senders and dates, is in `corpus-sources-private/inbox-captures-5.md`.

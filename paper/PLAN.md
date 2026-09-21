@@ -91,7 +91,37 @@ enough to hide the others.
 
 *Strength:* high, and genuinely novel-feeling. Synthetic-negative bias is
 assumed in the literature; here it is measured, with a confidence gap.
-*Weakness:* n = 15 real. The direction is clear; the magnitude is not.
+*Weakness:* n = 15 real, because the LLM side has not been re-run since the
+collection closed at 55. That re-run is §8 item 4. The direction is clear; the
+magnitude is not.
+
+#### The same asymmetry appears with no model in the system at all
+
+The deterministic baseline (§8 item 3, `docs/benchmark-offline.md`, regenerated
+2026-09-22 over all 81 items, free) holds 62 of 68 legitimate messages quiet.
+**All six false alarms are collected messages. Not one is a written one** —
+6/55 collected against 0/13 written.
+
+This matters out of proportion to its size: the offline engine is regular
+expressions and a known-organisation list, so whatever produces the provenance
+gap here cannot be an artefact of language-model behaviour. Real inboxes simply
+contain shapes nobody thought to write down. The mechanism is legible in a way
+the LLM's is not — all six are one brand-impersonation check misfiring on
+`careers.anz.com` (a genuine ANZ subdomain), `sau.hvue.io` (HireVue, ANZ's
+genuine interview vendor), and one case where the checker read an email
+address's local part as a domain.
+
+**State the significance honestly: there is none.** One-sided Fisher on
+6/55 vs 0/13 gives **p = 0.265**. With 13 written negatives the test cannot
+resolve a gap this size, and the enlarged collection did nothing for that half.
+Report it as a consistent direction in an independent system, never as a
+second significant result — and note that growing the *written* negatives, not
+the collected ones, is what would make this testable.
+
+**The six are not to be fixed yet.** Narrowing a check while looking at the
+messages that caught it is how the corpus was spent the first time (F3), and it
+would retire these six as evidence. Fix it from published documentation of ANZ's
+and HireVue's real domains, then measure on messages nobody has read.
 
 ### F3 — A held-out corpus is a wasting asset, and the usual fix is not a rule
 
@@ -215,7 +245,8 @@ through-line.
 | :-- | :-- | :-- | :-- |
 | `bench/imc25.csv` | 292 real reported smishing texts | Agarwal et al., ACM IMC 2025, CC BY 4.0 | Yes, with attribution |
 | `bench/corpus.ts` scams | 13 | 7 verbatim from published screenshots, rest reconstructed/synthetic | Yes |
-| `bench/corpus.ts` legitimate | 28 (25 hard negatives) | 13 authored, 15 captured from two real inboxes, redacted shape-preservingly | Yes — see §6 |
+| `bench/corpus.ts` legitimate | 68 (44 hard negatives) | 13 authored, 55 captured from two real inboxes under `paper/SAMPLING-PROTOCOL.md`, redacted shape-preservingly | Yes — see §6 |
+| Deterministic baseline | 81 messages, no model | `docs/benchmark-offline.md`, regenerated 2026-09-22, free and reproducible | Yes |
 | Opus runs on `test` | 3 × 146 messages | Cached, `bench/.imc25-cache.jsonl` | Yes |
 | Haiku runs | 292 + narrative half | Cached | Yes |
 | Jev runs | 145 dev + 28 legit | Cached, $0.00 inside free window | Yes |
@@ -426,8 +457,14 @@ submission. The order is by what unblocks what.
    the old "measures no cross-model firing rates" line would have read as a
    false claim to any reviewer who knew the paper. F4's verdict is unchanged at
    Partial; its justification is narrower. Cost nothing but time.
-3. **Gap 4**, the deterministic baseline. Free, and it closes the question every
-   security reviewer asks first.
+3. ~~**Gap 4**, the deterministic baseline.~~ **DONE 2026-09-22.**
+   `npm run bench -- --write` regenerated `docs/benchmark-offline.md` over all
+   81 items for $0.00. It answers the reviewer's first question — the offline
+   engine gets 6/9 on held-out scams, so the LLM is not merely dressing up a
+   regex — and it returned an unplanned result: all six of its false alarms are
+   collected messages and none is written, the F2 direction reproducing in a
+   system with no model in it (p = 0.265, so direction only). Written up under
+   F2 in §2. The six are deliberately left unfixed; see §2.
 4. **Re-run F2** on the enlarged negative set and re-test. Same model as the
    original run — a measurement moved to a cheaper model measures a different
    system.
