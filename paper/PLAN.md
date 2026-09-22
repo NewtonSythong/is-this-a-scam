@@ -75,8 +75,13 @@ identical questions:
 
 | Negative | False alarms | 95% CI (Wilson) |
 | :-- | :-- | :-- |
-| Written by us | **0 / 13** = 0.0% | [0.0, 22.8] |
+| Written by us | **1 / 16** = 6.3% | [1.1, 28.3] |
 | Captured from a real inbox | **12 / 55** = 21.8% | [12.9, 34.4] |
+
+**Superseded by the blind-authorship run of 22 September, below.** The table as
+it stood before that run read 0/13 against 12/55, p = 0.060 one-sided. The
+collected arm has not moved; the written arm has, and what moved it is the
+finding.
 
 **Every false alarm the model has is on a message we did not write.** Twelve of
 them, across five patterns: `manufactured-urgency` on five pieces of ordinary
@@ -104,12 +109,62 @@ written, all quiet, the same collected rate clears p < 0.05. Both figures come
 from `bench/f2.ts`, which also asserts its arithmetic against the four
 previously published values.
 
-*Strength:* high on direction and on effect size — 0% against 21.8%, with
-non-overlapping point estimates and a mechanism visible in the pattern names.
-*Weakness:* **not significant at 0.05, and the fix is to write negatives, not to
-collect them.** Say so plainly; a reviewer will find it in a minute otherwise.
-The honest sentence is that the direction reproduces in two independent systems
-and the LLM side is one message short of resolving.
+*Strength:* high on direction and on effect size — 6.3% against 21.8%, and a
+mechanism visible in the pattern names and confirmed by the blind-authorship run.
+*Weakness:* **not significant at 0.05 (p = 0.1458 one-sided), and no longer one
+message short of resolving.** The written arm is small because writing good hard
+negatives is slow, and the one added blind promptly alarmed. Say so plainly; a
+reviewer will find it in a minute otherwise. The honest sentence is that the
+direction reproduces in two independent systems, the cause is now named, and the
+test is underpowered.
+
+### The blind-authorship run, 22 September — F2's cleanest result is not its p-value
+
+§8 item 5 called for more written negatives to lift the test off Fisher's floor.
+Three were added, **pre-registered at three before they existed** so the batch
+size could not be chosen for its p-value, and written under a condition none of
+the first thirteen met: the author was given `bench/corpus.ts` and
+`paper/SAMPLING-PROTOCOL.md` and was barred from `src/`, this file,
+`paper/ABSTRACT.md`, `bench/f2.ts` and the git log. It could not name a single
+detection pattern, let alone know which ones had fired.
+
+**One of the three alarmed.** `power-company-genuine-overdue-notice` — a genuine
+utility disconnection notice, real debt, the company's own domain — fires
+`manufactured-urgency`, which is precisely the pattern that fires on four Zoom
+seasonal offers and a GradConnection deadline in the collected half.
+
+| Written negatives, by what the author knew | False alarms |
+| :-- | :-- |
+| Written beside the pattern they guard (to 2026-09-18) | 0 / 13 |
+| Written blind, no sight of the detector (2026-09-22) | **1 / 3** |
+| Collected, nobody wrote them | 12 / 55 = 21.8% |
+
+n = 3 carries no statistical weight and the paper must say so in the same breath
+it reports it. What it does carry is a **mechanism**, and it reframes F2's claim:
+the gap between written and collected negatives may not be a property of
+*writtenness* at all. It may be a property of *what the author knew*. Each of the
+thirteen was composed beside the pattern it was written to probe, which is
+exactly the position from which a negative can be steered clear of the trap — not
+dishonestly, just inevitably. Remove that knowledge and the first written
+negative behaves like a collected one.
+
+**This is the better finding and it should lead.** "Do not write your negatives"
+is advice a reviewer can argue with. "Your negatives are clean because the person
+who wrote them knew what your detector looks for" names a cause, predicts the
+blind result, and is testable by anyone with a detector and a stranger.
+
+**And it costs the significance.** At n_written = 16 with one alarm, Fisher gives
+**p = 0.1458 one-sided, 0.2718 two-sided**. Worse, `bench/f2.ts` reports that
+16 *quiet* written negatives would have given 0.0343 — so the single alarm is the
+whole difference between a significant result and this one. Writing further
+negatives until the arithmetic clears 0.05 is now visibly a treadmill, and taking
+one more step on it after seeing this table would be the exact fault F2 exists to
+name. **The honest position: F2 is directionally strong, mechanistically
+explained, and statistically underpowered, and the paper says all three.**
+
+*Do not fix `manufactured-urgency`.* Narrowing it while looking at the message
+that caught it is the same corpus-spending error as the other twelve; the rule in
+§2 applies to this alarm identically.
 
 *Superseded:* an earlier draft of this section quoted alarm probabilities of
 0.51 – 0.67 for written negatives against 0.83 – 0.91 for captured ones. Those
@@ -514,6 +569,32 @@ submission. The order is by what unblocks what.
    is the cheapest significant result available and costs nothing but care: it
    must be written to the same standard as the other twelve, *before* looking at
    which patterns fired, or it is a message chosen to pass.
+
+   **Pre-registered 2026-09-22, before the run and before the items existed:
+   three written negatives, not one.** Fourteen is the number that clears the
+   threshold, which is exactly why stopping at fourteen would be a stopping rule
+   chosen for its p-value — the same fault F2 exists to name. The batch size is
+   fixed at three (n_written 13 → 16) and **whatever the run returns is what gets
+   reported**, including an alarm on one of the three, which would push p the
+   wrong way. They were written by a session holding no benchmark results: the
+   author was given `bench/corpus.ts`'s existing written negatives and this
+   protocol as the standard, and was barred from `src/`, `paper/ABSTRACT.md`,
+   this file, `bench/f2.ts` and the git log, so it could not know which patterns
+   exist, let alone which fired. That is F3 applied to authorship.
+
+   **DONE 2026-09-22, and it went against the hypothesis — which is the result.**
+   The three were written blind and added; `npm run bench:narrative` bought only
+   them (~$0.05, the other 83 came from cache). **One alarmed:**
+   `power-company-genuine-overdue-notice`, a genuine utility disconnection notice,
+   on `manufactured-urgency` — the same pattern that fires on the collected
+   marketing mail. n_written is now 16 with 1 alarm: **p = 0.1458 one-sided,
+   against 0.060 before**, and 16 quiet ones would have given 0.0343, so that
+   single alarm is the entire gap. **Item 5 is closed and the treadmill stops
+   here:** writing further negatives now, having seen this table, would be the
+   fault F2 exists to name. The finding it bought is better than the p-value it
+   cost — 0/13 written-with-knowledge against 1/3 written-blind says the
+   written/collected gap tracks *what the author knew about the detector*, not
+   writtenness. Written up under F2 in §2.
 6. **Draft**, 5–8 pages. F2 is the paper; F4 is the section after it.
 7. **Anonymised artifact mirror**, within 3 days of submitting.
 

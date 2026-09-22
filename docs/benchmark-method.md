@@ -913,6 +913,50 @@ ourselves* — and it has to be written to the same standard as the other twelve
 and written **before** anyone looks at which patterns fired, or it is a message
 chosen to pass rather than a negative.
 
+## The blind-authorship run — 2026-09-22, ~$0.05, and it went the other way
+
+That minimum-detectable-effect note was acted on, and the result is now the more
+interesting half of F2.
+
+**Three** written negatives were added rather than one, and **the batch size was
+pre-registered before the messages existed**, precisely because 14 is the number
+that clears the threshold and stopping at 14 would have been a stopping rule
+chosen for its p-value. They were written under a condition none of the first
+thirteen met: the author held `bench/corpus.ts` and `paper/SAMPLING-PROTOCOL.md`
+and was barred from `src/`, `paper/PLAN.md`, `paper/ABSTRACT.md`, `bench/f2.ts`
+and the git log. It could not name one detection pattern.
+
+**One of the three alarmed.** `power-company-genuine-overdue-notice` — a genuine
+utility disconnection notice with a real debt, a real deadline and the company's
+own domain — fires `manufactured-urgency`, the same pattern that accounts for
+five of the twelve collected alarms.
+
+```
+written   power-company-genuine-overdue-notice   manufactured-urgency
+```
+
+| Written negatives, by what the author knew | False alarms |
+| :-- | :-- |
+| Written beside the pattern they guard | 0 / 13 |
+| Written blind                          | 1 / 3 |
+| Collected                              | 12 / 55 |
+
+**n = 3, and that has to be said in the same breath.** What it buys is not power,
+it is a mechanism: the written/collected gap may track *what the author knew
+about the detector* rather than whether the text was written. Each of the thirteen
+was composed beside the pattern it probes — the one position from which a negative
+gets steered clear of the trap without anyone intending to. Remove that knowledge
+and the first written negative behaves like a collected one.
+
+**The cost: p = 0.1458 one-sided (0.2718 two-sided) at 1/16 against 12/55**, up
+from 0.060. Sixteen *quiet* written negatives would have given 0.0343, so the
+single alarm is the entire difference. **No further negatives are to be written
+for this table.** Doing so now, with the alarms visible, is the fault this paper
+exists to name.
+
+`manufactured-urgency` is **not** to be narrowed in response to this. Same rule
+as everything below.
+
 ### The twelve
 
 ```

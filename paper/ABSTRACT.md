@@ -40,14 +40,24 @@ benchmarking**; **evaluation methodology**.
 > added 55 genuine messages captured from two real inboxes under a pre-registered
 > sampling rule, redacted but otherwise untouched, and re-ran the identical
 > engine. It alarmed at **12 of the 55 real messages and 0 of the 13 we wrote** —
-> 21.8% [12.9, 34.4] against 0.0% [0.0, 22.8] — flagging genuine Spotify and
-> PlayStation billing notices, a Google Play points expiry, an ORCID address
-> verification and four Zoom marketing offers. Self-authored negatives did not
-> merely underestimate the false-alarm rate; they reported it as absent. The
-> split is not significant at the conventional threshold (Fisher's exact,
-> p = 0.060 one-sided) and cannot be: with 13 written negatives this is already
-> the most extreme table the margins permit, which is itself a finding about how
-> small the written half of a benchmark is allowed to be.
+> 21.8% [12.9, 34.4] against 0.0% — flagging genuine Spotify and PlayStation
+> billing notices, a Google Play points expiry, an ORCID address verification and
+> four Zoom marketing offers. Self-authored negatives did not merely underestimate
+> the false-alarm rate; they reported it as absent.
+>
+> We then asked *why*, and the answer was not the one we expected. Each of the 13
+> had been written beside the detection pattern it was meant to probe. We
+> commissioned three more from an author given the corpus and the sampling
+> protocol and denied all sight of the detector, its pattern names and every
+> prior result, with the batch size fixed before the messages existed. **One of
+> the three alarmed** — a genuine utility disconnection notice, on the same
+> urgency pattern that fires on the marketing mail. The written/collected gap
+> appears to track what the author knew about the system under test, not the
+> provenance of the text. That leaves the headline split unsignificant at the
+> conventional threshold (Fisher's exact, **p = 0.146 one-sided** at 1/16 against
+> 12/55), and we report it that way: the direction reproduces in two independent
+> systems, the cause is named and predicts the blind result, and the test is
+> underpowered because writing hard negatives is slow.
 >
 > Two further failures follow. A cheaper model scored 83.4% recall on 145
 > held-out real smishing messages — twenty-one points above the shipping engine —
@@ -86,12 +96,14 @@ benchmarking**; **evaluation methodology**.
   0.031.** Both numbers are in the paragraph above on purpose. Do not quote the
   0.031: it belongs to a 28-item corpus that no longer exists, and a reviewer
   who recomputed it would find the newer, weaker figure.
-- **One more written negative is the whole gap.** At the observed collected
-  rate, 14 quiet written negatives clear p < 0.05 and 13 cannot, whatever the
-  data does. This is the cheapest outstanding result in the project and it costs
-  nothing but care — the message has to be written to the standard of the other
-  twelve and **before** anyone reads which patterns fired, or it is a negative
-  chosen to pass. `npm run bench:f2` recomputes all of this for free.
+- **Updated 22 Sep again, after the blind-authorship run (~$0.05).** Three
+  negatives were written under clean-room conditions, pre-registered at three so
+  the batch could not be sized for its p-value, and one alarmed. n_written is 16,
+  1/16 against 12/55, **p = 0.146 one-sided**. Sixteen quiet ones would have given
+  0.034, so the single alarm is the whole difference. **Writing further negatives
+  is now off the table** — doing it after seeing this table is the fault the paper
+  exists to name. **Quote 0.146. The 0.060 and the 0.031 are both dead.**
+  `npm run bench:f2` recomputes all of this for free.
 - "Deployed" is accurate: the application is live and public. It has no user base
   to speak of, and the paper should not imply one.
 

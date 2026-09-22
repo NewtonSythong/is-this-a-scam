@@ -453,6 +453,67 @@ const LEGITIMATE: readonly CorpusItem[] = [
 		source: "n/a — an ordinary message, written as a false-alarm probe for unexpected-money",
 		note: "Money arriving unannounced, which `unexpected-money` fires on. Genuine because it is a receipt for a return the reader made, asks nothing and offers nothing — the exclusion clause added to that pattern on 2026-09-18 exists for this message.",
 	},
+	// ── Added 2026-09-22: three negatives written blind ───────────────────────
+	//
+	// These three were written by an author who was given the corpus file and the
+	// sampling protocol and nothing else: no sight of `src/`, no pattern names, no
+	// benchmark results, no run of any kind. That is deliberate, and it is the
+	// only thing that distinguishes them from the thirteen written negatives
+	// above.
+	//
+	// Each of those thirteen was composed beside the pattern it was meant to
+	// guard, which makes it a good probe for that pattern and a poor sample of
+	// ordinary life. A negative written by somebody who knows what fires can be
+	// steered — away from the trap, which flatters the detector, or into it, which
+	// dramatises a weakness. Neither was available here, so whatever these three
+	// do, they do it without having been aimed. If they pass, that is worth
+	// slightly more than the thirteen passing; if one of them alarms, nobody chose
+	// it to.
+	{
+		id: "power-company-genuine-overdue-notice",
+		message:
+			"Meridian Energy: your account 4471028 is overdue by $186.40. To avoid disconnection please pay by 5pm on Friday 26 September. You can pay online at https://www.meridianenergy.co.nz/pay or from your online account.",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		source:
+			"n/a — an ordinary message, written to represent the shape of a genuine overdue-account notice",
+		note:
+			"A named consequence, a deadline in hours, an amount owed and a link that wants money " +
+			"today — the whole extortionate shape, sent lawfully by every utility in the country. " +
+			"Genuine because the debt is real, the link is the company's own domain, and the reader " +
+			"can do the same thing by logging in without following anything.",
+	},
+	{
+		id: "netball-club-genuine-subs-request",
+		message:
+			"Hi team parents — winter subs are $95 per player and are due by 30 September. Please pay into the club account 12-3141-0067890-00 with your child's surname as the reference. Give me a yell if that's difficult this month. Thanks, Rachel (treasurer)",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		source: "n/a — an ordinary message, written to represent the shape of a club collecting money",
+		note:
+			"A bank account number arriving by text, with a sum, a due date and a reference to quote. " +
+			"That is the anatomy of invoice interception and it is also how every school trip and " +
+			"sports club in the country is paid for. Genuine because it is a group message from a " +
+			"treasurer the parents already know, for a fee the club set and publishes.",
+	},
+	{
+		id: "trademe-genuine-buyer-arranging-pickup",
+		message:
+			"Hi, I'm the one who won your bike on Trade Me last night. I've just transferred the $220 so it should land in the morning. Would it be alright if my brother collects it on Saturday instead of me? He'll have the listing number with him.",
+		kind: "legitimate",
+		provenance: "synthetic",
+		hardNegative: true,
+		source:
+			"n/a — an ordinary message, written to represent the shape of a private sale between strangers",
+		note:
+			"A stranger with the reader's number, money asserted rather than shown, and a request to " +
+			"hand the goods to a third party who has not been named — the shape of the proxy-collection " +
+			"and fake-transfer frauds marketplaces warn sellers about. Genuine because the auction " +
+			"happened, the amount is the one it closed at, and the sender is a normal buyer with a busy " +
+			"Saturday. A false alarm here fires on the ordinary business of selling a bike.",
+	},
 	// ── Added 2026-09-21: the first genuine messages in this corpus that a New
 	// Zealander actually received ────────────────────────────────────────────
 	//
