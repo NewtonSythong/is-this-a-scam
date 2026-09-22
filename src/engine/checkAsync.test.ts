@@ -17,11 +17,13 @@ const ORGS = [ANZ];
 const NOTHING_FOUND: LinkLookups = {
 	expand: async () => null,
 	dangerous: async () => [],
+	establishedSince: async () => null,
 };
 
 const expandingTo = (host: string): LinkLookups => ({
 	expand: async (link: Link) => (link.host === "bit.ly" ? { raw: link.raw, host } : null),
 	dangerous: async () => [],
+	establishedSince: async () => null,
 });
 
 const kinds = (message: string, lookups: LinkLookups) =>
@@ -81,6 +83,7 @@ describe("checkAsync: links on a public danger list", () => {
 	const flagging = (raw: string): LinkLookups => ({
 		expand: async () => null,
 		dangerous: async () => [raw],
+		establishedSince: async () => null,
 	});
 
 	it("calls a known dangerous link a scam", async () => {
@@ -108,6 +111,9 @@ describe("checkAsync: when the network fails", () => {
 		dangerous: async () => {
 			throw new Error("network down");
 		},
+		establishedSince: async () => {
+			throw new Error("network down");
+		},
 	};
 
 	it("falls back to the offline answer rather than failing", async () => {
@@ -129,6 +135,7 @@ describe("checkAsync: when the network fails", () => {
 				throw new Error("network down");
 			},
 			dangerous: async () => ["https://ordinary-looking.com/x"],
+			establishedSince: async () => null,
 		};
 
 		const verdict = await checkAsync(
