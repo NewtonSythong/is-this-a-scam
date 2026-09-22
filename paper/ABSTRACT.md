@@ -37,16 +37,22 @@ benchmarking**; **evaluation methodology**.
 > Our central result is a natural experiment. The negative half of our benchmark
 > contained 13 hard negatives we had written ourselves, against which the
 > deployed detector measured a false-alarm rate of zero for nine months. We then
-> added 15 genuine messages captured from real inboxes, redacted but otherwise
-> untouched, and re-ran the identical engine. It alarmed at **5 of the 15 real
-> messages and 0 of the 13 we wrote** (Fisher's exact, p = 0.031), flagging a
-> genuine Spotify payment reminder, a PlayStation billing notice and a Google
-> Play points expiry. Self-authored negatives did not merely underestimate the
-> false-alarm rate; they reported it as absent.
+> added 55 genuine messages captured from two real inboxes under a pre-registered
+> sampling rule, redacted but otherwise untouched, and re-ran the identical
+> engine. It alarmed at **12 of the 55 real messages and 0 of the 13 we wrote** —
+> 21.8% [12.9, 34.4] against 0.0% [0.0, 22.8] — flagging genuine Spotify and
+> PlayStation billing notices, a Google Play points expiry, an ORCID address
+> verification and four Zoom marketing offers. Self-authored negatives did not
+> merely underestimate the false-alarm rate; they reported it as absent. The
+> split is not significant at the conventional threshold (Fisher's exact,
+> p = 0.060 one-sided) and cannot be: with 13 written negatives this is already
+> the most extreme table the margins permit, which is itself a finding about how
+> small the written half of a benchmark is allowed to be.
 >
 > Two further failures follow. A cheaper model scored 83.4% recall on 145
 > held-out real smishing messages — twenty-one points above the shipping engine —
-> while alarming at 21 of those 28 genuine messages: on a scam-only corpus,
+> while alarming at 21 of the 28 genuine messages then in the corpus: on a
+> scam-only corpus,
 > indiscriminate firing is indistinguishable from detection, and an engine that
 > alarms at everything scores 100%. And a held-out corpus is consumed by the act
 > of improving against it; we describe a dev/test split whose harness refuses to
@@ -71,14 +77,28 @@ benchmarking**; **evaluation methodology**.
   we wrote. That closed the gap this file previously flagged, and the finding
   upgraded from "a cheap model does this" to "the deployed system does this",
   with a p-value. It is now the abstract's opening result rather than its
-  second. Full entry: `docs/benchmark-method.md`, last section.
+  second. Full entry: `docs/benchmark-method.md`.
+- **Updated 22 Sep, after the re-run on the closed corpus for $1.26.** Same
+  model, all 83 items: 14/15 scams seen, 12/68 false alarms, and **all twelve
+  still on captured messages, none on written ones**, with forty more collected
+  negatives for the written half to fail on. The effect is larger and better
+  described than the 21 Sep version, and **the p-value is worse — 0.060, not
+  0.031.** Both numbers are in the paragraph above on purpose. Do not quote the
+  0.031: it belongs to a 28-item corpus that no longer exists, and a reviewer
+  who recomputed it would find the newer, weaker figure.
+- **One more written negative is the whole gap.** At the observed collected
+  rate, 14 quiet written negatives clear p < 0.05 and 13 cannot, whatever the
+  data does. This is the cheapest outstanding result in the project and it costs
+  nothing but care — the message has to be written to the standard of the other
+  twelve and **before** anyone reads which patterns fired, or it is a negative
+  chosen to pass. `npm run bench:f2` recomputes all of this for free.
 - "Deployed" is accurate: the application is live and public. It has no user base
   to speak of, and the paper should not imply one.
 
 ## Rejection risk, honestly
 
 SaTML is a competitive venue with serious ML-security chairs. A single
-unaffiliated author submitting a position paper built on n=28 negatives is a
+unaffiliated author submitting a position paper built on n=68 negatives is a
 long shot. The abstract registration costs twenty minutes and commits to nothing;
 the draft it forces is reusable at CSET, eCrime and arXiv regardless of the
 outcome. That asymmetry is the whole argument for registering.

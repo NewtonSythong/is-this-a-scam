@@ -867,3 +867,80 @@ were enough to take a measured zero to a measured third.
 to 58%, which is the difference between an irritation and an unusable app. The
 argument for the other thirty-five genuine messages is now arithmetic rather than
 rhetorical.
+
+## The same model on the sixty-eight: 0/13 on ours, 12/55 on the real ones
+
+**Added 2026-09-22.** The re-run the section above asked for, once the collection
+closed. `claude-opus-5` again — the same model, because a measurement moved to a
+cheaper one measures a different system — over all 83 items via `npm run
+bench:narrative`. All answered, no failed calls, **$1.26**. The analysis is
+`npm run bench:f2`, which is free, reads the benchmark's cache, and asserts its
+own arithmetic against the four values published above before it reports.
+
+| | Result |
+| :-- | :-- |
+| Scams the model's half saw something in | **14/15** |
+| False alarms on legitimate messages | **12/68** |
+
+| Legitimate half | False alarms | 95% CI (Wilson) |
+| :-- | :-- | :-- |
+| The 13 messages we wrote ourselves | **0/13** — every one still quiet | [0.0, 22.8] |
+| The 55 captured from real inboxes | **12/55** — 21.8% | [12.9, 34.4] |
+
+The direction held under a near-fourfold increase in the collected arm, and all
+five original alarms reappear among the twelve. The written half stayed at a
+clean zero with forty more chances to fail.
+
+### And the p-value went up, which is the part worth reading twice
+
+**p = 0.060 one-sided, 0.104 two-sided** — worse than the 0.031 the smaller
+corpus gave, on data that supports the claim more strongly. That is not a
+paradox and it is not a reason to quote the old number.
+
+Fisher's floor is set by the smaller arm. Holding the written negatives at 13
+while every alarm lands on the collected side produces **the most extreme table
+these margins allow**, and its one-sided p is 0.060. There was no result
+available at n_written = 13 that would have cleared 0.05. Enlarging the
+collection moved mass into the arm that was never the constraint, and in doing so
+made the test's floor visible — which is worth more than the earlier number was,
+because the earlier number cleared 0.05 partly by having only fifteen real
+messages to be extreme about.
+
+**The minimum detectable effect, stated:** at the observed 21.8% collected rate,
+**14 quiet written negatives** clear p < 0.05. Thirteen cannot. The cheapest
+significant result this paper has available is *one more message we write
+ourselves* — and it has to be written to the same standard as the other twelve,
+and written **before** anyone looks at which patterns fired, or it is a message
+chosen to pass rather than a negative.
+
+### The twelve
+
+```
+ALARM anz-genuine-job-referral              job-or-earnings-offer
+ALARM googleplay-genuine-points-expiry      benefit-expiry-pretext
+ALARM spotify-genuine-student-reverify      verify-account-pretext, benefit-expiry-pretext
+ALARM playstation-genuine-payment-problem   verify-account-pretext, benefit-expiry-pretext
+ALARM spotify-genuine-payment-reminder      verify-account-pretext, benefit-expiry-pretext
+ALARM orcid-genuine-verify-email            verify-account-pretext
+ALARM seek-genuine-profile-strength         verify-account-pretext
+ALARM coronet-peak-genuine-survey           unexpected-money, manufactured-urgency
+ALARM zoom-genuine-new-year-offer           manufactured-urgency
+ALARM zoom-genuine-cyber-monday             manufactured-urgency
+ALARM zoom-genuine-black-friday             manufactured-urgency
+ALARM gradconnection-genuine-commbank-deadline  manufactured-urgency
+```
+
+Five patterns now, not three. The two that the enlarged corpus added are the
+interesting ones. **`manufactured-urgency` accounts for five of the twelve, and
+every one is ordinary marketing** — three Zoom seasonal offers, a New Year offer,
+and a graduate-programme application deadline. A discount that ends on Monday and
+a scam that ends on Monday are the same sentence. **`verify-account-pretext` now
+also fires on an ORCID address-verification mail and a SEEK profile nudge**,
+neither of which is billing, which widens the earlier reading: it is not that the
+pattern cannot separate a phisher from Spotify, it is that it fires on being
+asked to click through to your own account at all.
+
+**These twelve are not to be fixed here.** Same rule as the five and the offline
+baseline's six: narrowing a check while looking at the messages that caught it
+retires them as evidence. Fix from published descriptions, measure on messages
+nobody has read.

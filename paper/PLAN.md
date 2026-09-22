@@ -68,32 +68,60 @@ conclusions.
 
 The crispest number in the repository, and the one most likely to be quoted.
 
-Of the 28 legitimate messages, 13 were written by us and 15 were captured from
-two real inboxes. Asked the identical questions:
+**Re-run on the closed corpus, 2026-09-22** (§8 item 4): the Narrative Check
+alone, `claude-opus-5`, all 83 items, $1.26. Of the 68 legitimate messages, 13
+were written by us and 55 were captured from two real inboxes. Asked the
+identical questions:
 
-| Negative | Alarm probabilities drawn |
-| :-- | :-- |
-| Our own invented hard negatives | 0.51 – 0.67 |
-| Genuine captured messages | 0.83, 0.86, 0.88, 0.89, 0.91 |
+| Negative | False alarms | 95% CI (Wilson) |
+| :-- | :-- | :-- |
+| Written by us | **0 / 13** = 0.0% | [0.0, 22.8] |
+| Captured from a real inbox | **12 / 55** = 21.8% | [12.9, 34.4] |
 
-**The real messages fired harder than the ones we invented to be hard.** The
-model was more confident a genuine Google sign-in alert was a scam than that any
-message we wrote was. Neither the Google alert nor the Inland Revenue login
-alert mentions a benefit, a reward or an expiry — so `benefit-expiry-pretext`
-was not detecting its pretext at all. It was detecting *institutional email*,
-and on a scam-only corpus there was no way to see that.
+**Every false alarm the model has is on a message we did not write.** Twelve of
+them, across five patterns: `manufactured-urgency` on five pieces of ordinary
+marketing (four Zoom seasonal-offer mails and a GradConnection application
+deadline), `verify-account-pretext` and `benefit-expiry-pretext` together on
+genuine Spotify, PlayStation and Google Play billing mail, `verify-account-pretext`
+on an ORCID address-verification mail and a SEEK profile nudge,
+`job-or-earnings-offer` on a real ANZ referral, and `unexpected-money` on a ski-field
+survey. The reproduction script is `bench/f2.ts` (`npm run bench:f2`), which is free
+and reads the benchmark's cache.
+
+**And the significance moved the wrong way: p = 0.060 one-sided, 0.104
+two-sided**, against 0.031 and 0.044 on the 28-item corpus. This must be
+reported as the headline, not buried — the effect got *larger* and the test got
+*weaker*, which looks like a contradiction and is not.
+
+The explanation is the whole lesson of §8 item 5. **Fisher's floor is set by the
+smaller arm.** With the written negatives held at 13 and all twelve alarms
+landing on the collected side, this is already the most extreme table the
+margins permit: 0.060 is the *smallest p obtainable at n_written = 13*, however
+the data had fallen. Collecting more real messages cannot rescue it, and the
+enlarged collection is in fact what pushed it up, by moving mass into the arm
+that was never the constraint. **One more written negative resolves it** — at 14
+written, all quiet, the same collected rate clears p < 0.05. Both figures come
+from `bench/f2.ts`, which also asserts its arithmetic against the four
+previously published values.
+
+*Strength:* high on direction and on effect size — 0% against 21.8%, with
+non-overlapping point estimates and a mechanism visible in the pattern names.
+*Weakness:* **not significant at 0.05, and the fix is to write negatives, not to
+collect them.** Say so plainly; a reviewer will find it in a minute otherwise.
+The honest sentence is that the direction reproduces in two independent systems
+and the LLM side is one message short of resolving.
+
+*Superseded:* an earlier draft of this section quoted alarm probabilities of
+0.51 – 0.67 for written negatives against 0.83 – 0.91 for captured ones. Those
+are **Jev's**, from the closed spike (`docs/jev-spike.md`), on the 28-item
+corpus, and they are a different model on a different corpus. Keep them as
+corroborating colour if the draft wants them; the table above is the result.
 
 Corollary, and it is the sharper version: the earlier reading was that one bad
 pattern explained everything, and that excluding it left the model quiet on all
-thirteen negatives. On the enlarged 28, **eight messages still fire on three
-further patterns**. There was never one bad pattern; there was one pattern bad
-enough to hide the others.
-
-*Strength:* high, and genuinely novel-feeling. Synthetic-negative bias is
-assumed in the literature; here it is measured, with a confidence gap.
-*Weakness:* n = 15 real, because the LLM side has not been re-run since the
-collection closed at 55. That re-run is §8 item 4. The direction is clear; the
-magnitude is not.
+thirteen negatives. Five patterns now fire, and the largest single contributor
+is `manufactured-urgency` on ordinary marketing mail. There was never one bad
+pattern; there was one pattern bad enough to hide the others.
 
 #### The same asymmetry appears with no model in the system at all
 
@@ -447,8 +475,9 @@ submission. The order is by what unblocks what.
 
 1. ~~**Gap 3 — grow the collected negatives from 15 to roughly 50–60.**~~
    **DONE 2026-09-22, at 55.** Two capture rounds under
-   `paper/SAMPLING-PROTOCOL.md`; the corpus is now 81 items, 13 scams and 68
-   legitimate, of which 13 written and 55 collected. Cost nothing but time.
+   `paper/SAMPLING-PROTOCOL.md`; the legitimate half is 68, of which 13 written
+   and 55 collected. Cost nothing but time. The positive-side capture closed the
+   same day at 2, taking the corpus to **83 items, 15 scams and 68 legitimate**.
 2. ~~**Verify every citation in §2 against the actual paper.**~~
    **DONE 2026-09-22.** All seven pulled and read; the record is
    `paper/CITATIONS.md`. Six held exactly, including every number quoted from
@@ -465,11 +494,26 @@ submission. The order is by what unblocks what.
    collected messages and none is written, the F2 direction reproducing in a
    system with no model in it (p = 0.265, so direction only). Written up under
    F2 in §2. The six are deliberately left unfixed; see §2.
-4. **Re-run F2** on the enlarged negative set and re-test. Same model as the
-   original run — a measurement moved to a cheaper model measures a different
-   system.
+4. ~~**Re-run F2** on the enlarged negative set and re-test.~~
+   **DONE 2026-09-22, and it changed the finding.** `npm run bench:narrative` on
+   `claude-opus-5`, all 83 items, **$1.26** — the same model as the original run,
+   because a measurement moved to a cheaper model measures a different system.
+   Result: **0/13 written against 12/55 collected**, every false alarm on a
+   message we did not write, but **p = 0.060 one-sided, up from 0.031**. Written
+   up under F2 in §2. The effect grew and the test weakened, because Fisher's
+   floor is set by the smaller arm and the collection effort went into the arm
+   that was never the constraint. **This makes item 5 the critical path, not a
+   tidying step.**
 5. **Gap 5**, a confidence interval on every number, and a stated
-   minimum-detectable-effect for the ablation.
+   minimum-detectable-effect for the ablation. **Half-done and now load-bearing.**
+   `bench/f2.ts` (`npm run bench:f2`, free) computes Wilson intervals, Fisher
+   both ways, and the MDE, and asserts its arithmetic against the four values
+   already published. What it reports is that **F2 needs one more written
+   negative** — 14 quiet written negatives clear p < 0.05 at the observed
+   collected rate, and 13 cannot, whatever the data does. Writing that message
+   is the cheapest significant result available and costs nothing but care: it
+   must be written to the same standard as the other twelve, *before* looking at
+   which patterns fired, or it is a message chosen to pass.
 6. **Draft**, 5–8 pages. F2 is the paper; F4 is the section after it.
 7. **Anonymised artifact mirror**, within 3 days of submitting.
 
