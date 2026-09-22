@@ -1,5 +1,15 @@
 # SaTML 2027 — abstract registration
 
+> **SUPERSEDED 2026-09-22. The live abstract is the one in `paper/DRAFT.md`.**
+> This file was sized for the SaTML registration field, and SaTML was abandoned
+> (`PLAN.md` §8 preamble). Its title line is the old F1 framing and is dead; its
+> body was updated three times as the numbers moved and is broadly right, but the
+> draft's abstract is the one written against the current corpus (86 items, 71
+> legitimate) and against the blind-authorship mechanism. **Quote the draft.**
+> Kept, unedited below, because the notes at the foot record which number was
+> believed when — which is the same reason `docs/benchmark-method.md` is never
+> tidied.
+
 **Registration closes Tuesday 22 September 2026.** The fields below are what the
 form asks for. Title and abstract may still change before the 29 September paper
 deadline; authors, affiliations and topics are fixed at registration.

@@ -294,3 +294,29 @@ Reasons given:
 
 **`afterpay-verify-account-verbatim`** — 2026-09-07: this is the message that exposed both gaps. The verify-account-pretext narrative pattern was written after reading it, and Afterpay was added to the Known Organisation list because of it.
 
+
+---
+
+## Re-run over 86 items — 2026-09-22, free, recorded rather than overwritten
+
+The run above was made over the corpus as it stood at **81 items**, before the
+two captured scams and the three blind-written negatives were added. It is left
+standing because it is what the paper's earlier reading rests on. The same
+command over the current **86** items (`npm run bench`, no `--write`) gives:
+
+| Measure | 81 items | 86 items |
+| :-- | :-- | :-- |
+| Scams raised, never developed against | 6/9 (67%) | **6/11 (55%)** |
+| Legitimate left quiet | 62/68 (91%) | **65/71 (92%)** |
+| Overall | 69/81 (85%) | **72/86 (84%)** |
+
+**The false-alarm side is the part that matters for F2, and it did not move:**
+the same six alarms, all six still `verbatim`, none written. The written arm is
+now 16 rather than 13, because the three blind negatives are all quiet here —
+including `power-company-genuine-overdue-notice`, which trips the *narrative*
+engine on `manufactured-urgency`. So the blind batch is not simply harder mail;
+it is mail that catches a narrative detector and not a deterministic one.
+
+**0/16 written against 6/55 collected, one-sided Fisher p = 0.202** (it was
+0.265 at 13 written). Direction only, as before. The six are still not to be
+fixed.

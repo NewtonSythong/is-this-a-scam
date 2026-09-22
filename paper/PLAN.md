@@ -665,6 +665,46 @@ submission. The order is by what unblocks what.
    written/collected gap tracks *what the author knew about the detector*, not
    writtenness. Written up under F2 in §2.
 6. **Draft**, 5–8 pages. F2 is the paper; F4 is the section after it.
+   **FIRST FULL DRAFT WRITTEN 2026-09-22 — `paper/DRAFT.md`**, ~6,000 body words,
+   6–7 pages in the IEEE template. Markdown on purpose, per §9: pandoc applies
+   the venue's class file at build time so nothing in the source is committed to
+   a venue. Its structure is the system under test, the corpus and how it was
+   built, F2 by provenance, the blind-authorship run, the deterministic baseline,
+   the power cost and the stopping decision, F4, related work, threats,
+   recommendations, the AI disclosure, and ethics/artifact. F1 is motivation and
+   never claimed; F3 is a methods note in §3.5. A comment block at the head of
+   the draft records what is deliberately absent and why.
+
+   **Three things the drafting turned up, and they are corrections, not
+   polish.**
+
+   **(a) The corpus is 86 items, not 83 — and the legitimate half is 71, not
+   68.** Counted from `bench/corpus.ts`: 15 scams, 71 legitimate, of which 16
+   written and 55 collected, 47 hard negatives. §2's F2 prose still says "all 83
+   items" and "of the 68 legitimate messages", which was true before the three
+   blind negatives landed and is not now. The tables are right; the sentences
+   around them are stale. **Anything quoting a corpus size should say 86/71.**
+
+   **(b) The deterministic baseline was re-run over all 86 for free, and its
+   written arm is now 16.** `docs/benchmark-offline.md` records the 81-item run
+   and now carries a dated note for the 86-item one below it. The false-alarm
+   side did not move — the same six alarms, all six collected — so it is
+   **0/16 written against 6/55 collected, one-sided p = 0.202** (it was 0.265 at
+   13 written). The draft quotes 0.202. The unplanned part is worth keeping:
+   **all three blind negatives are quiet offline**, including the power-company
+   notice that trips the narrative engine, so the blind batch is not simply
+   harder mail — it is mail that catches a narrative detector and not a
+   deterministic one.
+
+   **(c) The title is now an open decision, and it is Newton's.** §7's
+   registered title, *Written Negatives Make Detectors Look Quiet*, was chosen
+   when provenance was believed to be the mechanism. §2 says the blind result
+   should lead, and it says the mechanism is what the author knew. The draft
+   keeps the registered title and leads with the mechanism in the abstract, and
+   the head-comment records the alternative rather than acting on it.
+
+   Still owed on the draft: a `.bib` (§9 budgets half an hour for it), a decision
+   on the title, and a prose pass against the AI-writing markers §9 flags.
 7. **Anonymised artifact mirror**, within 3 days of submitting.
 
 ---
