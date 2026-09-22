@@ -294,8 +294,13 @@ construction moves headline numbers.
 assumed: XSTest (Röttger et al., NAACL 2024) is 250 *hand-written* safe prompts
 and is a standard over-refusal benchmark. Small hand-built negative sets are
 accepted when their construction is principled. The exposure is not the sample
-size but that a single Fisher test at p = 0.031 carries the whole claim. Growing
-the collected negatives to roughly 50–60 and re-running moves p off the boundary.
+size but that a single Fisher test carried the whole claim. **The remedy proposed
+here was tried and was wrong:** growing the collected negatives to 55 moved p
+*up*, from 0.031 to 0.060, because Fisher's floor is set by the smaller arm. The
+written arm was the constraint all along. Three blind-written negatives were then
+added and one alarmed, leaving p = 0.1458 — see the blind-authorship subsection
+under F2. XSTest's precedent still holds; what does not hold is the idea that
+collecting more real messages could rescue the test.
 
 **Every citation above was verified against the actual paper on 2026-09-22.**
 The record — full bibliographic entries, the verbatim sentence carrying each
@@ -304,6 +309,70 @@ the seven held; the Palla row was wrong and the table above now carries the
 corrected reading. Anything added to §2 after this date is an unverified lead
 again until it appears in `CITATIONS.md`: a fabricated citation in a paper about
 honest measurement would be fatal in a way it would not be elsewhere.
+
+### Related work — the published leaders are far ahead, and are not measuring this
+
+This paragraph is owed, and it is defensive. A reviewer who has just read a 98%
+Macro-F1 will read a detector that false-alarms on 12 of 55 real messages as
+simply bad. The answer is not that their numbers are wrong. **It is that they are
+not measurements of the same thing.**
+
+**The comparator.** Yadav & Masum (*Electronics* 15(12):2606, June 2026) report
+**Macro-F1 98.28% and phishing recall 99.45%** from a multi-agent LLM framework,
+"evaluated on a fixed 1000-email subset drawn from a unified TREC/Nazario corpus
+of 56,212 emails". Crucially, their own abstract says the gain is "driven
+primarily by **reduced false positives on legitimate emails** while preserving
+high phishing recall". They are optimising the same quantity this paper measures.
+That makes the comparison honest rather than point-scoring, and it removes the
+easy dismissal that the field only cares about recall.
+
+**So the whole disagreement is about what a legitimate email is.** TREC's ham is
+genuinely collected — nobody wrote it — which is exactly what this paper asks
+for, and it is still not a sample of anyone's life. TREC's own track overview
+describes the canonical public corpus, trec07p (25,220 ham, 50,199 spam):
+
+> "The public corpus contains all the messages delivered to a particular server
+> from April 8 through July 6, 2007. The server contains many accounts that have
+> fallen into disuse but continue to receive a lot of spam. To these accounts
+> were added a number of 'honeypot' accounts published on the web and used to
+> sign up for a number of services – some legitimate and some not."
+> — Cormack, *TREC 2007 Spam Track Overview*, §4.1
+
+Mail to abandoned accounts and to traps, in 2007. Against that, the negatives
+here are 2026 mail arriving in an inbox somebody actually reads: a Spotify
+payment reminder, a Google Play points expiry, an ORCID address verification, a
+SEEK profile nudge, four Zoom seasonal offers, a GradConnection application
+deadline, and — written blind — a genuine power-company disconnection notice.
+**A false alarm on any of those is a person taught to distrust a real message.
+There is no equivalent failure available on a honeypot account.**
+
+*Stated honestly:* Yadav & Masum's abstract names "TREC" without an edition, and
+the full text could not be retrieved (MDPI 403s every automated fetch and the
+browser is not permitted to reach the host), so trec07p is cited as TREC's own
+canonical public corpus and **not** as a verified claim about their setup. See
+`paper/CITATIONS.md` entries 8 and 9. This is the same discipline as the F2
+novelty claim: say what was checked.
+
+**And corpus identity is itself learnable, which compounds it.** Bhuiyan &
+Bhuiyan (BDCC 10(7):211, 2026) separate six public phishing corpora by origin
+alone at 0.9722 (LR TF-IDF) and 0.9806 (Linear SVC). A score measured on a
+positive set and a negative set drawn from the same archive is partly a score for
+telling archives apart. TREC/Nazario is exactly such a pairing.
+
+**The conclusion this paper draws, and it is a sharpening rather than a
+contradiction.** "Negatives must be collected, not written" is the requirement
+this work started with, and the blind-authorship run says it is not sufficient on
+its own. The requirement has two clauses:
+
+1. **Collected from the population the system will deploy into** — not from an
+   archive that happens to be labelled, however carefully it was built.
+2. **Not authored by anyone who knows what the detector looks for** — because
+   0/13 written beside the patterns against 1/3 written blind says that gap
+   tracks the author's knowledge, not the provenance of the text.
+
+98.28% and 21.8% are both correct, about different populations. The number this
+paper cannot produce is the one a deployed detector needs, and neither can
+theirs; the difference is that this one says so.
 
 ### The vignette that anchors the ethics section: "hey stranger"
 
@@ -648,6 +717,14 @@ neglect in security classifiers, and benchmark contamination are all established
 literatures, and a reviewer at SaTML will know them. **This is the largest
 remaining risk to the submission and it is larger than any measurement gap in
 §4.**
+
+**Partly discharged 2026-09-22.** The comparison paragraph is now written — see
+*Related work* under §2 — and rests on two verified citations (Yadav & Masum for
+the SOTA figures, Cormack's TREC 2007 overview for what TREC ham actually is).
+What remains open is the *absence* claim behind F2's novelty, which no citation
+check can settle and which must stay phrased as "we found none". The unverified
+leads below are still leads: PiMRef (arXiv:2507.15393) and ChatSpamDetector
+(Koide et al.).
 
 Checked the Claude Code plugin marketplace first (`SearchPlugins`, keywords
 `research`/`citations`/`arxiv`/`zotero`/`latex`/`bibliography`) — nothing

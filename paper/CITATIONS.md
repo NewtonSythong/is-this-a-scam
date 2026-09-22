@@ -165,6 +165,78 @@ that n is small): **supported.**
 
 ---
 
+# Second pass — 2026-09-22, for the related-work paragraph
+
+## 8. Yadav & Masum 2026 — the SOTA comparator · VERIFIED (abstract), FULL TEXT BLOCKED
+
+> Tanya Yadav, Mohammad Masum. "Explainable Multi-Agent LLM Framework for
+> Phishing Email Detection via Role-Specialized Evidence Decomposition."
+> *Electronics* 15(12):2606, 12 June 2026. doi:10.3390/electronics15122606
+
+Both authors are at the Department of Applied Data Science, San Jose State
+University. Author list, title, volume, issue, article number and date confirmed
+against **Crossref** (`api.crossref.org/works/10.3390/electronics15122606`),
+because MDPI returns 403 to every automated fetch of the article and the browser
+pane is not permitted to reach the host. The work is Phase II of Tanya Yadav's
+SJSU master's thesis, *From Feature-Enhanced Url Phishing Detection to
+Explainable Multi-Agent Email Phishing Detection Using Large Language Models*
+(Spring 2026, advisor Mohammad Masum), which corroborates the headline figures
+independently.
+
+Three claims are carried by §2's related-work paragraph, and all three are
+**verbatim from the published abstract** (retrieved through the Semantic Scholar
+graph API, which mirrors the publisher's abstract):
+
+- "The framework is evaluated on a fixed 1000-email subset drawn from a unified
+  TREC/Nazario corpus of 56,212 emails under controlled zero-shot conditions."
+- "The full multi-agent Meta-Judge system achieves Macro-F1 = 98.28% and phishing
+  recall = 99.45%, improving Macro-F1 by 6.3 percentage points over a zero-shot
+  single-model GPT-4o-mini baseline."
+- "Paired statistical testing confirms that this improvement is significant and is
+  driven primarily by **reduced false positives on legitimate emails** while
+  preserving high phishing recall."
+
+That third sentence is the one that makes the comparison fair rather than
+point-scoring: their headline gain is itself a false-positive result, so they are
+optimising the same quantity this paper measures. The disagreement is entirely
+about what counts as a legitimate email.
+
+**What this check could NOT establish, and §2 must not assert:** the abstract
+says "TREC" without naming an edition, and the full text is unreachable. So the
+paper's own dataset section has not been read, and **no claim about which TREC
+corpus they used, how the 1000 were sampled, or the class balance of the subset
+may be attached to them.** §2 is phrased accordingly: it describes the canonical
+public TREC spam corpus from TREC's own overview (entry 9) and says plainly that
+the edition used here is unverified.
+
+## 9. Cormack 2007 — what TREC ham actually is · VERIFIED
+
+> Gordon V. Cormack. "TREC 2007 Spam Track Overview." *Proceedings of the
+> Sixteenth Text REtrieval Conference (TREC 2007)*, NIST Special Publication
+> 500-274, 2007. trec.nist.gov/pubs/trec16/papers/SPAM.OVERVIEW16.pdf
+
+Pulled as PDF from NIST and read directly. §4, Table 1: the public corpus
+**trec07p** is **25,220 ham and 50,199 spam, 75,419 total**. §4.1, verbatim:
+
+> "The public corpus contains all the messages delivered to a particular server
+> from April 8 through July 6, 2007. The server contains many accounts that have
+> fallen into disuse but continue to receive a lot of spam. To these accounts
+> were added a number of 'honeypot' accounts published on the web and used to
+> sign up for a number of services – some legitimate and some not."
+
+And: "This corpus is the first TREC public corpus that contains exclusively ham
+and spam sent to the same server within the same time period. The messages were
+unaltered except for a few systematic substitutions of names."
+
+Claim in §2 (TREC ham is genuinely collected, and is nonetheless mail delivered
+to disused accounts and to honeypots in 2007 rather than mail arriving in a
+working inbox today): **supported, verbatim.** Note the honesty required in both
+directions — the same sentence that makes the point also shows the corpus was
+built carefully and documented well. The argument is about what population it
+samples, not about its rigour.
+
+---
+
 ## What this pass could not check
 
 The sweep behind F2's "Novel" verdict — "a sweep of malware, IDS, spam and
