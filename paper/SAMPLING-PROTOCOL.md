@@ -367,3 +367,122 @@ afternoons, that ratio is the Part II result, and it argues the paper's case
 better than forty captures would have: scam corpora are written rather than
 gathered because gathering them from one person's mail does not work. The next
 round of this work is measurement, not more sampling.
+
+
+---
+
+# Part III — a held-out validation set for the link lookups
+
+**Written 2026-09-23, before a single message in the source stratum had been
+read, and before the lookup it exists to test had been measured on anything.**
+
+## Why this is a new pre-registration and not a third round
+
+Part I's collected-negative set is **closed at 55**, inside its own stopping
+band, and it stays closed. Nothing captured under Part III is added to it, and
+no F2 number is recomputed with these messages. That separation is the whole
+point: the collected 55 have now been read, quoted and written about for two
+weeks, and two changes have been measured against them — RDAP domain age
+(`d33edf1`, deterministic false alarms 6 → 0) and, in flight in a parallel
+session, the destination-page fetch. Sampling *more* negatives into the F2 set
+after seeing those results would be outcome-driven sampling, which is the exact
+fault F2 exists to name.
+
+So this is a validation set with a job of its own: **establish whether the link
+lookups behave on messages nobody here has read.** It is reported as its own
+table, beside Part I's, never merged into it.
+
+## The source
+
+**Inbox B's Inbox** — the author's secondary personal Gmail account. The letter
+is mapped to an address only in `corpus-sources-private/README.md`, outside this
+public repository.
+
+Inbox B has supplied positives before (Part II walked its **spam folder**), but
+its ordinary inbox has never been sampled for negatives at all. Every collected
+negative to date comes from inbox A. A second account is therefore a genuinely
+unswept stratum and not a re-walk of a picked-over one, and the difference
+between two people's — here, one person's two — mail streams is itself worth
+reporting.
+
+## The rule
+
+Walk the Inbox backwards from the most recent message. **Walk it in order** — do
+not scan the sender column first; that shortcut was committed and recorded in
+Part I's round 2 and is not to be repeated. Take every message satisfying all of:
+
+1. **Machine-sent** — judged from the sender address before the body is read.
+2. **Genuine** — anything of uncertain authenticity is skipped and counted,
+   never guessed at.
+3. **Self-contained** — enough body text to classify alone.
+4. **Distinct sender** — at most **three** per sending domain, counted within
+   Part III only, since this set is scored separately from Part I's.
+5. **Not already in the corpus**, in substance, under either part.
+
+Part I's amendments 1–3 carry over verbatim: per **sending domain**, no blanket
+exclusion of job-application mail, and duplicate templates skipped. Part I's
+exclusions carry over too — personal human correspondence, irreducible secrets.
+
+**Nothing is selected or rejected for looking scam-like.** `hardNegative` is
+assessed after capture, per item.
+
+## New in Part III: the destination is captured, not just the message
+
+A parallel session measured this today and it is the reason this clause exists.
+The phishing host behind `afterpay-verify-account-verbatim` —
+`lahresour.inportal.nl`, the compromised Dutch ticketing server — **is still up,
+still 200, still `text/html`, and now serves the genuine Inserve Portal login
+with no password field.** The attack page is gone. The single corpus item the
+destination-page feature exists to recover can no longer measure it.
+
+A corpus item's link half therefore decays on a timescale of weeks while its text
+half does not, and a corpus that records only the message silently stops
+measuring half of what it claims to. SmishX sidestepped this by excluding
+messages whose URLs had gone dead, which selects for live infrastructure on both
+sides — we should not inherit that.
+
+So for every captured message carrying a link, record **at capture time**, into
+`corpus-sources-private/`:
+
+- the final URL after redirects, and the redirect chain
+- HTTP status and `content-type`
+- the page `<title>` and any declared site name
+- whether the delivered HTML contains a password field
+- the first 256 KB of the delivered HTML, byte-capped, stored verbatim
+
+This is **archival, not scoring.** No verdict is computed, no detector path is
+invoked, and the archive is committed before anything is run. It is the same
+distinction Part II's contamination rule draws, applied to a new artefact.
+
+Where a link's destination cannot be reached at capture time, that is recorded as
+a fact about the item — `unreachable` with its date — and never left blank.
+
+## The contamination rule applies in full
+
+**No message captured under Part III may be run through the detector, in any
+engine, until this capture is closed and committed.** Not to check a hunch. The
+lookups being validated are in flight in another session as this is written,
+which makes the rule sharper rather than softer: the temptation is to see whether
+the new fetch clears an item while there is still time to adjust it.
+
+## Target and stopping condition
+
+Walk until **30** messages qualify, or the stratum is exhausted, whichever comes
+first. Report whichever happened. Thirty is stated in advance and is not a power
+calculation — it is the smallest set that could show a false-alarm rate
+materially different from Part I's 21.8% LLM / 0-of-55 deterministic, and a short
+sample is a finding about the source rather than a failure.
+
+## Where they live
+
+A separate file, `bench/corpus-validation.ts`, exported separately and **not**
+concatenated into `CORPUS`. Merging them would silently move every F2 number,
+and `bench/corpus.ts` is the instrument three documents already quote.
+
+## Redaction
+
+As Parts I and II: shape-preserving, unredacted originals and archived HTML to
+`corpus-sources-private/inbox-captures-6.md`, and `bench/redaction.test.ts` must
+pass. Archived destination HTML is a new hazard for that test — a real page can
+carry the recipient's email in a tracking token — so the redaction pass covers
+the archive, not only the message.
