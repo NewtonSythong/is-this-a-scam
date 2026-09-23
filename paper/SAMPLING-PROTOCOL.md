@@ -486,3 +486,32 @@ As Parts I and II: shape-preserving, unredacted originals and archived HTML to
 pass. Archived destination HTML is a new hazard for that test — a real page can
 carry the recipient's email in a tracking token — so the redaction pass covers
 the archive, not only the message.
+
+## Capture cadence, set against a measured decay rate
+
+Added 2026-09-23, still before any Part III message was read, from a measurement
+made in the parallel session that built the destination fetch. Of the **23 link
+hosts in the current corpus, 13 serve no readable page, and 9 of the 9 scam
+hosts are gone** — total, on the positive side, within roughly two weeks of
+capture for the newest items.
+
+That is not a caveat, it is a rate, and it sets three rules:
+
+1. **The destination archive is captured in the same session as the message**,
+   never scheduled for later. A day's delay is a material fraction of the
+   window in which a scam host is still itself.
+2. **Every archived destination carries the timestamp it was fetched at**, and
+   any later fetch of the same URL is recorded as a **new dated observation
+   beside the first, never as a replacement.** What a host served on capture day
+   and what it serves now are two facts, and the Afterpay item is the proof: its
+   host is still up and now serves the genuine login, so overwriting would have
+   erased the only record that it ever served an attack.
+3. **A link-half result is reported with the age of its archive.** A destination
+   check scored against a two-week-old archive is measuring the archive, and the
+   paper should say which.
+
+The same rate is what makes the field's convention indefensible rather than
+merely convenient. Excluding messages whose URLs have gone dead does not sample
+"messages with live links" — at 9 of 9 within a fortnight it samples *recency*,
+on the positive side far more strongly than on the negative side, and it does so
+invisibly.
