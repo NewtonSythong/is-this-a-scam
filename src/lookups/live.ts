@@ -1,5 +1,6 @@
 import type { Link } from "../domain/types";
 import type { LinkLookups } from "../engine/lookups";
+import { destinationPage } from "./destinationPage";
 import { rdapDomainAge } from "./domainAge";
 
 /** Injectable so both lookups can be tested without a network. */
@@ -120,5 +121,6 @@ export function liveLookups(apiKey: string, fetchImpl: Fetch = fetch): LinkLooku
 		expand: redirectFollower(fetchImpl),
 		dangerous: googleSafeBrowsing(apiKey, fetchImpl),
 		establishedSince: rdapDomainAge(fetchImpl),
+		destination: destinationPage(fetchImpl),
 	};
 }

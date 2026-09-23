@@ -1,4 +1,5 @@
 import type { Link } from "../domain/types";
+import type { DestinationPage } from "../lookups/destinationPage";
 
 /**
  * The outside world, as the Check needs it (ADR 0008).
@@ -32,6 +33,19 @@ export interface LinkLookups {
 	 * undo. See `src/lookups/domainAge.ts`.
 	 */
 	establishedSince(link: Link): Promise<Date | null>;
+
+	/**
+	 * What the page at this link is — whether it asks for a password, and what it
+	 * says it is — read server-side without rendering anything. `null` where that
+	 * could not be established, which must read as "we did not find out" and never
+	 * as "the page is fine".
+	 *
+	 * This is the one lookup that loads a page an attacker may control. ADR 0008
+	 * forbade it until 2026-09-23 and the amendment there records what changed and
+	 * what restrains it; `src/lookups/destinationPage.ts` is where those restraints
+	 * actually live.
+	 */
+	destination(link: Link): Promise<DestinationPage | null>;
 }
 
 /** Lookups that find nothing. The offline Check, expressed as an async one. */
@@ -39,4 +53,5 @@ export const NO_LOOKUPS: LinkLookups = {
 	expand: async () => null,
 	dangerous: async () => [],
 	establishedSince: async () => null,
+	destination: async () => null,
 };

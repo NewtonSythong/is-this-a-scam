@@ -43,8 +43,11 @@ export function signalsForLinks(
 	prose: string,
 	organisations: readonly KnownOrganisation[],
 	established: ReadonlySet<string> = new Set(),
+	harvesting: ReadonlySet<string> = new Set(),
 ): Signal[] {
-	return links.flatMap((link) => worstSignalFor(link, prose, organisations, established));
+	return links.flatMap((link) =>
+		worstSignalFor(link, prose, organisations, established, harvesting),
+	);
 }
 
 /** The Message with its links removed. See `claimsToBeFrom` for why this matters. */
@@ -66,12 +69,19 @@ export function proseOf(message: string, links: readonly Link[]): string {
  * impersonation rules are skipped for those hosts and nothing else is: a link
  * can be twenty years old and still be a shortener hiding where it goes, and
  * `bit.ly` itself is older than most banks' web presences.
+ *
+ * `harvesting` holds the hosts whose page was found asking for a password while
+ * wearing the claimed organisation's name. It is the one thing that outranks
+ * `established`, and it has to be, because the case that broke domain age was a
+ * twenty-year-old Dutch host serving an Afterpay login form. Age says where a
+ * page lives; only the page says what it is for.
  */
 function worstSignalFor(
 	link: Link,
 	prose: string,
 	organisations: readonly KnownOrganisation[],
 	established: ReadonlySet<string>,
+	harvesting: ReadonlySet<string>,
 ): Signal[] {
 	// A link that genuinely belongs to a Known Organisation ends the matter,
 	// whatever else might be said about it.
@@ -79,8 +89,16 @@ function worstSignalFor(
 		return [];
 	}
 
+	const claimed = organisations.find((organisation) => claimsToBeFrom(prose, organisation));
+
+	// Caught in the act, and therefore ahead of every rule below including the
+	// age exemption: this is not an inference from a list or a date, it is what
+	// the page was found doing.
+	if (claimed !== undefined && harvesting.has(link.host)) {
+		return [credentialHarvest(claimed, link)];
+	}
+
 	if (!established.has(link.host)) {
-		const claimed = organisations.find((organisation) => claimsToBeFrom(prose, organisation));
 		if (claimed) return [linkNotOwnedByClaimedOrg(claimed, link)];
 
 		const imitated = organisations.find((organisation) => imitates(link.host, organisation));
@@ -91,6 +109,30 @@ function worstSignalFor(
 	if (hasThrowawayEnding(link.host)) return [throwawayEnding(link)];
 
 	return [];
+}
+
+/**
+ * The page behind the link was found asking for a password under the claimed
+ * organisation's name.
+ *
+ * Severity `scam`, and the strongest thing this app ever says, because unlike
+ * every other rule here it rests on what the destination *does* rather than on
+ * what a list or a registry says about it. The Reason names the one action that
+ * matters to a Checker who may already have started typing — it tells them the
+ * page wants their password, in those words, rather than "credential harvesting"
+ * or "phishing page".
+ */
+function credentialHarvest(organisation: KnownOrganisation, link: Link): Signal {
+	return {
+		kind: "credential-harvest",
+		severity: "scam",
+		organisation: organisation.name,
+		reason:
+			`This message says it is from ${organisation.name}, and the link opens a page at ` +
+			`${link.host} that asks for your ${organisation.name} password. ` +
+			`It is not ${organisation.name}. If you have already typed your password there, ` +
+			`change it now.`,
+	};
 }
 
 function linkNotOwnedByClaimedOrg(organisation: KnownOrganisation, link: Link): Signal {
@@ -154,8 +196,13 @@ function throwawayEnding(link: Link): Signal {
  * itself — treating that as a claim would make this rule's Reason ("this message
  * says it is from ANZ") untrue, which is what the separate lookalike rule exists
  * to cover.
+ *
+ * Exported because `checkAsync` asks the same question of a *fetched page's*
+ * title — "does this page present itself as ANZ?" — and the two must agree. A
+ * second, looser matcher over there would let a page called "ANZ Internet
+ * Banking" and a message about "Franzia" be judged by different rules.
  */
-function claimsToBeFrom(prose: string, organisation: KnownOrganisation): boolean {
+export function claimsToBeFrom(prose: string, organisation: KnownOrganisation): boolean {
 	return organisation.mentions.some((mention) =>
 		new RegExp(`\\b${escapeRegExp(mention)}\\b`, "i").test(prose),
 	);

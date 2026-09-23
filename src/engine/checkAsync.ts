@@ -1,7 +1,7 @@
 import { LINK_SHORTENERS } from "../data/linkReputation";
 import type { KnownOrganisation, Link, ReportingChannel, Signal, Verdict } from "../domain/types";
-import { proseOf, signalsForLinks } from "./artifactCheck";
-import { extractLinks } from "./links";
+import { claimsToBeFrom, proseOf, signalsForLinks } from "./artifactCheck";
+import { extractLinks, hostBelongsTo } from "./links";
 import type { LinkLookups } from "./lookups";
 import type { NarrativeCheck } from "./narrative";
 import { paymentRailSignals } from "./paymentRails";
@@ -46,11 +46,16 @@ export async function checkAsync(
 	// Asked only of where links really go, after any redirect, because that is
 	// the host the impersonation rules will judge.
 	const effective = resolved.map((resolution) => resolution.effective);
-	const established = await establishedHosts(effective, lookups);
+
+	// Independent questions about the same hosts, so they wait together.
+	const [established, harvesting] = await Promise.all([
+		establishedHosts(effective, lookups),
+		harvestingHosts(effective, prose, organisations, lookups),
+	]);
 
 	return verdictFrom(
 		[
-			...signalsForLinks(effective, prose, organisations, established),
+			...signalsForLinks(effective, prose, organisations, established, harvesting),
 			...resolved.flatMap(hiddenDestinationSignal),
 			...links.filter((link) => dangerous.includes(link.raw)).map(knownDangerousSignal),
 			...paymentRailSignals(message),
@@ -107,6 +112,55 @@ async function establishedHosts(
 	);
 
 	return new Set(ages.filter((host): host is string => host !== null));
+}
+
+/**
+ * The hosts caught serving a sign-in page for somebody they are not.
+ *
+ * Two facts have to line up before this says anything: the page asks for a
+ * password, and the page presents itself as the organisation the Message claimed
+ * to be from. Either alone is ordinary — half the web has a password field, and
+ * any page may mention a bank — and it is the conjunction that is the evidence.
+ * The page's own words are put through `claimsToBeFrom`, the same word-boundary
+ * matcher the Message's prose goes through, so "ANZ Internet Banking" matches and
+ * "Franzia" does not.
+ *
+ * WHICH LINKS GET FETCHED, which is a cost and an exposure question before it is
+ * an accuracy one. Only links in a Message that names a Known Organisation, and
+ * only those not belonging to any Known Organisation's own domains — that is the
+ * same precondition the impersonation rule has, so nothing is loaded that could
+ * not change the answer. A Message with no claimed organisation fetches nothing
+ * at all, which is most of them.
+ *
+ * Every failure resolves to "not harvesting", exactly as the age lookup resolves
+ * to "not established": a refused address, a timeout, a dead host and a page with
+ * no password field all leave the verdict where it was without this lookup.
+ */
+async function harvestingHosts(
+	links: readonly Link[],
+	prose: string,
+	organisations: readonly KnownOrganisation[],
+	lookups: LinkLookups,
+): Promise<ReadonlySet<string>> {
+	const claimed = organisations.find((organisation) => claimsToBeFrom(prose, organisation));
+	if (claimed === undefined) return new Set();
+
+	const worthFetching = links.filter(
+		(link) =>
+			!organisations.some((organisation) => hostBelongsTo(link.host, organisation.domains)),
+	);
+
+	const caught = await Promise.all(
+		worthFetching.map(async (link) => {
+			const page = await orNull(lookups.destination(link));
+
+			return page !== null && page.asksForPassword && claimsToBeFrom(page.presentsAs, claimed)
+				? link.host
+				: null;
+		}),
+	);
+
+	return new Set(caught.filter((host): host is string => host !== null));
 }
 
 /**
