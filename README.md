@@ -139,6 +139,7 @@ not see.
 | `npm run bench:full:write` | The same, and replace `docs/benchmark.md` with the result |
 | `npm run bench:narrative` | The model's half alone, over the held-out corpus |
 | `npm run bench:imc25` | The model's half over 292 real reported scams (the big one) |
+| `npm run bench:uci-ham` | The model's half over 400 genuine texts — the false-alarm rate (`:haiku` for the cheap model) |
 
 Every command that spends credit says roughly what it will cost before the first
 call and caches each answer as it arrives, so any of them can be stopped and

@@ -21,7 +21,9 @@
     "bench:narrative": "tsx bench/narrative.ts",
     "bench:imc25": "tsx bench/narrative-imc25.ts",
     "bench:resume": "tsx bench/narrative-imc25.ts --model claude-haiku-4-5",
-    "bench:narrative:haiku": "tsx bench/narrative.ts --model claude-haiku-4-5"
+    "bench:narrative:haiku": "tsx bench/narrative.ts --model claude-haiku-4-5",
+    "bench:uci-ham": "tsx bench/narrative-imc25.ts --corpus uci-ham",
+    "bench:uci-ham:haiku": "tsx bench/narrative-imc25.ts --corpus uci-ham --model claude-haiku-4-5"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

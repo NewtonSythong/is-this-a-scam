@@ -31,6 +31,10 @@
  *
  * Read the two together, always: `npm run bench:narrative` for the false-alarm
  * side, this for the recall side.
+ *
+ * `--corpus uci-ham` runs the same harness over `bench/uci-ham.csv` instead: 400
+ * genuine messages, where anything firing is a false alarm. See
+ * `bench/build-uci-ham.mjs` for what that corpus can and cannot say.
  */
 
 import { createHash } from "node:crypto";
@@ -70,7 +74,10 @@ function parseCsv(csv: string): string[][] {
 	return out;
 }
 
-const rows = parseCsv(readFileSync("bench/imc25.csv", "utf8")).slice(1).filter((r) => r.length >= 5);
+const corpusArg = process.argv.indexOf("--corpus");
+const CORPUS = corpusArg === -1 ? "imc25" : (process.argv[corpusArg + 1] ?? "imc25");
+
+const rows = parseCsv(readFileSync(`bench/${CORPUS}.csv`, "utf8")).slice(1).filter((r) => r.length >= 5);
 const items: Item[] = rows.map((r) => ({
 	id: r[0] ?? "",
 	tier: r[1] ?? "",
@@ -95,9 +102,9 @@ const narrative = anthropicNarrativeCheck(new Anthropic(), MODEL);
  * as it was before the change, and the run would report a mixture of two
  * engines as though it were one reading.
  *
- * Delete `bench/.imc25-cache.jsonl` to force a clean run.
+ * Delete `bench/.<corpus>-cache.jsonl` to force a clean run.
  */
-const CACHE = "bench/.imc25-cache.jsonl";
+const CACHE = `bench/.${CORPUS}-cache.jsonl`;
 const fingerprint = createHash("sha256").update(`${MODEL}\u0000${systemPrompt()}`).digest("hex").slice(0, 16);
 const keyFor = (message: string) =>
 	createHash("sha256").update(`${fingerprint}\u0000${message}`).digest("hex").slice(0, 24);
@@ -241,6 +248,27 @@ if (run.fatal !== null) {
 const answered = results.filter((r) => !r.failed);
 const seen = answered.filter((r) => r.fired.length > 0);
 const pct = (n: number, d: number) => (d === 0 ? "  n/a" : `${((n / d) * 100).toFixed(1)}%`);
+
+// A corpus of genuine messages turns every firing into a false alarm, so the
+// recall report below would be reporting the wrong thing with the right maths.
+if (items.every((i) => i.tier === "ham")) {
+	const failed = results.length - answered.length;
+	console.log(`\nNarrative Check alone, against genuine messages — bench/${CORPUS}.csv\n`);
+	const patterns = new Map<string, number>();
+	for (const r of seen) for (const f of new Set(r.fired)) patterns.set(f, (patterns.get(f) ?? 0) + 1);
+	console.log("PATTERNS THAT FIRED (each one a false alarm)");
+	for (const [p, n] of [...patterns].sort((a, b) => b[1] - a[1])) console.log(`  ${p.padEnd(32)} ${n}`);
+	console.log(`\nFALSE ALARMS: ${seen.length}/${answered.length}  (${pct(seen.length, answered.length)})`);
+	if (seen.length === 0) {
+		// The rule of three: zero events in n trials puts the 95% upper bound near 3/n.
+		console.log(`              none observed; 95% upper bound about ${pct(3, answered.length)}`);
+	}
+	if (failed > 0) console.log(`              ${failed} call(s) failed and are excluded`);
+	console.log(`\nIds that fired: ${seen.map((r) => r.item.id).join(" ") || "(none)"}`);
+	console.log("\nThese are personal texts, not New Zealand bank or courier mail. A clean reading");
+	console.log("here says nothing about how the engine treats a genuine ANZ notification.");
+	process.exit(0);
+}
 
 const by = (key: (r: (typeof results)[number]) => string) => {
 	const m = new Map<string, { seen: number; total: number }>();
