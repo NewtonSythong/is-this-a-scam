@@ -38,6 +38,7 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 
 import Anthropic from "@anthropic-ai/sdk";
 import { NARRATIVE_MODEL, anthropicNarrativeCheck, systemPrompt } from "../src/narrative/anthropic";
+import { type Item, loadCorpus, splitFromArgv, splitOf } from "./corpus-imc25";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
@@ -45,38 +46,14 @@ if (!process.env.ANTHROPIC_API_KEY) {
 	throw new Error("bench/narrative-imc25.ts needs ANTHROPIC_API_KEY — it is the thing being measured");
 }
 
-interface Item {
-	id: string;
-	tier: string;
-	scamType: string;
-	message: string;
-}
-
-function parseCsv(csv: string): string[][] {
-	const out: string[][] = [];
-	let row: string[] = [], field = "", quoted = false;
-	for (let i = 0; i < csv.length; i++) {
-		const c = csv[i];
-		if (quoted) {
-			if (c === '"' && csv[i + 1] === '"') { field += '"'; i++; }
-			else if (c === '"') quoted = false;
-			else field += c;
-		} else if (c === '"') quoted = true;
-		else if (c === ",") { row.push(field); field = ""; }
-		else if (c === "\n") { row.push(field); out.push(row); row = []; field = ""; }
-		else if (c !== "\r") field += c;
-	}
-	if (field !== "" || row.length > 0) { row.push(field); out.push(row); }
-	return out;
-}
-
-const rows = parseCsv(readFileSync("bench/imc25.csv", "utf8")).slice(1).filter((r) => r.length >= 5);
-const items: Item[] = rows.map((r) => ({
-	id: r[0] ?? "",
-	tier: r[1] ?? "",
-	scamType: r[2] ?? "",
-	message: r[4] ?? "",
-}));
+/**
+ * The corpus, its split, and why the split exists, all live in
+ * `bench/corpus-imc25.ts` so that every runner means the same thing by "the dev
+ * half". Read that file before changing anything about which messages are where.
+ */
+const all = loadCorpus();
+const SPLIT = splitFromArgv(process.argv);
+const items = splitOf(all, SPLIT);
 
 /** `--model claude-haiku-4-5` to price a run differently. See the note below. */
 const modelArg = process.argv.indexOf("--model");
@@ -132,7 +109,7 @@ const RATES: Record<string, { input: number; output: number }> = {
 	const remaining = items.filter((i) => !cached.has(keyFor(i.message))).length;
 	const rate = MODEL === undefined ? undefined : RATES[MODEL];
 	console.log("");
-	console.log(`Corpus     ${items.length} messages`);
+	console.log(`Corpus     ${items.length} messages${SPLIT === "all" ? "  (both halves — a reading here mixes a spent half with a held-out one)" : `  (${SPLIT} half of ${all.length})`}`);
 	console.log(`Model      ${MODEL}${MODEL === NARRATIVE_MODEL ? "  (the model the app runs on)" : "  (NOT the model the app runs on)"}`);
 	console.log(`Cached     ${items.length - remaining} already answered and paid for`);
 	console.log(`To buy     ${remaining}`);
@@ -296,6 +273,17 @@ console.log("legitimate half is the only false-alarm evidence this project has."
 const missed = answered.filter((r) => r.fired.length === 0);
 console.log(`\n${missed.length} message(s) the model's half found nothing in. Their ids:`);
 console.log(missed.map((r) => r.item.id).join(" ") || "  (none)");
-console.log("\nReading those messages in order to fix them spends them, exactly as it spent");
-console.log("bench/corpus.ts. Record any you study, and treat their later passing as proof");
-console.log("of nothing.");
+
+// The ids alone are useless for writing a pattern and harmless to print. The
+// text is the opposite of both, so it comes out for the dev half only — the half
+// already understood to be spent. Printing it for `test` or `all` would spend
+// the held-out half in the act of looking at it, which is the failure this
+// split exists to prevent, so the harness refuses rather than trusting whoever
+// is reading to look away.
+if (SPLIT === "dev") {
+	console.log("\nThe dev half is the half you may read. Here are its misses in full:\n");
+	for (const r of missed) console.log(`  ${r.item.id}  [${r.item.scamType}]\n    ${r.item.message.replace(/\n/g, "\n    ")}\n`);
+} else {
+	console.log("\nTheir text is deliberately not printed. Run `--split dev` to read misses you");
+	console.log("are allowed to read; reading these would spend the half that measures the app.");
+}

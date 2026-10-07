@@ -447,3 +447,544 @@ array, two corpus items missing their required `source` field, and three unsafe
 index accesses. The numbers in the entries above stand — they came from
 `bench/imc25.csv`, which is read at runtime and was unaffected — but the claim
 that those two negatives were guarding anything was wrong until now.
+
+
+## The corpus is cut in half, so that improving the engine stops destroying it
+
+**Added 2026-09-18.** Everything above this line describes the same failure
+happening twice. `bench/corpus.ts` was held out, somebody read its misses to fix
+them, and it now passes by construction. `bench/imc25.csv` replaced it, all 292
+messages held out — and the run's own closing words were *"reading those messages
+in order to fix them spends them, exactly as it spent bench/corpus.ts."* The
+project had built itself a second instrument and scheduled it for the same death,
+because there was no way to improve the engine except by reading the misses, and
+no way to read the misses without spending everything.
+
+`bench/narrative-imc25.ts` now takes `--split dev` or `--split test`.
+
+- **`dev`, 146 messages — the half you may read.** Study its misses, write
+  patterns from them, iterate as often as you like. Its score is not this
+  project's number and never will be; it is understood to be spent from the day
+  it was created.
+- **`test`, 146 messages — never read, only scored.** `--split test` prints the
+  ids of the messages that were missed and refuses to print their text, so the
+  half that measures the engine cannot be spent by the act of looking at a
+  report. That refusal is in the harness rather than in a rule, because a rule
+  addressed to a person who is mid-debugging and wants to know *why* is not a
+  guard.
+
+The cut is the file's own order, alternated. Rows are grouped by scam type in
+blocks of forty, so every other row splits each stratum exactly in half: 20 and
+20 of each type, 6 and 6 of hey mum/dad. No seed to record, no shuffle to
+reproduce, and the same message is in the same half forever.
+
+### The two halves are not equally hard, and the gap is the noise floor
+
+Scoring the three runs already paid for — the cache is keyed on the model and the
+whole system prompt, so re-scoring a subset of a completed run costs nothing —
+gives the baselines below, all from the catalogue as it stood on 2026-09-10.
+
+| | dev half | test half | whole corpus |
+| :--- | :--- | :--- | :--- |
+| Claude Opus 5 | 91/146 — 62.3% | 84/146 — 57.5% | 175/292 — 59.9% |
+| Claude Haiku 4.5 | 102/146 — 69.9% | 91/146 — 62.3% | 193/292 — 66.1% |
+
+**The dev half is about five points easier on Opus and seven on Haiku.** That is
+an accident of the cut and it is permanent, so a dev score must never be compared
+to a test score — only dev to dev, and test to test. It is recorded here because
+the temptation to read "72.6% on dev" against "57.5% on test" as an improvement
+will be strong, and it would be wrong by about six points before anything had
+changed at all.
+
+## What the dev half showed when somebody finally read it
+
+**Added 2026-09-18.** The 55 messages the app's own model found nothing in, on the
+half that exists to be read. Three things came out of it, and only one of them is
+a percentage.
+
+### The catalogue had no pattern for being offered work
+
+Three dev misses offer money to be *earned* rather than money to be *sent*:
+Rs.9,800 a day, MYR 200–300 a day for liking videos, a flat wage to somebody
+"selected". `investment-promise` covers money the reader is asked to put in and
+nothing covered this. `job-or-earnings-offer` was added, written from the FTC's
+[April 2026 alert](https://consumer.ftc.gov/consumer-alerts/2026/04/job-offer-text-probably-scam)
+and its [task-scam guidance](https://consumer.ftc.gov/consumer-alerts/2025/08/how-spot-avoid-task-scams)
+rather than from the three messages, on the flat rule those give: real employers
+do not approach strangers by text. `unexpected-money` was widened at the same
+time to cover a reward offered for finishing a survey or entering a giveaway,
+which two more dev misses used.
+
+### A pattern was written, measured, and withdrawn — for one false alarm
+
+Wrong number is still the worst category in the corpus. Reading its misses showed
+why in a way the score could not: `wrong-number-opener` describes somebody who
+plainly does not know the reader, and the misses are the opposite posture.
+*"Honey I hope you don't forget our promise to go to church."* *"Hi baby, here
+are the photos I wanted to share with you."* *"It's been a lil bit since u
+called, do u want me yet?"* These are strangers asserting a relationship, not
+confessing a mistake, and the existing description excluded them by its own
+words.
+
+`false-familiarity` was written for that shape and it worked: 6 dev misses, and
+wrong number went from 8/20 to 14/20 on Haiku. It also fired on
+`friend-genuine-after-a-gap` — *"Hey stranger! It's been far too long, I keep
+meaning to message. Are you still up for that coffee we talked about?"* — a
+hard negative written for it **before** the run, precisely because that is the
+ordinary message sitting nearest to it.
+
+**It was withdrawn rather than narrowed.** Narrowing a pattern until it stops
+firing on the message that caught it is how `bench/corpus.ts` was spent, and a
+narrowed version passing the same probe afterwards would be evidence of nothing.
+Three things are worth recording about this:
+
+- **It is the first false alarm this project has ever measured.** Every previous
+  run reported 0/10, on both models, and that was starting to read as a property
+  of the engine. It was partly a property of the corpus.
+- **The negative existed before the run, and that is the whole reason this
+  worked.** Had it been added afterwards, the pattern would have shipped, and the
+  message that exposes it would have been written later — by a user, about their
+  own friend.
+- **The item stays in the corpus with the story attached.** Anyone who writes
+  this pattern again will meet the same message, and will need it to stay quiet
+  on a version nobody tuned against it.
+
+### The biggest cluster of misses is a deliberate decision, not a gap
+
+Roughly a dozen dev misses are one shape: *something is waiting for you, follow
+this link*. A policy update to read, an MMS to collect, a bill to view, a
+voicemail to sign in for, a Covid pass to apply for. No threat, no deadline, no
+money, nothing false on its face.
+
+The catalogue could catch all of them tomorrow, and it must not. That shape is
+also what a genuine notification looks like, which is why `verify-account-pretext`
+carries the explicit clause *"a message saying only that a document, bill or
+statement is ready and to log in to a named service, claiming nothing is wrong,
+is NOT this pattern"* — written to keep `ird-genuine-assessment` quiet. These
+misses are the price of that clause, they were paid on purpose, and a future
+reader looking at the miss list should know that before trying to close them.
+
+A second cluster is unwinnable for a different reason. Six dev misses are a
+stranger asking about something the reader is supposedly selling — a house on
+Facebook, an item, a property viewing. Genuine buyers send that message
+constantly, and unlike `wrong-number-opener`, being wrong is **not** cheap here:
+"do not reply" costs a real seller a real sale. Until the app can know whether
+the reader has a listing, this one stays open.
+
+## The first false alarm, and it was not the new pattern
+
+**Added 2026-09-18.** `false-familiarity` was withdrawn because it alarmed on
+`friend-genuine-after-a-gap`. The gate was re-run with it gone, on the model the
+app runs on, and the same message alarmed again:
+
+```
+ALARM friend-genuine-after-a-gap
+      wrong-number-opener
+```
+
+**The false alarm was already in the shipped engine.** `wrong-number-opener` has
+been in the catalogue since 2026-09-09 and every run since has reported 0/10 on
+both models. That figure was a property of the corpus, not of the engine: there
+was no message in it of the one shape that breaks this pattern, so the pattern
+could not be seen to break. The entry above, warning that ten legitimate messages
+cannot detect a rate this app would consider unacceptable, turns out to have been
+understating it — the corpus could not detect a fault that was *already there*.
+
+### It is one word
+
+Four variants were put to `claude-opus-5` directly, which cost about five cents
+and settled it:
+
+| Message | |
+| :--- | :--- |
+| "Hey **stranger**! It's been far too long… Are you still up for that coffee we talked about?" | **ALARM** |
+| "Long time no see! I keep meaning to message. Are you still up for that coffee we talked about?" | quiet |
+| "Hi, it's been ages! Are you still up for that coffee we talked about?" | quiet |
+| "Hey **stranger**! It's been far too long. Still up for that coffee? **— Anna**" | **ALARM** |
+
+The trigger is the literal token *"stranger"*, and it survives the sender signing
+their name — which the pattern's own description says rules it out ("a message
+from somebody who identifies themselves and refers to actual shared business is
+NOT this pattern"). A model reading a catalogue entry about strangers latches
+onto the word, and the exclusion clause loses.
+
+*"Hey stranger"* is an ordinary English greeting between two people who know each
+other perfectly well and have not spoken in a while. It is not rare, and it is
+not confined to the young. An app that tells somebody their friend's catch-up
+text is probably a scam has done the specific harm this project says it fears
+most, and it would have done it on a pattern that measured clean for nine days.
+
+### Why this is not a licence to relax
+
+The lesson is not "the benchmark was wrong". It is that **a false-alarm corpus
+only measures the shapes somebody thought to write down**, and recall corpora do
+not have this problem — the 292 real messages in `bench/imc25.csv` were collected
+by people who were actually targeted, so they contain shapes nobody here would
+have invented. The legitimate half has no such source. Every one of its 13
+messages was written by us, which means its coverage is exactly our imagination
+and its zero was our imagination too.
+
+That is the same bottleneck named twice already on this page, arriving for the
+third time and now with a demonstrated cost attached. Fifty to a hundred genuine
+New Zealand messages of the awkward kind would have caught this in September
+rather than in a probe written for something else.
+
+## The first reading off the held-out half: 57.5% to 61.6%
+
+**Added 2026-09-18.** `claude-opus-5`, the model the app runs on, over the 146
+messages of the `test` half. All answered, no failed calls. Both columns are the
+same messages and the same model, so unlike every comparison earlier on this
+page, only one thing differs between them: the catalogue.
+
+| Scam type | Before | **After** |
+| :--- | :--- | :--- |
+| hey mum/dad | 6/6 — 100% | **6/6 — 100%** |
+| government | 16/20 — 80.0% | **17/20 — 85.0%** |
+| spam | 11/20 — 55.0% | **15/20 — 75.0%** |
+| delivery | 13/20 — 65.0% | **14/20 — 70.0%** |
+| telecom | 14/20 — 70.0% | **14/20 — 70.0%** |
+| others | 9/20 — 45.0% | **10/20 — 50.0%** |
+| banking | 9/20 — 45.0% | **9/20 — 45.0%** |
+| wrong number | 6/20 — 30.0% | **5/20 — 25.0%** |
+| **Overall** | **84/146 — 57.5%** | **90/146 — 61.6%** |
+
+**Six messages, and four of them are the spam stratum**, which is where the job
+offers and the survey rewards live — the two shapes the change was aimed at.
+`job-or-earnings-offer` fired 3 times, on messages it was not written from. That
+is what a well-scoped change looks like: the stratum it targeted moved, and the
+rest sat still or moved by one, which at n=20 is noise.
+
+This is the first reading in this project's history where the thing measured was
+not also the thing read. The patterns were written from the dev half and from the
+FTC's published guidance; these 146 messages have never been printed, and the
+harness will not print them.
+
+### Two honest qualifications
+
+**Wrong number went down by one, and that is not a result.** One message in a
+20-item stratum is inside the run-to-run variation this page has recorded twice
+before. Nothing was removed from the catalogue that could explain it.
+
+**This number was taken before the `wrong-number-opener` fix.** The false alarm
+described in the entry above was found while this run was already in flight, and
+editing the catalogue mid-run would have orphaned the answers already bought and
+produced a figure describing a prompt that no longer existed. So 61.6% is the
+score of the catalogue as it stood at 18:18 on 2026-09-18: the two new patterns
+in, `false-familiarity` out, and the "hey stranger" exclusion **not yet added**.
+
+Adding that exclusion could plausibly cost recall in the wrong-number stratum,
+because warm familiarity is also how a genuine scam opener reads. Whether it
+does is unmeasured, and the only way to know is another 146-message run at about
+$2.19. Until somebody buys it, the honest statement is: **61.6% on the held-out
+half, for a catalogue one clause away from the one that ships.**
+
+### The fix, and what it is still not known to cost
+
+The exclusion added to `wrong-number-opener` names the fact rather than the
+probe: *a warm greeting between people who already know each other and have not
+spoken in a while — "hey stranger", "long time no see", "it's been ages" — is not
+this pattern; in that greeting the word "stranger" means the opposite of what it
+says.* That is a claim about English, checkable by anyone, and it is the same
+class of justification as `nzp.st` being NZ Post's own shortener: a fact about
+the world that happens to also move a score.
+
+The gate was re-run on `claude-opus-5` after it:
+
+| | Before the fix | After |
+| :--- | :--- | :--- |
+| Scams the model's half saw something in | 13/13 | **13/13** |
+| False alarms on legitimate messages | 1/13 | **0/13** |
+
+So the clause costs nothing on the thirteen scams in that corpus. **What it may
+cost on the 292 is unmeasured.** Warm familiarity is also how a real wrong-number
+opener reads, and that stratum is already the weakest in the benchmark, so the
+exclusion could plausibly suppress true positives there. One more 146-message run
+on Opus, about $2.19, would settle it. Nobody should quote a post-fix figure until
+somebody has.
+
+## The clause was free: 61.6% to 61.0% on the held-out half
+
+**Added 2026-09-21.** `claude-opus-5`, the same 146 `test` messages, all
+answered, no failed calls. The entry above ended by saying nobody should quote a
+post-fix figure until somebody bought the run. Somebody bought it. The two
+columns differ by exactly one thing: the "hey stranger" exclusion added to
+`wrong-number-opener`.
+
+| Scam type | Before the clause | **After** |
+| :--- | :--- | :--- |
+| hey mum/dad | 6/6 — 100% | **6/6 — 100%** |
+| government | 17/20 — 85.0% | **17/20 — 85.0%** |
+| spam | 15/20 — 75.0% | **14/20 — 70.0%** |
+| delivery | 14/20 — 70.0% | **14/20 — 70.0%** |
+| telecom | 14/20 — 70.0% | **14/20 — 70.0%** |
+| others | 10/20 — 50.0% | **11/20 — 55.0%** |
+| banking | 9/20 — 45.0% | **8/20 — 40.0%** |
+| wrong number | 5/20 — 25.0% | **5/20 — 25.0%** |
+| **Overall** | **90/146 — 61.6%** | **89/146 — 61.0%** |
+
+**The stratum the clause was feared to damage did not move.** The worry was
+specific and reasonable: warm familiarity is also how a genuine scam opener
+reads, so telling the model that "hey stranger" between friends is not this
+pattern could plausibly have suppressed true positives in the weakest category in
+the corpus. Worst case was put at 4.1 points. It cost nothing there — wrong
+number is 5/20 either way, and `wrong-number-opener` still fires on five test
+messages.
+
+Overall moved by one message in 146. This page has twice recorded a single
+message in a stratum as inside run-to-run variation, and the same applies to a
+single message overall: it is not evidence that the clause cost recall, and it is
+not evidence that it was free either. What can be said is that **no effect large
+enough to see was found**, on the only comparison this project has ever run where
+the model, the messages and everything but one clause are held fixed.
+
+So the number to quote is now **61.0% on the held-out half, for the catalogue
+that actually ships** — which is the first time this project has had a figure
+with no "one clause away" attached to it.
+
+### What this cost, and the mistake worth not repeating
+
+$0.82, for 55 messages. The other 91 came from `bench/.imc25-cache.jsonl` free,
+because the run that started on 2026-09-18 wrote every answer to disk as it
+arrived and then refused to report a partial score. That refusal is worth
+keeping: the run stopped on a spend limit at message 91, and a harness that
+printed 57/91 as a percentage would have reported a catalogue regression that did
+not exist.
+
+The stop itself was not Anthropic's tier cap. It was a **self-imposed** monthly
+spend limit of $15 on the org, which reads as HTTP 400 `invalid_request_error`
+beginning *"You have reached your specified API usage limits"* and clears the
+moment the limit is raised, against a tier cap's HTTP 429 `rate_limit_error`
+which only support can clear. Three days were spent treating a two-click setting
+as a wait until 1 October. Settings → Billing → Spend limits → Adjust limit.
+
+### The false-alarm half is still the thing blocking everything
+
+Unchanged and now said four times on this page: recall is 61.0% and the
+false-alarm rate rests on 13 messages we wrote ourselves. The "hey stranger"
+fault above proves what that is worth — a corpus of our own imagination measured
+0/10 for nine days on an engine that was already wrong. Fifty to a hundred
+genuine New Zealand messages of the awkward kind is still the single highest-value
+thing anyone could add to this project.
+
+## The dev half's Opus baseline was never bought
+
+**Added 2026-09-21.** Written down because it was assumed otherwise, and the
+assumption was costing a plan a factor of three hundred.
+
+At the current catalogue's fingerprint (`036de0bd9e79d2c9`),
+`bench/.imc25-cache.jsonl` holds **146/146 answers for `test` and 0/146 for
+`dev`**. Every run paid for since the "hey stranger" clause went in went to the
+held-out half, which is the right place to spend money and the reason the 61.0%
+figure exists — but it means there is no same-catalogue Opus reading on `dev` to
+compare anything against. The published dev figure, 91/146 — 62.3%, is one
+catalogue behind.
+
+Anything that wants to be compared against Opus on the `dev` half therefore costs
+an Opus dev run, about $2.19, on top of its own. That is now the first paragraph
+of [`jev-spike.md`](./jev-spike.md), which is the brief for the next thing this
+project was going to do and had mispriced at a cent.
+
+## The shipping model, on the twenty-eight: 0/13 on ours, 5/15 on the real ones
+
+**Added 2026-09-21, later the same day.** `claude-opus-5` — the model the app
+actually runs — over all 41 items of `bench/corpus.ts` via `npm run
+bench:narrative`. All answered, no failed calls. This is the run the jev-spike
+page named as the open question, and it cost $0.62.
+
+| | Result |
+| :-- | :-- |
+| Scams the model's half saw something in | **13/13** |
+| False alarms on legitimate messages | **5/28** |
+
+Five is not twenty-one, so Opus is nothing like Jev. But the five are the entire
+finding, because of **where** they fall:
+
+| Legitimate half | False alarms |
+| :-- | :-- |
+| The 13 messages we wrote ourselves | **0/13** — every one quiet |
+| The 15 captured from real inboxes | **5/15** — 33.3% |
+
+**Every false alarm the shipping engine has is on a message we did not write.**
+The half of the corpus this project relied on for nine months of "0/10, both
+models" is silent on an engine that alarms at a third of genuine institutional
+mail. Fisher's exact test on that split gives **p = 0.031 one-sided, 0.044
+two-sided** — the first result in this repository with a p-value attached, and it
+is significant despite n=28.
+
+(The Wilson intervals overlap — 0/13 is [0, 22.8]% and 5/15 is [15.2, 58.3]% —
+which is the expected and well-known failure of reading overlap as
+non-significance. Fisher is the right test for a 2×2 this small; the intervals
+are quoted because the paper will need them, not because they contradict it.)
+
+### The five
+
+```
+ALARM anz-genuine-job-referral          job-or-earnings-offer
+ALARM googleplay-genuine-points-expiry  benefit-expiry-pretext
+ALARM spotify-genuine-student-reverify  benefit-expiry-pretext, verify-account-pretext
+ALARM playstation-genuine-payment-problem   verify-account-pretext, benefit-expiry-pretext
+ALARM spotify-genuine-payment-reminder      verify-account-pretext, benefit-expiry-pretext
+```
+
+Three patterns, and they are **the same three the Jev run implicated**:
+`benefit-expiry-pretext`, `verify-account-pretext`, `job-or-earnings-offer`. The
+difference between the two models is degree, not kind. Jev read those
+descriptions loosely enough to fire on a courier and a two-factor code; Opus
+reads them narrowly enough to stay quiet on those, and still fires on every
+subscription-billing email in the corpus.
+
+So the catalogue finding survives the model change, which is what makes it a
+finding rather than an anecdote about a cheap model. **`benefit-expiry-pretext`
+cannot distinguish a loyalty-points scam from a loyalty-points marketing email,
+and `verify-account-pretext` cannot distinguish "your payment failed, update your
+card" sent by a phisher from the same sentence sent by Spotify.** On the evidence
+here neither distinction exists in the message text at all, which would mean the
+patterns are asking a question the words cannot answer.
+
+### This is a live defect, not only a measurement
+
+The app, as deployed, will tell somebody that a genuine Spotify payment reminder,
+a genuine PlayStation billing notice and a genuine Google Play points expiry are
+worth worrying about. That is the specific harm ADR 0001 and every page in this
+directory says the project fears most, and it has been shipping.
+
+**It is not being fixed in this entry, deliberately.** Narrowing three patterns
+while looking at the five messages that caught them is exactly how
+`bench/corpus.ts` was spent the first time, and `false-familiarity` was withdrawn
+rather than narrowed on 2026-09-18 for this reason. The five stay in the corpus
+with the story attached. Any fix must be written from published descriptions of
+the pretexts — as `wrong-number-opener` and `job-or-earnings-offer` were — and
+measured on messages nobody has read.
+
+### What this settles, and what it does not
+
+**Settled:** the nine days of "0/10 false alarms on both models" was a property of
+the corpus, not the engine, and now there is a controlled demonstration of it
+rather than a single anecdote about the word "stranger". Fifteen real messages
+were enough to take a measured zero to a measured third.
+
+**Not settled:** 5/15 is not a false-alarm rate. Its 95% interval runs from 15%
+to 58%, which is the difference between an irritation and an unusable app. The
+argument for the other thirty-five genuine messages is now arithmetic rather than
+rhetorical.
+
+## The same model on the sixty-eight: 0/13 on ours, 12/55 on the real ones
+
+**Added 2026-09-22.** The re-run the section above asked for, once the collection
+closed. `claude-opus-5` again — the same model, because a measurement moved to a
+cheaper one measures a different system — over all 83 items via `npm run
+bench:narrative`. All answered, no failed calls, **$1.26**. The analysis is
+`npm run bench:f2`, which is free, reads the benchmark's cache, and asserts its
+own arithmetic against the four values published above before it reports.
+
+| | Result |
+| :-- | :-- |
+| Scams the model's half saw something in | **14/15** |
+| False alarms on legitimate messages | **12/68** |
+
+| Legitimate half | False alarms | 95% CI (Wilson) |
+| :-- | :-- | :-- |
+| The 13 messages we wrote ourselves | **0/13** — every one still quiet | [0.0, 22.8] |
+| The 55 captured from real inboxes | **12/55** — 21.8% | [12.9, 34.4] |
+
+The direction held under a near-fourfold increase in the collected arm, and all
+five original alarms reappear among the twelve. The written half stayed at a
+clean zero with forty more chances to fail.
+
+### And the p-value went up, which is the part worth reading twice
+
+**p = 0.060 one-sided, 0.104 two-sided** — worse than the 0.031 the smaller
+corpus gave, on data that supports the claim more strongly. That is not a
+paradox and it is not a reason to quote the old number.
+
+Fisher's floor is set by the smaller arm. Holding the written negatives at 13
+while every alarm lands on the collected side produces **the most extreme table
+these margins allow**, and its one-sided p is 0.060. There was no result
+available at n_written = 13 that would have cleared 0.05. Enlarging the
+collection moved mass into the arm that was never the constraint, and in doing so
+made the test's floor visible — which is worth more than the earlier number was,
+because the earlier number cleared 0.05 partly by having only fifteen real
+messages to be extreme about.
+
+**The minimum detectable effect, stated:** at the observed 21.8% collected rate,
+**14 quiet written negatives** clear p < 0.05. Thirteen cannot. The cheapest
+significant result this paper has available is *one more message we write
+ourselves* — and it has to be written to the same standard as the other twelve,
+and written **before** anyone looks at which patterns fired, or it is a message
+chosen to pass rather than a negative.
+
+## The blind-authorship run — 2026-09-22, ~$0.05, and it went the other way
+
+That minimum-detectable-effect note was acted on, and the result is now the more
+interesting half of F2.
+
+**Three** written negatives were added rather than one, and **the batch size was
+pre-registered before the messages existed**, precisely because 14 is the number
+that clears the threshold and stopping at 14 would have been a stopping rule
+chosen for its p-value. They were written under a condition none of the first
+thirteen met: the author held `bench/corpus.ts` and `paper/SAMPLING-PROTOCOL.md`
+and was barred from `src/`, `paper/PLAN.md`, `paper/ABSTRACT.md`, `bench/f2.ts`
+and the git log. It could not name one detection pattern.
+
+**One of the three alarmed.** `power-company-genuine-overdue-notice` — a genuine
+utility disconnection notice with a real debt, a real deadline and the company's
+own domain — fires `manufactured-urgency`, the same pattern that accounts for
+five of the twelve collected alarms.
+
+```
+written   power-company-genuine-overdue-notice   manufactured-urgency
+```
+
+| Written negatives, by what the author knew | False alarms |
+| :-- | :-- |
+| Written beside the pattern they guard | 0 / 13 |
+| Written blind                          | 1 / 3 |
+| Collected                              | 12 / 55 |
+
+**n = 3, and that has to be said in the same breath.** What it buys is not power,
+it is a mechanism: the written/collected gap may track *what the author knew
+about the detector* rather than whether the text was written. Each of the thirteen
+was composed beside the pattern it probes — the one position from which a negative
+gets steered clear of the trap without anyone intending to. Remove that knowledge
+and the first written negative behaves like a collected one.
+
+**The cost: p = 0.1458 one-sided (0.2718 two-sided) at 1/16 against 12/55**, up
+from 0.060. Sixteen *quiet* written negatives would have given 0.0343, so the
+single alarm is the entire difference. **No further negatives are to be written
+for this table.** Doing so now, with the alarms visible, is the fault this paper
+exists to name.
+
+`manufactured-urgency` is **not** to be narrowed in response to this. Same rule
+as everything below.
+
+### The twelve
+
+```
+ALARM anz-genuine-job-referral              job-or-earnings-offer
+ALARM googleplay-genuine-points-expiry      benefit-expiry-pretext
+ALARM spotify-genuine-student-reverify      verify-account-pretext, benefit-expiry-pretext
+ALARM playstation-genuine-payment-problem   verify-account-pretext, benefit-expiry-pretext
+ALARM spotify-genuine-payment-reminder      verify-account-pretext, benefit-expiry-pretext
+ALARM orcid-genuine-verify-email            verify-account-pretext
+ALARM seek-genuine-profile-strength         verify-account-pretext
+ALARM coronet-peak-genuine-survey           unexpected-money, manufactured-urgency
+ALARM zoom-genuine-new-year-offer           manufactured-urgency
+ALARM zoom-genuine-cyber-monday             manufactured-urgency
+ALARM zoom-genuine-black-friday             manufactured-urgency
+ALARM gradconnection-genuine-commbank-deadline  manufactured-urgency
+```
+
+Five patterns now, not three. The two that the enlarged corpus added are the
+interesting ones. **`manufactured-urgency` accounts for five of the twelve, and
+every one is ordinary marketing** — three Zoom seasonal offers, a New Year offer,
+and a graduate-programme application deadline. A discount that ends on Monday and
+a scam that ends on Monday are the same sentence. **`verify-account-pretext` now
+also fires on an ORCID address-verification mail and a SEEK profile nudge**,
+neither of which is billing, which widens the earlier reading: it is not that the
+pattern cannot separate a phisher from Spotify, it is that it fires on being
+asked to click through to your own account at all.
+
+**These twelve are not to be fixed here.** Same rule as the five and the offline
+baseline's six: narrowing a check while looking at the messages that caught it
+retires them as evidence. Fix from published descriptions, measure on messages
+nobody has read.

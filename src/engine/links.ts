@@ -12,10 +12,18 @@ import type { Link } from "../domain/types";
  * a Reason about a link that does not exist is exactly the invented evidence
  * ADR 0003 forbids.
  *
+ * The trailing lookahead keeps out the *other* half of an address, which the
+ * lookbehind cannot reach. In "Firstname.Lastname2@example.com" the local part alone
+ * matches — "Firstname." then "Lastname", because the digit stops the final label —
+ * and the app told a Checker their message linked to "firstname.lastname". Refusing a
+ * match that is still inside a local part is the fix: anything followed by more
+ * address characters and then an "@" is somebody's email, not a link.
+ *
  * Requiring the final label to be letters-only is what keeps "3.30pm" and
  * "$1,250.00" from reading as hosts.
  */
-const LINK_PATTERN = /(?<![@\w.-])(?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:\/[^\s]*)?/gi;
+const LINK_PATTERN =
+	/(?<![@\w.-])(?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:\/[^\s]*)?(?![\w.-]*@)/gi;
 
 /** Punctuation that ends a sentence rather than an address. */
 const TRAILING_PUNCTUATION = /[.,;:!?)\]}'"]+$/;

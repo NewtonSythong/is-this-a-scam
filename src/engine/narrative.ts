@@ -69,7 +69,11 @@ export const NARRATIVE_PATTERNS: readonly NarrativePattern[] = [
 		id: "unexpected-money",
 		severity: "warning",
 		description:
-			"Offers money the reader did not expect — a prize, a refund, compensation, or an inheritance.",
+			"Offers money the reader did not expect — a prize, a refund, compensation, or an " +
+			"inheritance — or offers a reward, voucher, store credit or discount for doing " +
+			"something small first, such as finishing a survey, entering a giveaway or claiming " +
+			"an offer. A receipt, statement or confirmation of money the reader has actually " +
+			"moved themselves is NOT this pattern.",
 		reason:
 			"This message offers you money you were not expecting. Refunds and prizes that arrive " +
 			"out of the blue are one of the most common ways people are caught.",
@@ -81,6 +85,45 @@ export const NARRATIVE_PATTERNS: readonly NarrativePattern[] = [
 		reason:
 			"This message promises a return on your money that is too good to be true. No genuine " +
 			"investment is guaranteed.",
+	},
+	// Written 2026-09-18 from misses in the *dev* half of `bench/imc25.csv` —
+	// three of them, offering Rs.9,800 a day, MYR 200-300 a day for liking
+	// videos, and a flat 16,000 a month to somebody "selected". See the note at
+	// the head of `bench/narrative-imc25.ts` on what that half is for: those
+	// three messages are spent and their later passing proves nothing. The test
+	// half was not read, and is where this pattern's score comes from.
+	//
+	// The catalogue had `investment-promise` for money the reader is asked to
+	// put in, and nothing at all for money they are offered to earn. That is a
+	// different fraud with a different victim: a task scam pays a small amount
+	// first to establish that the work is real, and only then asks for a deposit
+	// to unlock the rest.
+	//
+	// Sources: US Federal Trade Commission, "That job offer text is probably a
+	// scam", April 2026,
+	// https://consumer.ftc.gov/consumer-alerts/2026/04/job-offer-text-probably-scam
+	// — and "How to spot and avoid task scams", August 2025,
+	// https://consumer.ftc.gov/consumer-alerts/2025/08/how-spot-avoid-task-scams.
+	// Both checked 2026-09-18. The first gives the flat rule this pattern rests
+	// on: real employers do not approach strangers by text.
+	//
+	// The exclusion clause is doing real work. People do get legitimate texts
+	// about jobs they applied for, and a recruiter following up on an actual
+	// application is the nearest genuine message to this shape.
+	{
+		id: "job-or-earnings-offer",
+		severity: "warning",
+		description:
+			"Offers the reader work, a job, or a way to earn money that they did not ask " +
+			"about — particularly one quoting a daily, weekly or per-task rate, describing the " +
+			"work as easy, flexible or requiring no experience, or asking them to reply or " +
+			"follow a link to apply. A message from a named employer or recruiter about a job " +
+			"the reader has actually applied for is NOT this pattern.",
+		reason:
+			"This message offers you work or a way to earn money that you did not go looking " +
+			"for. Real employers do not hire strangers by text message. Offers like this are one " +
+			"of the fastest-growing scams there is: the first small payment arrives to prove the " +
+			"work is real, and then you are asked to put your own money in to unlock the rest.",
 	},
 	{
 		id: "verify-account-pretext",
@@ -173,11 +216,15 @@ export const NARRATIVE_PATTERNS: readonly NarrativePattern[] = [
 			"An unsolicited message from someone who does not appear to know who they are " +
 			"writing to: asking whether the reader is some other person, saying they have the " +
 			"wrong number, or striking up a friendly conversation with a stranger for no stated " +
-			"reason. Three things that are NOT this pattern: a message naming a real delivery, " +
+			"reason. Four things that are NOT this pattern: a message naming a real delivery, " +
 			"order, appointment or booking the reader could be expecting; a message from " +
-			"somebody who identifies themselves and refers to actual shared business; and a " +
+			"somebody who identifies themselves and refers to actual shared business; a " +
 			"message whose point is that a family member has a new number, which is " +
-			"`new-number-pretext`.",
+			"`new-number-pretext`; and a warm greeting between people who already know each " +
+			"other and have not spoken in a while — \"hey stranger\", \"long time no see\", " +
+			"\"it's been ages\". In that greeting the word \"stranger\" means the opposite of " +
+			"what it says, and it is how old friends open a conversation. Never report this " +
+			"pattern on the strength of that word alone.",
 		reason:
 			"This message looks like it came to you by mistake, or is from somebody who does " +
 			"not seem to know who you are. Messages like this are sent to thousands of numbers " +

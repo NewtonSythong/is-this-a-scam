@@ -23,10 +23,11 @@
  *    Artifact Check has nothing to say — invisible until it matters.
  */
 
-import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 
 import Anthropic from "@anthropic-ai/sdk";
-import { NARRATIVE_MODEL, anthropicNarrativeCheck } from "../src/narrative/anthropic";
+import { NARRATIVE_MODEL, anthropicNarrativeCheck, systemPrompt } from "../src/narrative/anthropic";
 import { CORPUS } from "./corpus";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
@@ -51,6 +52,53 @@ const MODEL = modelArg === -1 ? NARRATIVE_MODEL : (process.argv[modelArg + 1] ??
 console.log(`Model: ${MODEL}${MODEL === NARRATIVE_MODEL ? "  (the model the app runs on)" : "  (NOT the model the app runs on)"}`);
 console.log("");
 
+/**
+ * Answers already bought, so a run that dies at message seventy resumes instead
+ * of paying for the first sixty-nine again. Same design as `bench/run.ts`: keyed
+ * on the message together with a fingerprint of the model and the system prompt,
+ * so editing the pattern catalogue correctly invalidates every entry. Delete the
+ * file to force a clean run.
+ *
+ * Only the fired pattern ids are kept, because they are the whole of what this
+ * benchmark reports.
+ */
+const CACHE = "bench/.narrative-cache.jsonl";
+
+const fingerprint = createHash("sha256")
+	.update(`${MODEL} ${systemPrompt()}`)
+	.digest("hex")
+	.slice(0, 16);
+const keyFor = (message: string): string =>
+	createHash("sha256").update(`${fingerprint} ${message}`).digest("hex").slice(0, 24);
+
+const cached = new Map<string, string[]>();
+if (existsSync(CACHE)) {
+	for (const line of readFileSync(CACHE, "utf8").split("\n")) {
+		if (line.trim() === "") continue;
+		try {
+			const row = JSON.parse(line) as { key: string; fired: string[] };
+			cached.set(row.key, row.fired);
+		} catch {
+			// A half-written final line after a hard kill. Everything before it is
+			// still good, so read what parses and carry on.
+		}
+	}
+}
+
+// Said before anything is spent, not after, so a run can be abandoned while it
+// is still free. Measured on 2026-09-21: $0.62 for 41 messages on
+// `claude-opus-5` at this catalogue, so about 1.5 cents each.
+const remaining = CORPUS.filter((item) => !cached.has(keyFor(item.message))).length;
+console.log(`Corpus     ${CORPUS.length} messages`);
+console.log(`Cached     ${CORPUS.length - remaining} already answered and paid for`);
+console.log(`To buy     ${remaining}`);
+console.log(
+	remaining > 0
+		? `Very roughly $${((remaining * 0.62) / 41).toFixed(2)} — order of magnitude only`
+		: "Nothing to buy. Reporting from cache.",
+);
+console.log("");
+
 const narrative = anthropicNarrativeCheck(new Anthropic(), MODEL);
 
 let scamsReached = 0;
@@ -58,9 +106,11 @@ let scamsTotal = 0;
 let falseAlarms = 0;
 
 for (const item of CORPUS) {
-	let signals: Awaited<ReturnType<typeof narrative>>;
+	const key = keyFor(item.message);
+	const already = cached.get(key);
+	let signals: Awaited<ReturnType<typeof narrative>> = [];
 	try {
-		signals = await narrative(item.message);
+		if (already === undefined) signals = await narrative(item.message);
 	} catch (error) {
 		// A call that never happened looks exactly like a message the engine
 		// found nothing in — which on the legitimate half would read as a clean
@@ -72,7 +122,10 @@ for (const item of CORPUS) {
 		console.error("a legitimate message the engine stayed quiet on.");
 		process.exit(1);
 	}
-	const fired = signals.map((signal) => signal.kind);
+	const fired = already ?? signals.map((signal) => signal.kind);
+	// Written the moment it arrives, not at the end, because the failure this
+	// guards against is the run dying halfway with the credit already spent.
+	if (already === undefined) appendFileSync(CACHE, `${JSON.stringify({ key, id: item.id, fired })}\n`);
 	const spent = item.developedAgainst === undefined ? "" : " (no longer held out)";
 
 	if (item.kind === "scam") {

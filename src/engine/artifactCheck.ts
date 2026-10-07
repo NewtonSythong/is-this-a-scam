@@ -42,8 +42,9 @@ export function signalsForLinks(
 	links: readonly Link[],
 	prose: string,
 	organisations: readonly KnownOrganisation[],
+	established: ReadonlySet<string> = new Set(),
 ): Signal[] {
-	return links.flatMap((link) => worstSignalFor(link, prose, organisations));
+	return links.flatMap((link) => worstSignalFor(link, prose, organisations, established));
 }
 
 /** The Message with its links removed. See `claimsToBeFrom` for why this matters. */
@@ -58,11 +59,19 @@ export function proseOf(message: string, links: readonly Link[]): string {
  * reading two overlapping sentences about one link has been given more to
  * process at the exact moment they are least able to. So the rules are ordered
  * by how much they establish, and the first that fires wins.
+ *
+ * `established` holds the hosts whose domain has been registered long enough
+ * that impersonation is not a plausible reading — see `checkAsync`, which is the
+ * only caller that can fill it, and `src/lookups/domainAge.ts` for why. Both
+ * impersonation rules are skipped for those hosts and nothing else is: a link
+ * can be twenty years old and still be a shortener hiding where it goes, and
+ * `bit.ly` itself is older than most banks' web presences.
  */
 function worstSignalFor(
 	link: Link,
 	prose: string,
 	organisations: readonly KnownOrganisation[],
+	established: ReadonlySet<string>,
 ): Signal[] {
 	// A link that genuinely belongs to a Known Organisation ends the matter,
 	// whatever else might be said about it.
@@ -70,11 +79,13 @@ function worstSignalFor(
 		return [];
 	}
 
-	const claimed = organisations.find((organisation) => claimsToBeFrom(prose, organisation));
-	if (claimed) return [linkNotOwnedByClaimedOrg(claimed, link)];
+	if (!established.has(link.host)) {
+		const claimed = organisations.find((organisation) => claimsToBeFrom(prose, organisation));
+		if (claimed) return [linkNotOwnedByClaimedOrg(claimed, link)];
 
-	const imitated = organisations.find((organisation) => imitates(link.host, organisation));
-	if (imitated) return [lookalikeLink(imitated, link)];
+		const imitated = organisations.find((organisation) => imitates(link.host, organisation));
+		if (imitated) return [lookalikeLink(imitated, link)];
+	}
 
 	if (LINK_SHORTENERS.has(link.host)) return [shortenedLink(link)];
 	if (hasThrowawayEnding(link.host)) return [throwawayEnding(link)];

@@ -1,11 +1,18 @@
 # Benchmark — both engines
 
 > **This page is a stale run and is kept only because nothing has replaced it.**
-> It reports 21 messages. The corpus is now 23: `courier-genuine-at-the-door`
+> It reports 21 messages. The corpus is now 26. `courier-genuine-at-the-door`
 > and `tradesman-genuine-running-late` were added on 2026-09-09 to guard the
-> `wrong-number-opener` pattern, and neither has ever been through a both-engines
-> run. Both engines cost Anthropic credit per message, so this page is only as
-> current as the last time somebody paid for it.
+> `wrong-number-opener` pattern; `recruiter-genuine-followup`,
+> `friend-genuine-after-a-gap` and `retail-genuine-refund-receipt` were added on
+> 2026-09-18 to guard the patterns written that day. None of the five has ever
+> been through a both-engines run. Both engines cost Anthropic credit per
+> message, so this page is only as current as the last time somebody paid for it.
+>
+> One of those five matters more than this page does:
+> `friend-genuine-after-a-gap` produced the first false alarm this project has
+> ever measured, on a pattern that had been shipping for nine days. See
+> [`benchmark-method.md`](./benchmark-method.md).
 >
 > Two pages nearby are current. [`benchmark-offline.md`](./benchmark-offline.md)
 > is the deterministic half over all 23 and is free to regenerate.
