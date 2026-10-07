@@ -43,13 +43,14 @@ export async function checkAsync(
 		narrative === null ? [] : orNoSignals(narrative(message)),
 	]);
 
+	// Asked only of where links really go, after any redirect, because that is
+	// the host the impersonation rules will judge.
+	const effective = resolved.map((resolution) => resolution.effective);
+	const established = await establishedHosts(effective, lookups);
+
 	return verdictFrom(
 		[
-			...signalsForLinks(
-				resolved.map((resolution) => resolution.effective),
-				prose,
-				organisations,
-			),
+			...signalsForLinks(effective, prose, organisations, established),
 			...resolved.flatMap(hiddenDestinationSignal),
 			...links.filter((link) => dangerous.includes(link.raw)).map(knownDangerousSignal),
 			...paymentRailSignals(message),
@@ -58,6 +59,54 @@ export async function checkAsync(
 		organisations,
 		reporting,
 	);
+}
+
+/**
+ * How long a domain must have been registered before this app will stop calling
+ * a link to it impersonation.
+ *
+ * Two years, and the number is deliberately far larger than it needs to be. The
+ * industry convention for a *newly* registered domain is thirty days, and a
+ * phishing host is usually days old; the genuine vendor domains that our own
+ * rules libelled are 1,088, 7,463 and 11,067 days old. Anywhere between those
+ * two populations would separate them, so the threshold is put where being
+ * wrong is hardest rather than where the margin is largest — what is being
+ * suppressed is an accusation of forgery, and it should take real counter-
+ * evidence to suppress it, not a hair's breadth.
+ *
+ * It is not tuned and must not be. Nudging it while looking at the six messages
+ * that caught us would retire them as evidence, which is the corpus-spending
+ * error this project exists to name.
+ */
+const ESTABLISHED_AFTER_DAYS = 730;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The hosts old enough that the impersonation rules should stay quiet.
+ *
+ * Every failure mode here resolves to "not established", which leaves the rules
+ * exactly as they behaved before this lookup existed: an unreachable registry, a
+ * `.nz` domain with no RDAP service, a timeout and a rate limit all produce the
+ * same answer as a brand-new domain. That asymmetry is on purpose. The cost of
+ * wrongly staying quiet is a scam shown as `unclear`; the cost of wrongly
+ * suppressing is nothing at all, because the failure simply restores today's
+ * behaviour.
+ */
+async function establishedHosts(
+	links: readonly Link[],
+	lookups: LinkLookups,
+): Promise<ReadonlySet<string>> {
+	const cutoff = Date.now() - ESTABLISHED_AFTER_DAYS * DAY_MS;
+
+	const ages = await Promise.all(
+		links.map(async (link) => {
+			const since = await orNull(lookups.establishedSince(link));
+			return since !== null && since.getTime() <= cutoff ? link.host : null;
+		}),
+	);
+
+	return new Set(ages.filter((host): host is string => host !== null));
 }
 
 /**

@@ -20,6 +20,7 @@
     "bench:full:write": "tsx bench/run.ts --full --write",
     "bench:narrative": "tsx bench/narrative.ts",
     "bench:f2": "tsx bench/f2.ts",
+    "bench:domain-age": "tsx bench/domain-age.ts",
     "bench:imc25": "tsx bench/narrative-imc25.ts",
     "bench:imc25:dev": "tsx bench/narrative-imc25.ts --split dev",
     "bench:imc25:test": "tsx bench/narrative-imc25.ts --split test",

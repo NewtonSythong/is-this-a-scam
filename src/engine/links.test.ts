@@ -36,6 +36,20 @@ describe("extractLinks", () => {
 		expect(extractLinks("Email us at support@anz.co.nz")).toEqual([]);
 	});
 
+	// The local part of an address can match on its own: the digit stops the final
+	// label, so "Firstname." then "Lastname" reads as the host "firstname.lastname".
+	// The lookbehind cannot see the "@" that comes after it.
+	it("does not read the local part of an email address as a link", () => {
+		expect(extractLinks("Contact Firstname.Lastname2@example.com about it")).toEqual([]);
+		expect(extractLinks("Contact first.last@example.com about it")).toEqual([]);
+	});
+
+	it("still finds a real link beside an email address", () => {
+		expect(extractLinks("Mail first.last2@example.com or see https://asb.co.nz/help")).toEqual([
+			{ raw: "https://asb.co.nz/help", host: "asb.co.nz" },
+		]);
+	});
+
 	it("finds several links at once", () => {
 		expect(extractLinks("either bit.ly/3xYz or https://asb.co.nz/help")).toEqual([
 			{ raw: "bit.ly/3xYz", host: "bit.ly" },

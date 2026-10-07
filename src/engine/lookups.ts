@@ -23,10 +23,20 @@ export interface LinkLookups {
 	 * Returns the `raw` text of each flagged link.
 	 */
 	dangerous(links: readonly Link[]): Promise<readonly string[]>;
+
+	/**
+	 * When this link's domain was first registered, or `null` if that cannot be
+	 * established. `null` is the honest answer for `.nz` and for every other
+	 * registry with no RDAP service, and it must read as "unknown" rather than as
+	 * "new" — treating silence as suspicion is the mistake this lookup exists to
+	 * undo. See `src/lookups/domainAge.ts`.
+	 */
+	establishedSince(link: Link): Promise<Date | null>;
 }
 
 /** Lookups that find nothing. The offline Check, expressed as an async one. */
 export const NO_LOOKUPS: LinkLookups = {
 	expand: async () => null,
 	dangerous: async () => [],
+	establishedSince: async () => null,
 };
