@@ -1,7 +1,5 @@
 import type { Link } from "../domain/types";
 import type { LinkLookups } from "../engine/lookups";
-import { destinationPage } from "./destinationPage";
-import { rdapDomainAge } from "./domainAge";
 
 /** Injectable so both lookups can be tested without a network. */
 export type Fetch = typeof globalThis.fetch;
@@ -115,12 +113,10 @@ function hostOf(url: string): string | null {
 	}
 }
 
-/** Every lookup, wired to the real internet. */
+/** Both lookups, wired to the real internet. */
 export function liveLookups(apiKey: string, fetchImpl: Fetch = fetch): LinkLookups {
 	return {
 		expand: redirectFollower(fetchImpl),
 		dangerous: googleSafeBrowsing(apiKey, fetchImpl),
-		establishedSince: rdapDomainAge(fetchImpl),
-		destination: destinationPage(fetchImpl),
 	};
 }
